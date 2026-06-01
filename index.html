@@ -162,35 +162,48 @@ function openScanner(){
   document.getElementById("readerBox").style.display="block";
   if(scanning) return;
 
-  scanner = new Html5Qrcode("reader");
+  scanning = true;
 
-  scanner.start(
-    { facingMode:"environment" },
-    { 
-      fps: 30,              // ✅ Faster
-      qrbox: { width: 200, height: 200 }, // ✅ Bigger detection
-      aspectRatio: 1.0
-    },
-    qr => {
+  const codeReader = new ZXing.BrowserMultiFormatReader();
 
-      // ✅ HARD DUPLICATE STOP
-      if(scanLock || qr === lastScan) return;
+  let lastScan = "";
+  let lastTime = 0;
 
-      scanLock = true;
-      lastScan = qr;
+  codeReader.decodeFromVideoDevice(null, 'reader', (result, err) => {
 
-      // 🔥 CLEAN AD1 QR (remove //1, //5, //10 etc)
-      let cleanQR = qr.replace(/\/\/\d+$/,"");
+    if (result) {
 
+      let raw = result.getText();
+      let now = Date.now();
+
+      // 🚫 DUPLICATE BLOCK (STRONG)
+      if(raw === lastScan && (now - lastTime < 2000)){
+        return;
+      }
+
+      lastScan = raw;
+      lastTime = now;
+
+      // 🔥 CLEAN VALUE (REMOVE //1 //5 etc)
+      let cleanQR = raw
+        .trim()
+        .replace(/\s/g,"")
+        .replace(/\/\/\d+$/,"");
+
+      // 🔊 SOUND
       beep.currentTime = 0;
       beep.play();
 
-      fetch(API_URL+"?uid="+encodeURIComponent(cleanQR))
-      .then(r=>r.json())
-      .then(data=>{
+      // 🛑 TEMP STOP (IMPORTANT)
+      codeReader.reset();
+
+      fetch(API_URL + "?uid=" + encodeURIComponent(cleanQR))
+      .then(r => r.json())
+      .then(data => {
 
         if(!data.variant){
-          alert("❌ Not Found - "+cleanQR);
+          alert("❌ Not Found - " + cleanQR);
+          restartScanner();
           return;
         }
 
@@ -205,28 +218,34 @@ function openScanner(){
         }
 
         render();
+
+        // ✅ RESTART AFTER DELAY
+        setTimeout(()=>{
+          restartScanner();
+        }, 1000);
+
+      })
+      .catch(()=>{
+        restartScanner();
       });
-
-      // ✅ SUPER FAST RESET (no lag, no duplicate spam)
-      setTimeout(()=>{
-        scanLock = false;
-        lastScan = "";
-      }, 600);  // 🔥 fast reset
-
     }
-  );
 
-  scanning=true;
+  });
+
+  // 🔁 RESTART FUNCTION
+  function restartScanner(){
+    codeReader.decodeFromVideoDevice(null, 'reader', arguments.callee);
+  }
 }
-
 /* KEEP ALL YOUR FUNCTIONS SAME BELOW (NO CHANGE) */
 
 function closeScanner(){
-  if(scanner){
-    scanner.stop().then(()=>{
-      scanning=false;
-      readerBox.style.display="none";
-    });
+  document.getElementById("readerBox").style.display="none";
+  scanning = false;
+
+  let video = document.querySelector("#reader video");
+  if(video && video.srcObject){
+    video.srcObject.getTracks().forEach(t=>t.stop());
   }
 }
 
@@ -423,6 +442,7 @@ function submitData(){
 }
 
 </script>
+<script src="https://unpkg.com/@zxing/library@latest"></script>
 
 </body>
 </html>
