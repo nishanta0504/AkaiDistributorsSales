@@ -171,114 +171,105 @@ function openScanner(){
   const videoElement = document.getElementById("reader");
 
   const hints = new Map();
-  hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
-    ZXing.BarcodeFormat.CODE_128,
-    ZXing.BarcodeFormat.QR_CODE
-  ]);
-  hints.set(ZXing.DecodeHintType.TRY_HARDER, false);
+  hints.set(
+    ZXing.DecodeHintType.POSSIBLE_FORMATS,
+    [
+      ZXing.BarcodeFormat.CODE_128,
+      ZXing.BarcodeFormat.QR_CODE
+    ]
+  );
 
   codeReader = new ZXing.BrowserMultiFormatReader(hints);
 
   let lastScanLocal = "";
   let scanLockLocal = false;
 
-  // ✅ UNIVERSAL CAMERA HANDLING (ALL DEVICES SAFE)
-  codeReader.listVideoInputDevices()
-  .then((videoInputDevices) => {
-
-    let selectedDeviceId = videoInputDevices[0]?.deviceId;
-
-    // ✅ TRY TO PICK BACK CAMERA (MOBILE)
-    for (let device of videoInputDevices) {
-      const label = device.label.toLowerCase();
-
-      if (
-        label.includes("back") ||
-        label.includes("rear") ||
-        label.includes("environment")
-      ) {
-        selectedDeviceId = device.deviceId;
-        break;
-      }
+  const constraints = {
+    video: {
+      facingMode: { ideal: "environment" },
+      width: { ideal: 320 },
+      height: { ideal: 240 }
     }
+  };
 
-    // ✅ START SCANNER (SAFE CALL)
-    const constraints = {
-      video: {
-        deviceId: selectedDeviceId ? { exact: selectedDeviceId } : undefined,
-        width: { ideal: 640 },
-        height: { ideal: 480 },
-        facingMode: "environment"
-      }
-    };
+  codeReader.decodeFromConstraints(
+    constraints,
+    videoElement,
+    (result, err) => {
 
-codeReader.decodeFromConstraints(constraints, videoElement, (result, err) => {
+      if(result){
 
-        if (result) {
+        let raw = result.getText();
 
-          let raw = result.getText();
+        let cleanQR = raw
+          .trim()
+          .replace(/\s/g,"")
+          .replace(/\/\/(1|5|10)/g,"");
 
-          let cleanQR = raw
-            .trim()
-            .replace(/\s/g, "")
-            .replace(/\/\/(1|5|10)/g, "");
+        if(scanLockLocal) return;
 
-          // ✅ PREVENT DUPLICATE FAST SCAN
-          if (cleanQR === lastScanLocal || scanLockLocal) return;
+        scanLockLocal = true;
 
-          lastScanLocal = cleanQR;
-          scanLockLocal = true;
+        if(cleanQR === lastScanLocal){
+          scanLockLocal = false;
+          return;
+        }
 
-          // ✅ BEEP (SAFE)
-          try {
-            beep.currentTime = 0;
-            beep.play().catch(()=>{});
-          } catch(e){}
+        lastScanLocal = cleanQR;
 
-          fetch(API_URL + "?uid=" + encodeURIComponent(cleanQR))
-          .then(r => r.json())
-          .then(data => {
+        try{
+          beep.currentTime = 0;
+          beep.play().catch(()=>{});
+        }catch(e){}
 
-            if (!data.variant) {
-              alert("❌ Not Found - " + cleanQR);
-              scanLockLocal = false;
-              return;
-            }
+        fetch(API_URL + "?uid=" + encodeURIComponent(cleanQR))
+        .then(r=>r.json())
+        .then(data=>{
 
-            if (!items[data.variant]) {
-              items[data.variant] = {
-                variant: data.variant,
-                qty: 1,
-                mrp: Number(data.mrp) || 0
-              };
-            } else {
-              items[data.variant].qty++;
-            }
-
-            render();
+          if(!data.variant){
+            alert("❌ Not Found - " + cleanQR);
 
             setTimeout(()=>{
-               scanLock = false;
-            }, 600);
+              scanLockLocal = false;
+            },200);
 
-          })
-          .catch(() => {
+            return;
+          }
+
+          if(!items[data.variant]){
+            items[data.variant] = {
+              variant:data.variant,
+              qty:1,
+              mrp:Number(data.mrp) || 0
+            };
+          }else{
+            items[data.variant].qty++;
+          }
+
+          render();
+
+          setTimeout(()=>{
             scanLockLocal = false;
-          });
-        }
+          },200);
 
-        if (err && !(err instanceof ZXing.NotFoundException)) {
-          console.error(err);
-        }
+        })
+        .catch(()=>{
+
+          scanLockLocal = false;
+
+        });
+
       }
-    );
 
-  })
-  .catch(err => {
-    console.error("Camera Error:", err);
-    alert("❌ Camera permission required");
-  });
+      if(err && !(err instanceof ZXing.NotFoundException)){
+        console.error(err);
+      }
+
+    }
+  );
+
 }
+  
 /* KEEP ALL YOUR FUNCTIONS SAME BELOW (NO CHANGE) */
 
 function closeScanner(){
