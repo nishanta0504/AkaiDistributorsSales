@@ -34,6 +34,23 @@ button {
 
 #readerBox { display:none; position:relative; }
 #reader { width:220px; margin:auto; }
+#readerBox::after {
+  content: "";
+  position: absolute;
+  left: 10%;
+  width: 80%;
+  height: 2px;
+  background: red;
+  top: 50%;
+  animation: scanline 1.2s linear infinite;
+  z-index: 10;
+}
+
+@keyframes scanline {
+  0% { top: 20%; }
+  50% { top: 60%; }
+  100% { top: 20%; }
+}
 
 #closeScan {
   position:absolute;
@@ -170,7 +187,14 @@ function openScanner(){
 
   const videoElement = document.getElementById("reader");
 
-  codeReader = new ZXing.BrowserMultiFormatReader();
+  const hints = new Map();
+  hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
+    ZXing.BarcodeFormat.CODE_128,
+    ZXing.BarcodeFormat.QR_CODE
+  ]);
+  hints.set(ZXing.DecodeHintType.TRY_HARDER, false);
+
+  codeReader = new ZXing.BrowserMultiFormatReader(hints);
 
   let lastScanLocal = "";
   let scanLockLocal = false;
@@ -196,10 +220,16 @@ function openScanner(){
     }
 
     // ✅ START SCANNER (SAFE CALL)
-    codeReader.decodeFromVideoDevice(
-      selectedDeviceId,
-      videoElement,
-      (result, err) => {
+    const constraints = {
+      video: {
+        deviceId: selectedDeviceId ? { exact: selectedDeviceId } : undefined,
+        width: { ideal: 640 },
+        height: { ideal: 480 },
+        facingMode: "environment"
+      }
+    };
+
+codeReader.decodeFromConstraints(constraints, videoElement, (result, err) => {
 
         if (result) {
 
@@ -244,9 +274,9 @@ function openScanner(){
 
             render();
 
-            setTimeout(() => {
-              scanLockLocal = false;
-            }, 1200);
+            setTimeout(()=>{
+               scanLock = false;
+            }, 600);
 
           })
           .catch(() => {
