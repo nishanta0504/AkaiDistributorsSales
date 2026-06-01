@@ -133,6 +133,7 @@ let items = {};
 let scanner, scanning=false;
 let manualMode = false;
 let scanLock = false;
+let lastScan = "";   // ✅ NEW (prevent duplicate)
 
 const beep = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
 
@@ -156,7 +157,7 @@ function loadDealers(){
 }
 window.onload = loadDealers;
 
-/* SCANNER (UNCHANGED) */
+/* ✅ ULTRA FAST + AD1 FIXED SCANNER */
 function openScanner(){
   document.getElementById("readerBox").style.display="block";
   if(scanning) return;
@@ -165,21 +166,31 @@ function openScanner(){
 
   scanner.start(
     { facingMode:"environment" },
-    { fps:20, qrbox:180 },
+    { 
+      fps: 30,              // ✅ Faster
+      qrbox: { width: 200, height: 200 }, // ✅ Bigger detection
+      aspectRatio: 1.0
+    },
     qr => {
 
-      if(scanLock) return;
+      // ✅ HARD DUPLICATE STOP
+      if(scanLock || qr === lastScan) return;
+
       scanLock = true;
+      lastScan = qr;
+
+      // 🔥 CLEAN AD1 QR (remove //1, //5, //10 etc)
+      let cleanQR = qr.replace(/\/\/\d+$/,"");
 
       beep.currentTime = 0;
       beep.play();
 
-      fetch(API_URL+"?uid="+encodeURIComponent(qr))
+      fetch(API_URL+"?uid="+encodeURIComponent(cleanQR))
       .then(r=>r.json())
       .then(data=>{
 
         if(!data.variant){
-          alert("❌ Not Found - "+qr);
+          alert("❌ Not Found - "+cleanQR);
           return;
         }
 
@@ -196,7 +207,12 @@ function openScanner(){
         render();
       });
 
-      setTimeout(()=>scanLock=false,1500);
+      // ✅ SUPER FAST RESET (no lag, no duplicate spam)
+      setTimeout(()=>{
+        scanLock = false;
+        lastScan = "";
+      }, 600);  // 🔥 fast reset
+
     }
   );
 
@@ -268,7 +284,6 @@ function checkFields(){
     return false;
   }
 
-  /* ✅ ADDED */
   if(!photoData){
     alert("Capture Confirmation Photo");
     return false;
@@ -332,7 +347,6 @@ function download(){
 
   html+=`<tr><td><b>Total</b></td><td><b>${tq}</b></td><td><b>${tm}</b></td></tr></table>`;
 
-  /* ✅ ADDED PHOTO */
   html+=`<br><div style="text-align:center;"><img src="${photoData}" width="120"></div>`;
 
   bill.innerHTML=html;
@@ -352,7 +366,6 @@ function submitData(){
 
   if(!checkFields()) return;
 
-  // ✅ FIX: define BEFORE fetch
   const cleanItems = Object.values(items).map(i => ({
     variant: String(i.variant).trim(),
     qty: Number(i.qty) || 0
@@ -360,10 +373,6 @@ function submitData(){
 
   fetch(API_URL,{
     method:"POST",
-
-    // ❌ NO headers
-    // ❌ NO mode: no-cors
-
     body: new URLSearchParams({
       data: JSON.stringify({
         challan: String(challan.value).trim(),
@@ -390,7 +399,6 @@ function submitData(){
       throw new Error(data.message || "Server error");
     }
 
-    // ✅ KEEP YOUR EXISTING LOGIC
     let temp = {};
     (data.notMatched || []).forEach(i=>{
       temp[i.variant] = i;
@@ -413,7 +421,6 @@ function submitData(){
   });
 
 }
- 	
 
 </script>
 
