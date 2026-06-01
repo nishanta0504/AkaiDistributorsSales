@@ -191,11 +191,6 @@ function openScanner(){
     ]
   );
 
-  hints.set(
-    ZXing.DecodeHintType.TRY_HARDER,
-    true
-  );
-
   codeReader = new ZXing.BrowserMultiFormatReader(hints);
 
   let scanLockLocal = false;
@@ -207,8 +202,8 @@ function openScanner(){
       video:{
         facingMode:{ ideal:"environment" },
 
-        width:{ ideal:320 },
-        height:{ ideal:240 }
+        width:{ ideal:640 },
+        height:{ ideal:480 }
       }
     },
 
@@ -226,7 +221,7 @@ function openScanner(){
 
       if(
         cleanQR === lastScanLocal &&
-        Date.now() - lastScanTime < 1500
+        Date.now() - lastScanTime < 600
       ){
         return;
       }
@@ -251,7 +246,7 @@ function openScanner(){
 
           setTimeout(()=>{
             scanLockLocal = false;
-          },1000);
+          },300);
 
           return;
         }
@@ -287,7 +282,7 @@ function openScanner(){
 
 function closeScanner(){
 
-  document.getElementById("readerBox").style.display = "none";
+  document.getElementById("readerBox").style.display="none";
 
   scanning = false;
 
@@ -295,10 +290,13 @@ function closeScanner(){
     codeReader.reset();
   }
 
-  let video = document.getElementById("reader");
+  const reader = document.getElementById("reader");
 
-  if(video.srcObject){
-    video.srcObject.getTracks().forEach(t=>t.stop());
+  if(reader.srcObject){
+    reader.srcObject.getTracks().forEach(track=>{
+      track.stop();
+    });
+    reader.srcObject = null;
   }
 
 }
