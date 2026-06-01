@@ -2,7 +2,8 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  
+<script src="https://unpkg.com/@zxing/library@latest"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
@@ -158,25 +159,27 @@ function loadDealers(){
 window.onload = loadDealers;
 
 /* ✅ ULTRA FAST + AD1 FIXED SCANNER */
+let codeReader;
+
 function openScanner(){
   document.getElementById("readerBox").style.display="block";
-  if(scanning) return;
 
+  if(scanning) return;
   scanning = true;
 
-  const codeReader = new ZXing.BrowserMultiFormatReader();
+  codeReader = new ZXing.BrowserMultiFormatReader();
 
   let lastScan = "";
   let lastTime = 0;
 
   codeReader.decodeFromVideoDevice(null, 'reader', (result, err) => {
 
-    if (result) {
+    if(result){
 
       let raw = result.getText();
       let now = Date.now();
 
-      // 🚫 DUPLICATE BLOCK (STRONG)
+      // 🚫 BLOCK DUPLICATE
       if(raw === lastScan && (now - lastTime < 2000)){
         return;
       }
@@ -184,17 +187,16 @@ function openScanner(){
       lastScan = raw;
       lastTime = now;
 
-      // 🔥 CLEAN VALUE (REMOVE //1 //5 etc)
+      // 🔥 CLEAN VALUE
       let cleanQR = raw
         .trim()
         .replace(/\s/g,"")
         .replace(/\/\/\d+$/,"");
 
-      // 🔊 SOUND
       beep.currentTime = 0;
       beep.play();
 
-      // 🛑 TEMP STOP (IMPORTANT)
+      // 🛑 STOP TEMP
       codeReader.reset();
 
       fetch(API_URL + "?uid=" + encodeURIComponent(cleanQR))
@@ -219,10 +221,9 @@ function openScanner(){
 
         render();
 
-        // ✅ RESTART AFTER DELAY
         setTimeout(()=>{
           restartScanner();
-        }, 1000);
+        }, 800);
 
       })
       .catch(()=>{
@@ -232,6 +233,11 @@ function openScanner(){
 
   });
 
+  function restartScanner(){
+    if(!scanning) return;
+    codeReader.decodeFromVideoDevice(null, 'reader', (res, err) => {});
+  }
+}
   // 🔁 RESTART FUNCTION
   function restartScanner(){
     codeReader.decodeFromVideoDevice(null, 'reader', arguments.callee);
@@ -242,6 +248,10 @@ function openScanner(){
 function closeScanner(){
   document.getElementById("readerBox").style.display="none";
   scanning = false;
+
+  if(codeReader){
+    codeReader.reset();
+  }
 
   let video = document.querySelector("#reader video");
   if(video && video.srcObject){
@@ -442,7 +452,6 @@ function submitData(){
 }
 
 </script>
-<script src="https://unpkg.com/@zxing/library@latest"></script>
 
 </body>
 </html>
