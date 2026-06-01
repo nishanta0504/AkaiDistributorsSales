@@ -34,23 +34,6 @@ button {
 
 #readerBox { display:none; position:relative; }
 #reader { width:220px; margin:auto; }
-#readerBox::after {
-  content: "";
-  position: absolute;
-  left: 10%;
-  width: 80%;
-  height: 2px;
-  background: red;
-  top: 50%;
-  animation: scanline 1.2s linear infinite;
-  z-index: 10;
-}
-
-@keyframes scanline {
-  0% { top: 20%; }
-  50% { top: 60%; }
-  100% { top: 20%; }
-}
 
 #closeScan {
   position:absolute;
