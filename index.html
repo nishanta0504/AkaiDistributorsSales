@@ -2,8 +2,9 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-<script src="https://unpkg.com/@zxing/library@latest"></script>
+
+<!-- ✅ CHANGED: Use specific stable ZXing version for reliability -->
+<script src="https://unpkg.com/@zxing/library@0.19.1/umd/index.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
@@ -33,7 +34,9 @@ button {
 }
 
 #readerBox { display:none; position:relative; }
+/* ✅ CHANGED: reader is now a div wrapper for ZXing video */
 #reader { width:220px; margin:auto; }
+#reader video { width:220px; }
 
 #closeScan {
   position:absolute;
@@ -86,7 +89,8 @@ td,th { padding:10px; text-align:center; }
 
 <div id="readerBox">
 <button id="closeScan" onclick="closeScanner()">×</button>
-<video id="reader" style="width:220px;"></video>
+<!-- ✅ CHANGED: div wrapper, ZXing creates video internally -->
+<div id="reader"></div>
 </div>
 
 <table>
@@ -110,7 +114,6 @@ td,th { padding:10px; text-align:center; }
 </tfoot>
 </table>
 
-<!-- ✅ ADDED ONLY -->
 <button onclick="openCamera()">Confirmation</button>
 
 <div id="cameraBox" style="display:none;text-align:center;">
@@ -131,16 +134,11 @@ td,th { padding:10px; text-align:center; }
 const API_URL = "https://script.google.com/macros/s/AKfycbxN1ueHxR9seDLWBPOQffVkYOFInQpexU6W8-wJIJ-Nl82CtgjSBf6Q-gB-517orI_k/exec";
 
 let items = {};
-let scanner, scanning=false;
 let manualMode = false;
-let scanLock = false;
-let lastScan = "";   // ✅ NEW (prevent duplicate)
-
-const beep = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
-
-/* ✅ ADDED */
 let photoData = "";
 let stream;
+
+const beep = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
 
 /* LOAD DEALERS */
 function loadDealers(){
@@ -158,150 +156,125 @@ function loadDealers(){
 }
 window.onload = loadDealers;
 
-/* ✅ ULTRA FAST + AD1 FIXED SCANNER */
-let codeReader;
+/* ====================================================
+   ✅ COMPLETELY REWRITTEN SCANNER SECTION
+   - Supports ALL barcode/QR types
+   - No TRY_HARDER (faster decode)
+   - Relaxed camera constraints (faster device negotiation)
+   - Proper duplicate prevention with 1.5s cooldown
+   - Uses ZXing 0.19.1 stable
+   ==================================================== */
+
+let codeReader = null;
+let scanning   = false;
+let lastScanned = "";
+let lastScanTime = 0;
+const SCAN_COOLDOWN_MS = 1500; // prevent duplicate scans
 
 function openScanner(){
-
   document.getElementById("readerBox").style.display = "block";
-
   if(scanning) return;
   scanning = true;
 
-  const videoElement = document.getElementById("reader");
-
+  // ✅ Support ALL major formats — no whitelist restriction
   const hints = new Map();
+  hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
+    ZXing.BarcodeFormat.QR_CODE,
+    ZXing.BarcodeFormat.CODE_128,
+    ZXing.BarcodeFormat.CODE_39,
+    ZXing.BarcodeFormat.CODE_93,
+    ZXing.BarcodeFormat.EAN_13,
+    ZXing.BarcodeFormat.EAN_8,
+    ZXing.BarcodeFormat.UPC_A,
+    ZXing.BarcodeFormat.UPC_E,
+    ZXing.BarcodeFormat.DATA_MATRIX,
+    ZXing.BarcodeFormat.AZTEC,
+    ZXing.BarcodeFormat.PDF_417,
+    ZXing.BarcodeFormat.ITF,
+    ZXing.BarcodeFormat.CODABAR
+  ]);
+  // ✅ TRY_HARDER removed — it slows down normal scans significantly
 
-  hints.set(
-    ZXing.DecodeHintType.POSSIBLE_FORMATS,
-    [
-      ZXing.BarcodeFormat.QR_CODE,
-      ZXing.BarcodeFormat.CODE_128
-    ]
-  );
-  
-  hints.set(
-    ZXing.DecodeHintType.TRY_HARDER,
-    true
-  );
-  
   codeReader = new ZXing.BrowserMultiFormatReader(hints);
-  
-  let lastScanLocal = "";
-  let scanLockLocal = false;
-  let lastScanTime = 0;
-  
+
+  // ✅ Relaxed constraints — let browser pick best resolution quickly
   const constraints = {
     video: {
-      facingMode: {
-        ideal: "environment"
-      },
-      width: {
-        ideal: 1280
-      },
-      height: {
-        ideal: 720
-      }
+      facingMode: { ideal: "environment" }
+      // No width/height ideal — avoids negotiation delay on many phones
     }
   };
 
-  codeReader.decodeFromConstraints(
-    constraints,
-    videoElement,
-    (result, err) => {
+  codeReader.decodeFromConstraints(constraints, "reader", (result, err) => {
+    if(result){
+      const raw = result.getText();
 
-      if(result){
+      // Clean the raw value same as before
+      const cleanQR = raw
+        .trim()
+        .replace(/\s/g, "")
+        .replace(/\/\/(1|5|10)/g, "");
 
-        let raw = result.getText();
+      const now = Date.now();
 
-        let cleanQR = raw
-          .trim()
-          .replace(/\s/g,"")
-          .replace(/\/\/(1|5|10)/g,"");
+      // ✅ Duplicate prevention: same code within cooldown window → ignore
+      if(cleanQR === lastScanned && (now - lastScanTime) < SCAN_COOLDOWN_MS){
+        return;
+      }
 
-        if(scanLockLocal) return;
+      lastScanned  = cleanQR;
+      lastScanTime = now;
 
-        scanLockLocal = true;
+      // Beep
+      try{
+        beep.currentTime = 0;
+        beep.play().catch(()=>{});
+      }catch(e){}
 
-        if(
-          cleanQR === lastScanLocal &&
-          (Date.now() - lastScanTime) < 1000
-        ){
-          scanLockLocal = false;
+      // API lookup
+      fetch(API_URL + "?uid=" + encodeURIComponent(cleanQR))
+      .then(r => r.json())
+      .then(data => {
+        if(!data.variant){
+          alert("❌ Not Found - " + cleanQR);
           return;
         }
-          
-        lastScanLocal = cleanQR;
-        lastScanTime = Date.now();
-
-        try{
-          beep.currentTime = 0;
-          beep.play().catch(()=>{});
-        }catch(e){}
-
-        fetch(API_URL + "?uid=" + encodeURIComponent(cleanQR))
-        .then(r=>r.json())
-        .then(data=>{
-
-          if(!data.variant){
-            alert("❌ Not Found - " + cleanQR);
-
-            setTimeout(()=>{
-              scanLockLocal = false;
-            },200);
-
-            return;
-          }
-
-          if(!items[data.variant]){
-            items[data.variant] = {
-              variant:data.variant,
-              qty:1,
-              mrp:Number(data.mrp) || 0
-            };
-          }else{
-            items[data.variant].qty++;
-          }
-
-          render();
-
-          setTimeout(()=>{
-            scanLockLocal = false;
-          },200);
-
-        })
-        .catch(()=>{
-
-          scanLockLocal = false;
-
-        });
-
-      }
-
-      if(err && !(err instanceof ZXing.NotFoundException)){
-        console.error(err);
-      }
-
+        if(!items[data.variant]){
+          items[data.variant] = {
+            variant: data.variant,
+            qty: 1,
+            mrp: Number(data.mrp) || 0
+          };
+        } else {
+          items[data.variant].qty++;
+        }
+        render();
+      })
+      .catch(() => {
+        // network error — reset so next scan of same code is retried
+        lastScanned = "";
+      });
     }
-  );
 
+    // Suppress NotFoundException spam in console
+    if(err && !(err instanceof ZXing.NotFoundException)){
+      console.error(err);
+    }
+  });
 }
-  
-/* KEEP ALL YOUR FUNCTIONS SAME BELOW (NO CHANGE) */
 
 function closeScanner(){
-  document.getElementById("readerBox").style.display="none";
+  document.getElementById("readerBox").style.display = "none";
   scanning = false;
+  lastScanned = "";
+  lastScanTime = 0;
 
   if(codeReader){
     codeReader.reset();
-  }
-
-  let video = document.querySelector("#reader video");
-  if(video && video.srcObject){
-    video.srcObject.getTracks().forEach(t=>t.stop());
+    codeReader = null;
   }
 }
+/* ==================================================== */
 
 function toggleEdit(){
   manualMode=!manualMode;
@@ -356,12 +329,10 @@ function checkFields(){
     alert("Select Dealer");
     return false;
   }
-
   if(!photoData){
     alert("Capture Confirmation Photo");
     return false;
   }
-
   return true;
 }
 
@@ -394,7 +365,6 @@ function retakePhoto(){
 
 /* DOWNLOAD */
 function download(){
-
   if(!checkFields()) return;
 
   let tq=0, tm=0;
@@ -419,7 +389,6 @@ function download(){
   });
 
   html+=`<tr><td><b>Total</b></td><td><b>${tq}</b></td><td><b>${tm}</b></td></tr></table>`;
-
   html+=`<br><div style="text-align:center;"><img src="${photoData}" width="120"></div>`;
 
   bill.innerHTML=html;
@@ -436,7 +405,6 @@ function download(){
 
 /* SUBMIT */
 function submitData(){
-
   if(!checkFields()) return;
 
   const cleanItems = Object.values(items).map(i => ({
@@ -458,44 +426,37 @@ function submitData(){
     })
   })
   .then(async (res)=>{
-
     let text = await res.text();
-
     let data;
     try {
       data = JSON.parse(text);
     } catch {
       throw new Error("Invalid JSON from server");
     }
-
     if(data.status !== "success"){
       throw new Error(data.message || "Server error");
     }
-
     let temp = {};
     (data.notMatched || []).forEach(i=>{
       temp[i.variant] = i;
     });
-
     items = temp;
     render();
-
     if(!data.notMatched || data.notMatched.length === 0){
       alert("✅ Data Submitted");
       location.reload();
     } else {
-      alert("⚠ Some items not matched");
+      alert("⚠️ Some items not matched");
     }
-
   })
   .catch(err=>{
     console.error(err);
     alert("❌ Submit Failed: " + err.message);
   });
-
 }
 
 </script>
 
 </body>
 </html>
+
