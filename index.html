@@ -206,7 +206,9 @@ function openScanner(){
 
       let cleanQR = result
         .getText()
-        .trim();
+        .trim()
+        .replace(/\s/g,"")
+        .replace(/\/\/(1|5|10)/g,"");
   
       if(
         cleanQR === lastScanLocal &&
