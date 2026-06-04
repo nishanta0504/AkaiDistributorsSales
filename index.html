@@ -160,7 +160,7 @@ function loadDealers(){
 window.onload = loadDealers;
 
 /* ✅ ULTRA FAST + AD1 FIXED SCANNER */
-let codeReader;
+let htmlScanner;
 
 function openScanner(){
 
@@ -169,80 +169,43 @@ function openScanner(){
   if(scanning) return;
   scanning = true;
 
-  const videoElement = document.getElementById("reader");
+  const readerDiv = document.getElementById("reader");
+  readerDiv.innerHTML = "";
 
-  const hints = new Map();
+  htmlScanner = new Html5Qrcode("reader");
 
-  hints.set(
-    ZXing.DecodeHintType.POSSIBLE_FORMATS,
-    [
-      ZXing.BarcodeFormat.QR_CODE,
-      ZXing.BarcodeFormat.CODE_128,
-      ZXing.BarcodeFormat.DATA_MATRIX
-    ]
-  );
-
-  // add this line just below
-  hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
-
-  codeReader = new ZXing.BrowserMultiFormatReader(hints);
-
-  let scanLockLocal = false;
-
-  codeReader.decodeFromConstraints(
+  htmlScanner.start(
+    { facingMode: "environment" },
     {
-      video:{
-        facingMode:{ ideal:"environment" },
-
-        width: { ideal: 1280 },
-        height: { ideal: 720 },
-
-        frameRate: { ideal: 60, max: 60 },
-
-        advanced: [
-          { focusMode: "continuous" },
-          { exposureMode: "continuous" },
-          { whiteBalanceMode: "continuous" }
-        ]
-      }
+      fps: 30, // 🔥 stable + fast (not 60, avoids blur)
+      qrbox: { width: 180, height: 180 },
+      aspectRatio: 1.0
     },
 
-    videoElement,
+    (decodedText, decodedResult) => {
 
-    (result, err)=>{
+      let rawText = decodedText.trim();
 
-      if(!result) return;
-
-      let rawText = result.getText().trim();
-      let format = result.getBarcodeFormat();
+      let format = decodedResult.result.format.formatName;
 
       let cleanQR;
 
-      // ✅ APPLY REMOVE ONLY FOR CODE_128
-      if (format === ZXing.BarcodeFormat.CODE_128) {
+      // ✅ ONLY clean CODE_128
+      if (format === "CODE_128") {
         cleanQR = rawText.replace(/\/\/(1|5|10)/g, "");
       } else {
-        // ✅ KEEP QR / OTHER FORMATS EXACT
         cleanQR = rawText;
       }
 
       const now = Date.now();
 
-      if (cleanQR === lastScanLocal && (now - lastScanTime < 800)) {
+      // ✅ SUPER FAST duplicate prevention
+      if (cleanQR === lastScanLocal && (now - lastScanTime < 700)) {
         return;
       }
 
       lastScanLocal = cleanQR;
       lastScanTime = now;
-
-      if(scanLockLocal) return;
-
-      scanLockLocal = true;
-
-      // auto release lock fast (parallel to API)
-      setTimeout(()=>{
-        scanLockLocal = false;
-      },500);
 
       beep.currentTime = 0;
       beep.play().catch(()=>{});
@@ -252,7 +215,6 @@ function openScanner(){
       .then(data=>{
 
         if(!data.variant){
-
           alert("❌ Not Found - " + cleanQR);
           return;
         }
@@ -269,36 +231,26 @@ function openScanner(){
 
         render();
 
-      })
-      .catch(()=>{
-        scanLockLocal = false;
       });
 
+    },
+
+    (err) => {
+      // ignore scan errors (important for speed)
     }
 
   );
-
 }
-  
-/* KEEP ALL YOUR FUNCTIONS SAME BELOW (NO CHANGE) */
 
 function closeScanner(){
 
   document.getElementById("readerBox").style.display="none";
-
   scanning = false;
 
-  if(codeReader){
-    codeReader.reset();
-  }
-
-  const reader = document.getElementById("reader");
-
-  if(reader.srcObject){
-    reader.srcObject.getTracks().forEach(track=>{
-      track.stop();
-    });
-    reader.srcObject = null;
+  if(htmlScanner){
+    htmlScanner.stop().then(()=>{
+      htmlScanner.clear();
+    }).catch(()=>{});
   }
 
 }
