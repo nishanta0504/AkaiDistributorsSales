@@ -1,913 +1,499 @@
 <!DOCTYPE html>
-
 <html>
-
 <head>
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   
-
+<script src="https://unpkg.com/@zxing/library@latest"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-
-
 <style>
-
 body { font-family: Arial; background:#f4f6fb; padding:10px; }
-
 h2 { text-align:center; color:#1a237e; }
 
-
-
 .row { display:flex; gap:8px; }
-
 .row input { flex:1; }
 
-
-
 input, select {
-
   width:100%;
-
   padding:12px;
-
   margin:6px 0;
-
   font-size:16px;
-
 }
-
-
 
 button {
-
   width:100%;
-
   padding:10px;
-
   margin-top:6px;
-
   font-size:14px;
-
   border:none;
-
   border-radius:6px;
-
   background:#1a73e8;
-
   color:white;
-
 }
-
-
 
 #readerBox { display:none; position:relative; }
-
 #reader { width:180px; margin:auto; }
 
-
-
 #closeScan {
-
   position:absolute;
-
   right:5px;
-
   top:5px;
-
   background:red;
-
   color:white;
-
   border-radius:50%;
-
   width:30px;
-
   height:30px;
-
 }
-
-
 
 table {
-
   width:100%;
-
   margin-top:10px;
-
   background:white;
-
   border-collapse:collapse;
-
 }
-
-
 
 td,th { padding:10px; text-align:center; }
 
-
-
 .total { background:#e3f2fd; font-weight:bold; }
 
-
-
 #bill { display:none; background:white; padding:20px; }
-
 </style>
-
 </head>
-
-
 
 <body>
 
-
-
 <h2>AKAI DISTRIBUTORS</h2>
 
-
-
 <div class="row">
-
 <input id="challan" placeholder="Challan No">
-
 <input type="date" id="date">
-
 </div>
-
-
 
 <select id="dealer">
-
 <option value="">Select SO</option>
-
 <option>SAMARENDRA CHANDRA SARKA</option>
-
 <option>AJAY SINGHA</option>
-
 <option>SOMEN DAS</option>
-
 <option>CHANDAN DAS</option>
-
 </select>
 
-
-
 <input list="dealerList" id="dealerName" placeholder="Select Dealer">
-
 <datalist id="dealerList"></datalist>
 
-
-
 <button onclick="openScanner()">Scan QR</button>
-
 <button onclick="toggleEdit()">Manual Edit</button>
 
-
-
 <div id="readerBox">
-
 <button id="closeScan" onclick="closeScanner()">×</button>
-
-<div id="reader" style="width:180px; margin:auto;"></div>
-
+<video id="reader" style="width:180px;"></video>
 </div>
-
-
 
 <table>
-
 <thead>
-
 <tr>
-
 <th>Variant</th>
-
 <th>Qty</th>
-
 <th>MRP</th>
-
 <th id="editHead" style="display:none;">Action</th>
-
 </tr>
-
 </thead>
-
 <tbody id="tbody"></tbody>
 
-
-
 <tfoot>
-
 <tr class="total">
-
 <td>Total</td>
-
 <td id="tQty">0</td>
-
 <td id="tMrp">0</td>
-
 <td></td>
-
 </tr>
-
 </tfoot>
-
 </table>
 
-
-
 <!-- ✅ ADDED ONLY -->
-
 <button onclick="openCamera()">Confirmation</button>
 
-
-
 <div id="cameraBox" style="display:none;text-align:center;">
-
   <video id="video" width="150" height="120" autoplay></video><br>
-
   <button onclick="capturePhoto()">Click</button>
-
   <button onclick="retakePhoto()">Retake</button>
-
   <canvas id="canvas" width="150" height="120" style="display:none;"></canvas>
-
   <div id="preview"></div>
-
 </div>
 
-
-
 <button onclick="download()">Download</button>
-
 <button onclick="submitData()">Submit</button>
-
-
 
 <div id="bill"></div>
 
-
-
 <script>
-
-
 
 const API_URL = "https://script.google.com/macros/s/AKfycbxN1ueHxR9seDLWBPOQffVkYOFInQpexU6W8-wJIJ-Nl82CtgjSBf6Q-gB-517orI_k/exec";
 
-
-
 let items = {};
-
 let scanner, scanning=false;
-
 let manualMode = false;
-
 let scanLock = false;
-
-let lastScanLocal = "";
-
-let lastScanTime = 0;
-
-
+let lastScan = "";   // ✅ NEW (prevent duplicate)
 
 const beep = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
 
-
-
 /* ✅ ADDED */
-
 let photoData = "";
-
 let stream;
 
-
-
 /* LOAD DEALERS */
-
 function loadDealers(){
-
   fetch(API_URL + "?type=dealers")
-
   .then(res=>res.json())
-
   .then(data=>{
-
     let list = document.getElementById("dealerList");
-
     list.innerHTML="";
-
     data.forEach(d=>{
-
       let opt=document.createElement("option");
-
       opt.value=d;
-
       list.appendChild(opt);
-
     });
-
   });
-
 }
-
 window.onload = loadDealers;
 
-
-
 /* ✅ ULTRA FAST + AD1 FIXED SCANNER */
-
-let htmlScanner;
-
-
+let codeReader;
 
 function openScanner(){
 
-
-
   document.getElementById("readerBox").style.display = "block";
 
-
-
   if(scanning) return;
-
   scanning = true;
 
+  const videoElement = document.getElementById("reader");
 
+  const hints = new Map();
 
-  const readerDiv = document.getElementById("reader");
-
-  readerDiv.innerHTML = "";
-
-
-
-  htmlScanner = new Html5Qrcode("reader");
-
-
-
-  htmlScanner.start(
-
-  { facingMode: "environment" },
-
-  {
-
-    fps: 15, // 🔥 LOWER = better barcode detection
-
-    qrbox: { width: 250, height: 120 }, // 🔥 RECTANGLE (important for CODE128)
-
-    aspectRatio: 1.5,
-
-    disableFlip: false,
-
-    formatsToSupport: [
-
-      Html5QrcodeSupportedFormats.QR_CODE,
-
-      Html5QrcodeSupportedFormats.CODE_128
-
+  hints.set(
+    ZXing.DecodeHintType.POSSIBLE_FORMATS,
+    [
+      ZXing.BarcodeFormat.QR_CODE,
+      ZXing.BarcodeFormat.CODE_128,
+      ZXing.BarcodeFormat.CODE_39,
+      ZXing.BarcodeFormat.CODE_93,
+      ZXing.BarcodeFormat.EAN_13,
+      ZXing.BarcodeFormat.EAN_8,
+      ZXing.BarcodeFormat.UPC_A,
+      ZXing.BarcodeFormat.UPC_E,
+      ZXing.BarcodeFormat.ITF,
+      ZXing.BarcodeFormat.CODABAR,
+      ZXing.BarcodeFormat.DATA_MATRIX,
+      ZXing.BarcodeFormat.AZTEC,
+      ZXing.BarcodeFormat.PDF_417
     ]
+  );
 
-  },
+  codeReader = new ZXing.BrowserMultiFormatReader(hints);
 
+  let scanLockLocal = false;
+  let lastScanLocal = "";
+  let lastScanTime = 0;
 
+  codeReader.decodeFromConstraints(
+    {
+      video:{
+        facingMode:{ ideal:"environment" },
 
-    (decodedText, decodedResult) => {
-
-
-
-      let rawText = decodedText.trim();
-
-
-
-      let format = decodedResult.result.format.formatName;
-
-
-
-      let cleanQR;
-
-
-
-      // ✅ ONLY clean CODE_128
-
-      if (format === "CODE_128") {
-
-        cleanQR = rawText.replace(/\/\/(1|5|10)/g, "");
-
-      } else {
-
-        cleanQR = rawText;
-
+        width:{ ideal:640 },
+        height:{ ideal:480 }
       }
+    },
 
+    videoElement,
 
+    (result, err)=>{
 
-      const now = Date.now();
+      if(!result) return;
 
+      let cleanQR = result
+        .getText()
+        .trim()
+        .replace(/\s/g,"")
+        .replace(/\/\/(1|5|10)/g,"");
 
-
-      // ✅ SUPER FAST duplicate prevention
-
-      if (cleanQR === lastScanLocal && (now - lastScanTime < 700)) {
-
+      if(
+        cleanQR === lastScanLocal &&
+        Date.now() - lastScanTime < 600
+      ){
         return;
-
       }
 
+      if(scanLockLocal) return;
 
+      scanLockLocal = true;
 
       lastScanLocal = cleanQR;
-
-      lastScanTime = now;
-
-
+      lastScanTime = Date.now();
 
       beep.currentTime = 0;
-
       beep.play().catch(()=>{});
 
-
-
       fetch(API_URL + "?uid=" + encodeURIComponent(cleanQR))
-
       .then(r=>r.json())
-
       .then(data=>{
-
-
 
         if(!data.variant){
 
           alert("❌ Not Found - " + cleanQR);
 
+          setTimeout(()=>{
+            scanLockLocal = false;
+          },300);
+
           return;
-
         }
-
-
 
         if(!items[data.variant]){
-
           items[data.variant]={
-
             variant:data.variant,
-
             qty:1,
-
             mrp:Number(data.mrp)||0
-
           };
-
         }else{
-
           items[data.variant].qty++;
-
         }
-
-
 
         render();
 
+        setTimeout(()=>{
+          scanLockLocal = false;
+        },1000);
 
-
+      })
+      .catch(()=>{
+        scanLockLocal = false;
       });
 
-
-
-    },
-
-
-
-    (err) => {
-
-      // ignore scan errors (important for speed)
-
     }
-
-
 
   );
 
 }
-
-
+  
+/* KEEP ALL YOUR FUNCTIONS SAME BELOW (NO CHANGE) */
 
 function closeScanner(){
-
-
 
   document.getElementById("readerBox").style.display="none";
 
   scanning = false;
 
-
-
-  if(htmlScanner){
-
-    htmlScanner.stop().then(()=>{
-
-      htmlScanner.clear();
-
-    }).catch(()=>{});
-
+  if(codeReader){
+    codeReader.reset();
   }
 
+  const reader = document.getElementById("reader");
 
+  if(reader.srcObject){
+    reader.srcObject.getTracks().forEach(track=>{
+      track.stop();
+    });
+    reader.srcObject = null;
+  }
 
 }
-
-
 
 function toggleEdit(){
-
   manualMode=!manualMode;
-
   editHead.style.display = manualMode ? "" : "none";
-
   render();
-
 }
-
-
 
 function render(){
-
   let html="";
-
   let tq=0, tm=0;
 
-
-
   Object.keys(items).forEach(key=>{
-
     let i=items[key];
-
     tq+=Number(i.qty)||0;
-
     tm+=(Number(i.qty)||0)*(Number(i.mrp)||0);
 
-
-
     html+=`<tr>
-
       <td>${manualMode ? `<input value="${i.variant}">` : i.variant}</td>
-
       <td>${manualMode ? `<input type="number" value="${i.qty}" onchange="items['${key}'].qty=Number(this.value);render()">` : i.qty}</td>
-
       <td>${manualMode ? `<input type="number" value="${i.mrp}" onchange="items['${key}'].mrp=Number(this.value);render()">` : i.mrp}</td>
-
       ${manualMode ? `<td><button onclick="removeItem('${key}')">➖</button></td>` : `<td></td>`}
-
     </tr>`;
-
   });
-
-
 
   if(manualMode){
-
     html+=`<tr><td colspan="4"><button onclick="addItem()">➕ Add Item</button></td></tr>`;
-
   }
-
-
 
   tbody.innerHTML=html;
-
   tQty.innerText=tq;
-
   tMrp.innerText=tm;
-
 }
-
-
 
 function addItem(){
-
   let name=prompt("Enter Variant");
-
   if(!name) return;
-
   items[name]={variant:name,qty:1,mrp:0};
-
   render();
-
 }
-
-
 
 function removeItem(k){
-
   delete items[k];
-
   render();
-
 }
-
-
 
 function checkFields(){
-
   if(!challan.value || !dealer.value || !date.value){
-
     alert("Enter Challan, SO & Date");
-
     return false;
-
   }
-
   if(!dealerName.value){
-
     alert("Select Dealer");
-
     return false;
-
   }
-
-
 
   if(!photoData){
-
     alert("Capture Confirmation Photo");
-
     return false;
-
   }
 
-
-
   return true;
-
 }
-
-
 
 /* CAMERA */
-
 function openCamera(){
-
   navigator.mediaDevices.getUserMedia({video:true})
-
   .then(s=>{
-
     stream=s;
-
     document.getElementById("cameraBox").style.display="block";
-
     document.getElementById("video").srcObject=s;
-
   });
-
 }
-
-
 
 function capturePhoto(){
-
   let ctx=canvas.getContext("2d");
-
   ctx.drawImage(video,0,0,150,120);
-
   photoData=canvas.toDataURL("image/jpeg");
 
-
-
   stream.getTracks().forEach(t=>t.stop());
-
   video.srcObject=null;
 
-
-
   preview.innerHTML=`<img src="${photoData}" width="120">`;
-
 }
-
-
 
 function retakePhoto(){
-
   photoData="";
-
   preview.innerHTML="";
-
   openCamera();
-
 }
 
-
-
 /* DOWNLOAD */
-
 function download(){
-
-
 
   if(!checkFields()) return;
 
-
-
   let tq=0, tm=0;
-
   let now = new Date();
-
   let time = now.toLocaleTimeString("en-IN");
 
-
-
   let html=`
-
   <h2 style="text-align:center;">AKAI DISTRIBUTORS</h2>
-
   <p><b>SO:</b> ${dealer.value}</p>
-
   <p><b>Dealer:</b> ${dealerName.value}</p>
-
   <p><b>Date:</b> ${date.value}</p>
-
   <p><b>Time:</b> ${time}</p>
-
   <hr>
-
   <table border="1" style="width:100%;border-collapse:collapse;">
-
   <tr><th>Variant</th><th>Qty</th><th>MRP</th></tr>
-
   `;
 
-
-
   Object.values(items).forEach(i=>{
-
     tq+=i.qty;
-
     tm+=i.qty*i.mrp;
-
     html+=`<tr><td>${i.variant}</td><td>${i.qty}</td><td>${i.mrp}</td></tr>`;
-
   });
-
-
 
   html+=`<tr><td><b>Total</b></td><td><b>${tq}</b></td><td><b>${tm}</b></td></tr></table>`;
 
-
-
   html+=`<br><div style="text-align:center;"><img src="${photoData}" width="120"></div>`;
 
-
-
   bill.innerHTML=html;
-
   bill.style.display="block";
 
-
-
   html2canvas(bill).then(canvas=>{
-
     let a=document.createElement("a");
-
     a.href=canvas.toDataURL();
-
     a.download="Bill.jpg";
-
     a.click();
-
     bill.style.display="none";
-
   });
-
 }
 
-
-
 /* SUBMIT */
-
 function submitData(){
-
-
 
   if(!checkFields()) return;
 
-
-
   const cleanItems = Object.values(items).map(i => ({
-
     variant: String(i.variant).trim(),
-
     qty: Number(i.qty) || 0
-
   }));
 
-
-
   fetch(API_URL,{
-
     method:"POST",
-
     body: new URLSearchParams({
-
       data: JSON.stringify({
-
         challan: String(challan.value).trim(),
-
         so: String(dealer.value).trim(),
-
         dealer: dealerName.value,
-
         date: date.value,
-
         items: cleanItems,
-
         photo: photoData
-
       })
-
     })
-
   })
-
   .then(async (res)=>{
-
-
 
     let text = await res.text();
 
-
-
     let data;
-
     try {
-
       data = JSON.parse(text);
-
     } catch {
-
       throw new Error("Invalid JSON from server");
-
     }
-
-
 
     if(data.status !== "success"){
-
       throw new Error(data.message || "Server error");
-
     }
-
-
 
     let temp = {};
-
     (data.notMatched || []).forEach(i=>{
-
       temp[i.variant] = i;
-
     });
 
-
-
     items = temp;
-
     render();
 
-
-
     if(!data.notMatched || data.notMatched.length === 0){
-
       alert("✅ Data Submitted");
-
       location.reload();
-
     } else {
-
       alert("⚠ Some items not matched");
-
     }
 
-
-
   })
-
   .catch(err=>{
-
     console.error(err);
-
     alert("❌ Submit Failed: " + err.message);
-
   });
-
-
 
 }
 
-
-
 </script>
 
-
-
 </body>
-
 </html>
