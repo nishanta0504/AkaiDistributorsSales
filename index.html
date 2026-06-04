@@ -165,8 +165,20 @@ function openScanner(){
 
   scanner.start(
     { facingMode:"environment" },
-    { fps:20, qrbox:180 },
+    {
+      fps: 18,
+      qrbox: { width: 250, height: 120 }, // better for barcode
+      formatsToSupport: [
+        Html5QrcodeSupportedFormats.QR_CODE,
+        Html5QrcodeSupportedFormats.CODE_128
+      ]
+    }
     qr => {
+
+      // ✅ CLEAN QR / BARCODE DATA
+      let cleanQR = qr
+        .replace(/\/\/(1|5|10)$/,'')  // remove //1 //5 //10 ONLY at end
+        .trim();
 
       if(scanLock) return;
       scanLock = true;
@@ -174,12 +186,12 @@ function openScanner(){
       beep.currentTime = 0;
       beep.play();
 
-      fetch(API_URL+"?uid="+encodeURIComponent(qr))
+      fetch(API_URL+"?uid="+encodeURIComponent(cleanQR))
       .then(r=>r.json())
       .then(data=>{
 
         if(!data.variant){
-          alert("❌ Not Found - "+qr);
+          alert("❌ Not Found - "+cleanQR);
           return;
         }
 
