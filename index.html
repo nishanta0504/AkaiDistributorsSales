@@ -176,34 +176,39 @@ function openScanner(){
     ZXing.DecodeHintType.POSSIBLE_FORMATS,
     [
       ZXing.BarcodeFormat.QR_CODE,
-      ZXing.BarcodeFormat.CODE_128,
-      ZXing.BarcodeFormat.CODE_39,
-      ZXing.BarcodeFormat.CODE_93,
-      ZXing.BarcodeFormat.EAN_13,
-      ZXing.BarcodeFormat.EAN_8,
-      ZXing.BarcodeFormat.UPC_A,
-      ZXing.BarcodeFormat.UPC_E,
-      ZXing.BarcodeFormat.ITF,
-      ZXing.BarcodeFormat.CODABAR,
-      ZXing.BarcodeFormat.DATA_MATRIX,
-      ZXing.BarcodeFormat.AZTEC,
-      ZXing.BarcodeFormat.PDF_417
+      ZXing.BarcodeFormat.CODE_128
     ]
   );
+
+  // add this line just below
+  hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
 
   codeReader = new ZXing.BrowserMultiFormatReader(hints);
 
   let scanLockLocal = false;
-  let lastScanLocal = "";
-  let lastScanTime = 0;
+
+  if (
+    cleanQR === lastScanLocal &&
+    Date.now() - lastScanTime < 500
+  ){
+    return;
+  }
 
   codeReader.decodeFromConstraints(
     {
       video:{
         facingMode:{ ideal:"environment" },
 
-        width:{ ideal:640 },
-        height:{ ideal:480 }
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+
+        frameRate: { ideal: 60 },
+
+        advanced: [
+          { focusMode: "continuous" },
+          { exposureMode: "continuous" },
+          { whiteBalanceMode: "continuous" }
+        ]
       }
     },
 
@@ -229,6 +234,11 @@ function openScanner(){
       if(scanLockLocal) return;
 
       scanLockLocal = true;
+
+      // auto release lock fast (parallel to API)
+      setTimeout(()=>{
+        scanLockLocal = false;
+      },300);
 
       lastScanLocal = cleanQR;
       lastScanTime = Date.now();
