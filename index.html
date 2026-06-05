@@ -3,7 +3,7 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-<script src="https://unpkg.com/@zxing/library@latest"></script>
+<script src="https://unpkg.com/@zxing/library@0.20.0/umd/index.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
@@ -160,93 +160,101 @@ window.onload = loadDealers;
 /* ✅ ULTRA FAST + AD1 FIXED SCANNER */
 let codeReader;
 
-function openScanner(){
+function openScanner() {
   document.getElementById("readerBox").style.display = "block";
-  if(scanning) return;
+  if (scanning) return;
   scanning = true;
 
   const videoElement = document.getElementById("reader");
-  const hints = new Map();
-  hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
-    ZXing.BarcodeFormat.QR_CODE,
-    ZXing.BarcodeFormat.CODE_128,
-  ]);
-  hints.set(ZXing.DecodeHintType.TRY_HARDER, false); // faster scans
+  let scanLock = false;
+  let lastText = "";
+  let lastTime = 0;
 
-  codeReader = new ZXing.BrowserMultiFormatReader(hints, 200); // 200ms scan interval
+  // ── READER 1: QR only (fast, TRY_HARDER on for mobile angle tolerance)
+  const qrHints = new Map();
+  qrHints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [ZXing.BarcodeFormat.QR_CODE]);
+  qrHints.set(ZXing.DecodeHintType.TRY_HARDER, true);   // ← MUST be true for QR on mobile
+  const qrReader = new ZXing.BrowserQRCodeReader(qrHints); // ← dedicated QR reader, not Multi
 
-  let scanLockLocal = false;
-  let lastScanLocal = "";
-  let lastScanTime = 0;
+  // ── READER 2: Code128 only (separate reader, shared stream)
+  const c128Hints = new Map();
+  c128Hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [ZXing.BarcodeFormat.CODE_128]);
+  c128Hints.set(ZXing.DecodeHintType.TRY_HARDER, false); // fine for barcodes
+  const c128Reader = new ZXing.BrowserMultiFormatReader(c128Hints, 150);
 
-  codeReader.decodeFromConstraints(
-    {
-      video: {
-        facingMode: { ideal: "environment" },
-        width: { ideal: 640 },
-        height: { ideal: 480 }
-      }
-    },
-    videoElement,
-    (result, err) => {
-      if (!result) return;
+  codeReader = qrReader; // keep reference for closeScanner()
 
-      let cleanQR = result.getText().trim().replace(/\s/g,"").replace(/\/\/(1|5|10)/g,"");
-
-      const now = Date.now();
-      if (cleanQR === lastScanLocal && now - lastScanTime < 600) return;
-      if (scanLockLocal) return;
-
-      scanLockLocal = true;
-      lastScanLocal = cleanQR;
-      lastScanTime = now;
-
-      beep.currentTime = 0;
-      beep.play().catch(()=>{});
-
-      fetch(API_URL + "?uid=" + encodeURIComponent(cleanQR))
-        .then(r => r.json())
-        .then(data => {
-          if (!data.variant) {
-            alert("❌ Not Found - " + cleanQR);
-            return; // lock resets in finally
-          }
-          if (!items[data.variant]) {
-            items[data.variant] = { variant: data.variant, qty: 1, mrp: Number(data.mrp) || 0 };
-          } else {
-            items[data.variant].qty++;
-          }
-          render();
-        })
-        .catch(() => {}) // lock resets in finally
-        .finally(() => {
-          setTimeout(() => { scanLockLocal = false; }, 300); // ✅ ALWAYS resets, only 300ms
-        });
+  const constraints = {
+    video: {
+      facingMode: { ideal: "environment" },
+      width: { ideal: 1280 },   // ← higher res = faster QR decode (more pixels = clearer finder pattern)
+      height: { ideal: 720 }
     }
-  );
+  };
+
+  function handleResult(result) {
+    if (!result) return;
+
+    let cleanQR = result.getText().trim()
+      .replace(/\s/g, "")
+      .replace(/\/\/(1|5|10)/g, "");
+
+    const now = Date.now();
+    if (cleanQR === lastText && now - lastTime < 800) return;
+    if (scanLock) return;
+
+    scanLock = true;
+    lastText = cleanQR;
+    lastTime = now;
+
+    beep.currentTime = 0;
+    beep.play().catch(() => {});
+
+    fetch(API_URL + "?uid=" + encodeURIComponent(cleanQR))
+      .then(r => r.json())
+      .then(data => {
+        if (!data.variant) {
+          alert("❌ Not Found - " + cleanQR);
+          return;
+        }
+        if (!items[data.variant]) {
+          items[data.variant] = { variant: data.variant, qty: 1, mrp: Number(data.mrp) || 0 };
+        } else {
+          items[data.variant].qty++;
+        }
+        render();
+      })
+      .catch(() => {})
+      .finally(() => {
+        setTimeout(() => { scanLock = false; }, 400); // 400ms is enough, was 1000ms before
+      });
+  }
+
+  // Start QR reader first (gets camera permission + stream)
+  qrReader.decodeFromConstraints(constraints, videoElement, (result, err) => {
+    handleResult(result);
+  });
+
+  // Start Code128 reader on same video element (reuses stream, no second camera request)
+  c128Reader.decodeFromConstraints(constraints, videoElement, (result, err) => {
+    handleResult(result);
+  });
 }
   
 /* KEEP ALL YOUR FUNCTIONS SAME BELOW (NO CHANGE) */
 
-function closeScanner(){
-
-  document.getElementById("readerBox").style.display="none";
-
+function closeScanner() {
+  document.getElementById("readerBox").style.display = "none";
   scanning = false;
 
-  if(codeReader){
-    codeReader.reset();
-  }
+  if (codeReader) codeReader.reset();
 
+  // Stop video track
   const reader = document.getElementById("reader");
-
-  if(reader.srcObject){
-    reader.srcObject.getTracks().forEach(track=>{
-      track.stop();
-    });
+  if (reader.srcObject) {
+    reader.srcObject.getTracks().forEach(t => t.stop());
     reader.srcObject = null;
   }
-
 }
 
 function toggleEdit(){
