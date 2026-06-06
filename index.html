@@ -4,11 +4,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="UTF-8">
 <title>AKAI Distributors</title>
- 
+
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
- 
+
 <style>
 :root {
   --navy:    #0d1b3e;
@@ -27,16 +27,16 @@
   --radius:  14px;
   --radius-sm: 8px;
 }
- 
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
- 
+
 body {
   font-family: 'DM Sans', sans-serif;
   background: linear-gradient(135deg, #e8eeff 0%, #f4f7ff 60%, #fdf6e3 100%);
   min-height: 100vh;
   color: var(--text);
 }
- 
+
 /* ── HEADER ─────────────────────────────── */
 .header {
   background: linear-gradient(120deg, var(--navy) 0%, var(--navy2) 100%);
@@ -49,7 +49,7 @@ body {
   top: 0;
   z-index: 100;
 }
- 
+
 .header-logo {
   width: 44px; height: 44px;
   background: var(--accent);
@@ -61,7 +61,7 @@ body {
   letter-spacing: -1px;
   flex-shrink: 0;
 }
- 
+
 .header-text h1 {
   font-family: 'Syne', sans-serif;
   font-size: 18px; font-weight: 800;
@@ -74,7 +74,7 @@ body {
   font-weight: 400; letter-spacing: 0.8px;
   text-transform: uppercase;
 }
- 
+
 .header-badge {
   margin-left: auto;
   background: rgba(255,255,255,0.08);
@@ -86,10 +86,10 @@ body {
   font-weight: 500;
   white-space: nowrap;
 }
- 
+
 /* ── MAIN WRAPPER ──────────────────────── */
 .container { padding: 16px; max-width: 600px; margin: 0 auto; }
- 
+
 /* ── CARDS ──────────────────────────────── */
 .card {
   background: var(--white);
@@ -99,7 +99,7 @@ body {
   margin-bottom: 14px;
   border: 1px solid rgba(209,218,247,0.5);
 }
- 
+
 .card-title {
   font-family: 'Syne', sans-serif;
   font-size: 12px; font-weight: 700;
@@ -116,7 +116,7 @@ body {
   background: var(--blue);
   border-radius: 2px;
 }
- 
+
 /* ── FORM INPUTS ─────────────────────────── */
 .row { display: flex; gap: 10px; }
 .row .field { flex: 1; }
@@ -129,7 +129,7 @@ body {
   letter-spacing: 0.8px;
   margin-bottom: 4px;
 }
- 
+
 input[type="text"],
 input[type="date"],
 input[list],
@@ -157,11 +157,11 @@ select {
   background-position: right 12px center;
   padding-right: 32px;
 }
- 
+
 /* ── BUTTONS ─────────────────────────────── */
 .btn-row { display: flex; gap: 8px; margin-bottom: 6px; }
 .btn-row .btn { flex: 1; }
- 
+
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 7px;
   padding: 11px 16px;
@@ -175,49 +175,49 @@ select {
 }
 .btn:active { transform: scale(0.97); }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
- 
+
 .btn-primary {
   background: linear-gradient(135deg, var(--blue) 0%, var(--blue2) 100%);
   color: white;
   box-shadow: 0 3px 12px rgba(26,86,219,0.3);
 }
 .btn-primary:hover:not(:disabled) { box-shadow: 0 5px 16px rgba(26,86,219,0.4); }
- 
+
 .btn-accent {
   background: linear-gradient(135deg, var(--accent) 0%, #f97316 100%);
   color: var(--navy);
   box-shadow: 0 3px 12px rgba(245,158,11,0.28);
 }
 .btn-accent:hover:not(:disabled) { box-shadow: 0 5px 16px rgba(245,158,11,0.38); }
- 
+
 .btn-success {
   background: linear-gradient(135deg, #059669 0%, var(--green) 100%);
   color: white;
   box-shadow: 0 3px 12px rgba(16,185,129,0.28);
 }
 .btn-success:hover:not(:disabled) { box-shadow: 0 5px 16px rgba(16,185,129,0.38); }
- 
+
 .btn-outline {
   background: transparent;
   border: 1.5px solid var(--border);
   color: var(--text);
 }
 .btn-outline:hover:not(:disabled) { border-color: var(--blue2); color: var(--blue); background: #f0f4ff; }
- 
+
 .btn-danger {
   background: var(--red);
   color: white;
 }
- 
+
 .btn-sm {
   padding: 6px 10px;
   font-size: 12px;
   border-radius: 6px;
 }
- 
+
 /* Icon inside button */
 .btn svg { flex-shrink: 0; }
- 
+
 /* ── SCANNER ─────────────────────────────── */
 #readerBox {
   display: none;
@@ -229,7 +229,7 @@ select {
 }
 #reader { width: 100%; }
 #reader video { border-radius: var(--radius); }
- 
+
 .scanner-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 12px 16px 0;
@@ -250,7 +250,7 @@ select {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.4; transform: scale(0.8); }
 }
- 
+
 #closeScan {
   background: rgba(255,255,255,0.15);
   color: white;
@@ -263,7 +263,7 @@ select {
   transition: background 0.2s;
 }
 #closeScan:hover { background: var(--red); }
- 
+
 .scan-feedback {
   text-align: center;
   padding: 6px;
@@ -271,7 +271,7 @@ select {
   color: rgba(255,255,255,0.55);
   font-style: italic;
 }
- 
+
 /* ── TABLE ───────────────────────────────── */
 .table-wrap {
   overflow-x: auto;
@@ -304,7 +304,7 @@ td {
 }
 tbody tr:last-child td { border-bottom: none; }
 tbody tr:hover { background: #f8faff; }
- 
+
 .tfoot-row {
   background: linear-gradient(90deg, #dbeafe, #eff6ff);
 }
@@ -315,7 +315,7 @@ tbody tr:hover { background: #f8faff; }
   color: var(--navy);
   border-top: 2px solid var(--border);
 }
- 
+
 /* Table edit inputs */
 td input[type="number"], td input[type="text"] {
   width: 70px;
@@ -327,7 +327,7 @@ td input[type="number"], td input[type="text"] {
   text-align: center;
 }
 td input:focus { border-color: var(--blue2); outline: none; }
- 
+
 /* Item count badge */
 .item-badge {
   display: inline-flex;
@@ -340,7 +340,7 @@ td input:focus { border-color: var(--blue2); outline: none; }
   font-weight: 700;
   margin-left: 8px;
 }
- 
+
 /* empty state */
 .empty-state {
   text-align: center;
@@ -349,7 +349,7 @@ td input:focus { border-color: var(--blue2); outline: none; }
 }
 .empty-state svg { margin-bottom: 8px; opacity: 0.35; }
 .empty-state p { font-size: 13px; }
- 
+
 /* ── CAMERA ─────────────────────────────── */
 #cameraBox {
   display: none;
@@ -380,7 +380,7 @@ td input:focus { border-color: var(--blue2); outline: none; }
   max-width: 200px;
 }
 .cam-btns { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
- 
+
 /* ── PROCESSING OVERLAY ─────────────────── */
 #processingOverlay {
   display: none;
@@ -395,7 +395,7 @@ td input:focus { border-color: var(--blue2); outline: none; }
   gap: 16px;
 }
 #processingOverlay.active { display: flex; }
- 
+
 .spinner {
   width: 52px; height: 52px;
   border: 4px solid rgba(255,255,255,0.15);
@@ -404,7 +404,7 @@ td input:focus { border-color: var(--blue2); outline: none; }
   animation: spin 0.75s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
- 
+
 .processing-text {
   font-family: 'Syne', sans-serif;
   font-size: 16px; font-weight: 700;
@@ -413,7 +413,7 @@ td input:focus { border-color: var(--blue2); outline: none; }
 .processing-sub {
   font-size: 12px; color: rgba(255,255,255,0.55);
 }
- 
+
 /* ── TOAST NOTIFICATIONS ────────────────── */
 .toast-container {
   position: fixed;
@@ -435,12 +435,12 @@ td input:focus { border-color: var(--blue2); outline: none; }
 .toast.success { border-color: var(--green); }
 .toast.error   { border-color: var(--red); }
 .toast.warning { border-color: var(--accent); }
- 
+
 @keyframes slideIn {
   from { transform: translateX(110%); opacity: 0; }
   to   { transform: translateX(0);    opacity: 1; }
 }
- 
+
 /* ── SCAN FLASH ──────────────────────────── */
 .scan-flash {
   position: fixed; inset: 0;
@@ -451,7 +451,7 @@ td input:focus { border-color: var(--blue2); outline: none; }
   transition: opacity 0.05s;
 }
 .scan-flash.flash { opacity: 0.35; }
- 
+
 /* ── BILL (hidden, for capture) ─────────── */
 #bill {
   display: none;
@@ -460,15 +460,15 @@ td input:focus { border-color: var(--blue2); outline: none; }
   font-family: 'DM Sans', sans-serif;
   width: 600px;
 }
- 
+
 /* ── SCROLLBAR ───────────────────────────── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
- 
+
 /* ── DIVIDER ─────────────────────────────── */
 .divider { height: 1px; background: var(--border); margin: 10px 0; }
- 
+
 /* ── STATUS BAR ──────────────────────────── */
 .status-bar {
   display: flex; align-items: center; justify-content: space-between;
@@ -483,20 +483,20 @@ td input:focus { border-color: var(--blue2); outline: none; }
 </style>
 </head>
 <body>
- 
+
 <!-- PROCESSING OVERLAY -->
 <div id="processingOverlay">
   <div class="spinner"></div>
   <div class="processing-text">Submitting Data...</div>
   <div class="processing-sub">Please wait, do not close this page</div>
 </div>
- 
+
 <!-- SCAN FLASH -->
 <div class="scan-flash" id="scanFlash"></div>
- 
+
 <!-- TOAST CONTAINER -->
 <div class="toast-container" id="toastContainer"></div>
- 
+
 <!-- HEADER -->
 <div class="header">
   <div class="header-logo">A</div>
@@ -506,13 +506,13 @@ td input:focus { border-color: var(--blue2); outline: none; }
   </div>
   <div class="header-badge" id="headerDate"></div>
 </div>
- 
+
 <div class="container">
- 
+
   <!-- ORDER DETAILS CARD -->
   <div class="card">
     <div class="card-title">Order Details</div>
- 
+
     <div class="row">
       <div class="field">
         <label>Challan No.</label>
@@ -523,7 +523,7 @@ td input:focus { border-color: var(--blue2); outline: none; }
         <input type="date" id="date">
       </div>
     </div>
- 
+
     <div class="field">
       <label>Sales Officer (SO)</label>
       <select id="dealer">
@@ -534,18 +534,18 @@ td input:focus { border-color: var(--blue2); outline: none; }
         <option>CHANDAN DAS</option>
       </select>
     </div>
- 
+
     <div class="field">
       <label>Dealer Name</label>
       <input list="dealerList" id="dealerName" placeholder="Type to search dealer...">
       <datalist id="dealerList"></datalist>
     </div>
   </div>
- 
+
   <!-- SCAN CARD -->
   <div class="card">
     <div class="card-title">Scan &amp; Entry</div>
- 
+
     <div class="btn-row">
       <button class="btn btn-accent" onclick="openScanner()" id="scanBtn">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2"/><rect x="7" y="7" width="10" height="10" rx="1"/></svg>
@@ -556,7 +556,7 @@ td input:focus { border-color: var(--blue2); outline: none; }
         Manual Edit
       </button>
     </div>
- 
+
     <!-- SCANNER BOX -->
     <div id="readerBox">
       <div class="scanner-header">
@@ -570,7 +570,7 @@ td input:focus { border-color: var(--blue2); outline: none; }
       <div class="scan-feedback" id="scanFeedback">Point camera at QR code</div>
     </div>
   </div>
- 
+
   <!-- ITEMS TABLE CARD -->
   <div class="card">
     <div class="status-bar">
@@ -580,7 +580,7 @@ td input:focus { border-color: var(--blue2); outline: none; }
       </div>
       <div style="font-size:12px;color:var(--muted);">Total Qty: <b id="tQtyTop">0</b></div>
     </div>
- 
+
     <div class="table-wrap">
       <table>
         <thead>
@@ -612,16 +612,16 @@ td input:focus { border-color: var(--blue2); outline: none; }
       </table>
     </div>
   </div>
- 
+
   <!-- CONFIRMATION PHOTO CARD -->
   <div class="card">
     <div class="card-title">Confirmation Photo</div>
- 
+
     <button class="btn btn-outline" onclick="openCamera()" style="width:100%;margin-bottom:10px;">
       <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
       Open Camera
     </button>
- 
+
     <div id="cameraBox">
       <div class="cam-title">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="13" r="4"/><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/></svg>
@@ -636,7 +636,7 @@ td input:focus { border-color: var(--blue2); outline: none; }
       <div id="preview"></div>
     </div>
   </div>
- 
+
   <!-- SUBMIT CARD -->
   <div class="card">
     <button class="btn btn-success" style="width:100%;padding:14px;font-size:15px;" onclick="submitData()" id="submitBtn">
@@ -647,28 +647,28 @@ td input:focus { border-color: var(--blue2); outline: none; }
       Submitted items will download as image. Unmatched items stay on screen.
     </div>
   </div>
- 
+
 </div><!-- /container -->
- 
+
 <!-- BILL DIV (hidden, for html2canvas) -->
 <div id="bill"></div>
- 
+
 <script>
 // ──────────────────────────────────────────────────────────
 // CONFIG
 // ──────────────────────────────────────────────────────────
 const API_URL = "https://script.google.com/macros/s/AKfycbxN1ueHxR9seDLWBPOQffVkYOFInQpexU6W8-wJIJ-Nl82CtgjSBf6Q-gB-517orI_k/exec";
- 
+
 let items = {};
 let scanner = null, scanning = false;
 let manualMode = false;
 let scanLock = false;
 let photoData = "";
 let stream = null;
- 
+
 // Beep audio
 const beep = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
- 
+
 // ──────────────────────────────────────────────────────────
 // INIT
 // ──────────────────────────────────────────────────────────
@@ -679,7 +679,7 @@ window.onload = function() {
   document.getElementById("headerDate").textContent = today.toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" });
   loadDealers();
 };
- 
+
 // ──────────────────────────────────────────────────────────
 // LOAD DEALERS
 // ──────────────────────────────────────────────────────────
@@ -697,7 +697,7 @@ function loadDealers() {
     })
     .catch(() => {}); // silent fail
 }
- 
+
 // ──────────────────────────────────────────────────────────
 // TOAST NOTIFICATIONS
 // ──────────────────────────────────────────────────────────
@@ -710,14 +710,14 @@ function showToast(msg, type="info", duration=3000) {
   container.appendChild(toast);
   setTimeout(() => { toast.style.opacity = "0"; toast.style.transition = "opacity 0.3s"; setTimeout(()=>toast.remove(), 300); }, duration);
 }
- 
+
 // ──────────────────────────────────────────────────────────
 // SCANNER
 // ──────────────────────────────────────────────────────────
 function openScanner() {
   document.getElementById("readerBox").style.display = "block";
   if (scanning) return;
- 
+
   scanner = new Html5Qrcode("reader");
   scanner.start(
     { facingMode: "environment" },
@@ -731,17 +731,17 @@ function openScanner() {
     qrCode => {
       if (scanLock) return;
       scanLock = true;
- 
+
       // Flash effect
       const flash = document.getElementById("scanFlash");
       flash.classList.add("flash");
       setTimeout(() => flash.classList.remove("flash"), 150);
- 
+
       beep.currentTime = 0;
       beep.play().catch(() => {});
- 
+
       document.getElementById("scanFeedback").textContent = "⏳ Looking up: " + qrCode.substring(0,20) + "...";
- 
+
       fetch(API_URL + "?uid=" + encodeURIComponent(qrCode))
         .then(r => r.json())
         .then(data => {
@@ -769,10 +769,10 @@ function openScanner() {
     },
     () => {} // error callback silent
   );
- 
+
   scanning = true;
 }
- 
+
 function closeScanner() {
   if (scanner && scanning) {
     scanner.stop().then(() => {
@@ -785,7 +785,7 @@ function closeScanner() {
     });
   }
 }
- 
+
 // ──────────────────────────────────────────────────────────
 // MANUAL EDIT TOGGLE
 // ──────────────────────────────────────────────────────────
@@ -798,7 +798,7 @@ function toggleEdit() {
     : `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Manual Edit`;
   render();
 }
- 
+
 // ──────────────────────────────────────────────────────────
 // RENDER TABLE
 // ──────────────────────────────────────────────────────────
@@ -806,9 +806,9 @@ function render() {
   let html = "";
   let tq = 0, tm = 0;
   const keys = Object.keys(items);
- 
+
   document.getElementById("itemCount").textContent = keys.length;
- 
+
   if (keys.length === 0) {
     document.getElementById("tbody").innerHTML = `<tr id="emptyRow"><td colspan="4"><div class="empty-state"><svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><p>No items yet. Scan QR or add manually.</p></div></td></tr>`;
     document.getElementById("tQty").textContent = "0";
@@ -816,12 +816,12 @@ function render() {
     document.getElementById("tQtyTop").textContent = "0";
     return;
   }
- 
+
   keys.forEach(key => {
     const i = items[key];
     tq += Number(i.qty) || 0;
     tm += (Number(i.qty) || 0) * (Number(i.mrp) || 0);
- 
+
     html += `<tr>
       <td style="text-align:left;font-weight:500;">${manualMode ? `<input type="text" value="${i.variant}" style="width:100%;text-align:left;" onchange="items['${key}'].variant=this.value;">` : i.variant}</td>
       <td>${manualMode ? `<input type="number" value="${i.qty}" onchange="items['${key}'].qty=Number(this.value);render()">` : `<b>${i.qty}</b>`}</td>
@@ -829,29 +829,29 @@ function render() {
       ${manualMode ? `<td><button class="btn btn-danger btn-sm" onclick="removeItem('${key}')">✕</button></td>` : `<td></td>`}
     </tr>`;
   });
- 
+
   if (manualMode) {
     html += `<tr><td colspan="4" style="padding:8px;"><button class="btn btn-outline btn-sm" style="width:100%;" onclick="addItem()">＋ Add Item</button></td></tr>`;
   }
- 
+
   document.getElementById("tbody").innerHTML = html;
   document.getElementById("tQty").textContent = tq;
   document.getElementById("tMrp").textContent = "₹" + tm.toLocaleString("en-IN");
   document.getElementById("tQtyTop").textContent = tq;
 }
- 
+
 function addItem() {
   const name = prompt("Enter Variant Name:");
   if (!name) return;
   items[name.trim()] = { variant: name.trim(), qty: 1, mrp: 0 };
   render();
 }
- 
+
 function removeItem(k) {
   delete items[k];
   render();
 }
- 
+
 // ──────────────────────────────────────────────────────────
 // VALIDATION
 // ──────────────────────────────────────────────────────────
@@ -860,17 +860,17 @@ function checkFields() {
   const dealer  = document.getElementById("dealer").value;
   const date    = document.getElementById("date").value;
   const dname   = document.getElementById("dealerName").value.trim();
- 
+
   if (!challan) { showToast("Please enter Challan No.", "error"); return false; }
   if (!dealer)  { showToast("Please select a Sales Officer.", "error"); return false; }
   if (!date)    { showToast("Please select a date.", "error"); return false; }
   if (!dname)   { showToast("Please enter Dealer Name.", "error"); return false; }
   if (!photoData) { showToast("Please capture confirmation photo.", "error"); return false; }
   if (Object.keys(items).length === 0) { showToast("No items to submit.", "error"); return false; }
- 
+
   return true;
 }
- 
+
 // ──────────────────────────────────────────────────────────
 // CAMERA
 // ──────────────────────────────────────────────────────────
@@ -883,7 +883,7 @@ function openCamera() {
     })
     .catch(() => showToast("Camera access denied.", "error"));
 }
- 
+
 function capturePhoto() {
   const canvas = document.getElementById("canvas");
   const video  = document.getElementById("video");
@@ -892,19 +892,19 @@ function capturePhoto() {
   canvas.height = video.videoHeight || 240;
   ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
   photoData = canvas.toDataURL("image/jpeg", 0.85);
- 
+
   if (stream) stream.getTracks().forEach(t => t.stop());
   document.getElementById("video").srcObject = null;
   document.getElementById("preview").innerHTML = `<img src="${photoData}" style="max-width:200px;border-radius:10px;border:3px solid var(--green);margin-top:8px;">`;
   showToast("Photo captured!", "success");
 }
- 
+
 function retakePhoto() {
   photoData = "";
   document.getElementById("preview").innerHTML = "";
   openCamera();
 }
- 
+
 // ──────────────────────────────────────────────────────────
 // DOWNLOAD BILL IMAGE (only for matched items)
 // ──────────────────────────────────────────────────────────
@@ -915,7 +915,7 @@ function downloadBill(matchedItems) {
   const date       = document.getElementById("date").value;
   const now        = new Date();
   const time       = now.toLocaleTimeString("en-IN");
- 
+
   let tq = 0, tm = 0;
   let rows = "";
   matchedItems.forEach(i => {
@@ -923,7 +923,7 @@ function downloadBill(matchedItems) {
     tm += (Number(i.qty) || 0) * (Number(i.mrp) || 0);
     rows += `<tr><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;text-align:left;">${i.variant}</td><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;text-align:center;">${i.qty}</td><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;text-align:right;">₹${i.mrp}</td></tr>`;
   });
- 
+
   const html = `
   <div style="font-family:'DM Sans',Arial,sans-serif;background:white;padding:32px;width:560px;">
     <div style="background:linear-gradient(135deg,#0d1b3e,#162250);padding:20px 24px;border-radius:12px;margin-bottom:20px;display:flex;align-items:center;gap:14px;">
@@ -971,11 +971,11 @@ function downloadBill(matchedItems) {
     ${photoData ? `<div style="margin-top:16px;text-align:center;"><div style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Confirmation Photo</div><img src="${photoData}" style="max-width:160px;border-radius:8px;border:2px solid #10b981;"></div>` : ""}
     <div style="margin-top:16px;text-align:center;font-size:10px;color:#94a3b8;">Generated by AKAI Distributors Sales System</div>
   </div>`;
- 
+
   const bill = document.getElementById("bill");
   bill.innerHTML = html;
   bill.style.display = "block";
- 
+
   html2canvas(bill, { scale: 2, useCORS: true, backgroundColor: "#ffffff" }).then(canvas => {
     const a = document.createElement("a");
     a.href = canvas.toDataURL("image/jpeg", 0.92);
@@ -984,28 +984,28 @@ function downloadBill(matchedItems) {
     bill.style.display = "none";
   });
 }
- 
+
 // ──────────────────────────────────────────────────────────
 // SUBMIT
 // ──────────────────────────────────────────────────────────
 function submitData() {
   if (!checkFields()) return;
- 
+
   // Block UI
   document.getElementById("processingOverlay").classList.add("active");
   document.getElementById("submitBtn").disabled = true;
- 
+
   const challanVal = document.getElementById("challan").value.trim();
   const soVal      = document.getElementById("dealer").value.trim();
   const dealerVal  = document.getElementById("dealerName").value.trim();
   const dateVal    = document.getElementById("date").value;
- 
+
   const cleanItems = Object.values(items).map(i => ({
     variant: String(i.variant).trim(),
     qty:     Number(i.qty) || 0,
     mrp:     Number(i.mrp) || 0
   }));
- 
+
   fetch(API_URL, {
     method: "POST",
     body: new URLSearchParams({
@@ -1024,22 +1024,22 @@ function submitData() {
     let data;
     try { data = JSON.parse(text); } catch { throw new Error("Invalid response from server"); }
     if (data.status !== "success") throw new Error(data.message || "Server error");
- 
+
     // Items that matched = submitted items
     const notMatchedKeys = new Set((data.notMatched || []).map(i => i.variant));
     const matchedItems   = cleanItems.filter(i => !notMatchedKeys.has(i.variant));
- 
+
     // Download bill only for matched items
     if (matchedItems.length > 0) {
       downloadBill(matchedItems);
     }
- 
+
     // Keep only unmatched items in the table
     let temp = {};
     (data.notMatched || []).forEach(i => { temp[i.variant] = i; });
     items = temp;
     render();
- 
+
     if (!data.notMatched || data.notMatched.length === 0) {
       showToast("All items submitted successfully!", "success", 4000);
       // Reset form after short delay
@@ -1064,6 +1064,6 @@ function submitData() {
   });
 }
 </script>
- 
+
 </body>
 </html>
