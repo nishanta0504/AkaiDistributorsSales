@@ -2,263 +2,97 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
-<script src="https://unpkg.com/@zxing/library@0.20.0/umd/index.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Noto+Sans:wght@400;600&display=swap');
- 
-  :root {
-    --bg: #0d1117;
-    --surface: #161b22;
-    --surface2: #1c2230;
-    --accent: #00c8ff;
-    --accent2: #0af5a0;
-    --danger: #ff4d6d;
-    --text: #e6edf3;
-    --muted: #8b949e;
-    --border: #30363d;
-  }
- 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
- 
-  body {
-    font-family: 'Noto Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding: 12px;
-    font-size: 15px;
-  }
- 
-  h2 {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 26px;
-    font-weight: 700;
-    text-align: center;
-    letter-spacing: 3px;
-    color: var(--accent);
-    text-shadow: 0 0 20px rgba(0,200,255,0.4);
-    margin-bottom: 14px;
-    text-transform: uppercase;
-  }
- 
-  .row { display: flex; gap: 8px; }
-  .row input { flex: 1; }
- 
-  input, select {
-    width: 100%;
-    padding: 11px 13px;
-    margin: 5px 0;
-    font-size: 15px;
-    font-family: 'Noto Sans', sans-serif;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  input:focus, select:focus { border-color: var(--accent); }
-  input::placeholder { color: var(--muted); }
-  option { background: var(--surface2); }
- 
-  .btn-row { display: flex; gap: 8px; margin: 8px 0; }
- 
-  button {
-    flex: 1;
-    padding: 11px 8px;
-    font-size: 14px;
-    font-family: 'Rajdhani', sans-serif;
-    font-weight: 700;
-    letter-spacing: 1px;
-    border: none;
-    border-radius: 8px;
-    background: var(--accent);
-    color: #000;
-    cursor: pointer;
-    transition: opacity 0.15s, transform 0.1s;
-    text-transform: uppercase;
-  }
-  button:active { transform: scale(0.97); opacity: 0.85; }
-  button.danger  { background: var(--danger); color: #fff; }
-  button.secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-  button.green   { background: var(--accent2); color: #000; }
- 
-  /* SCANNER */
-  #readerBox {
-    display: none;
-    position: relative;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px;
-    margin: 8px 0;
-    text-align: center;
-  }
- 
-  #videoEl {
-    width: 100%;
-    max-width: 320px;
-    border-radius: 8px;
-    border: 2px solid var(--accent);
-    display: block;
-    margin: 0 auto;
-  }
- 
-  #scanCanvas { display: none; }
- 
-  .scan-overlay { position: relative; display: inline-block; width: 100%; max-width: 320px; }
- 
-  .scan-line {
-    position: absolute;
-    left: 5%; width: 90%; height: 2px;
-    background: var(--accent);
-    box-shadow: 0 0 10px var(--accent);
-    animation: scanMove 1.4s linear infinite;
-    top: 10%;
-    pointer-events: none;
-  }
- 
-  @keyframes scanMove {
-    0%   { top: 5%; }
-    50%  { top: 90%; }
-    100% { top: 5%; }
-  }
- 
-  #scanStatus {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 14px;
-    color: var(--accent2);
-    margin-top: 6px;
-    min-height: 22px;
-    letter-spacing: 1px;
-  }
- 
-  #scanType {
-    font-size: 11px;
-    color: var(--muted);
-    margin-bottom: 4px;
-    letter-spacing: 1px;
-  }
- 
-  #scanFlash {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,200,255,0.13);
-    z-index: 999;
-    pointer-events: none;
-  }
- 
-  /* TABLE */
-  .table-wrap {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    overflow: hidden;
-    margin-top: 10px;
-  }
- 
-  table { width: 100%; border-collapse: collapse; }
-  thead { background: var(--surface2); }
- 
-  th {
-    padding: 10px 8px;
-    font-family: 'Rajdhani', sans-serif;
-    font-weight: 700;
-    letter-spacing: 1px;
-    font-size: 13px;
-    color: var(--accent);
-    text-transform: uppercase;
-  }
- 
-  td {
-    padding: 9px 8px;
-    text-align: center;
-    font-size: 14px;
-    border-top: 1px solid var(--border);
-  }
- 
-  .item-new td { animation: rowPop 0.3s ease; }
- 
-  @keyframes rowPop {
-    0%   { background: rgba(0,200,255,0.18); }
-    100% { background: transparent; }
-  }
- 
-  tfoot tr td {
-    background: var(--surface2);
-    font-family: 'Rajdhani', sans-serif;
-    font-weight: 700;
-    font-size: 16px;
-    color: var(--accent2);
-    border-top: 2px solid var(--border);
-  }
- 
-  table input {
-    width: 80px; padding: 6px; margin: 0;
-    font-size: 13px; border-radius: 6px; text-align: center;
-  }
- 
-  .remove-btn {
-    background: var(--danger);
-    padding: 5px 10px;
-    font-size: 13px;
-    border-radius: 6px;
-    color: #fff;
-  }
- 
-  /* CAMERA */
-  #cameraBox {
-    display: none;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px;
-    margin: 8px 0;
-    text-align: center;
-  }
- 
-  #video {
-    width: 160px; height: 120px;
-    border-radius: 8px;
-    border: 2px solid var(--accent);
-  }
- 
-  #preview img {
-    border-radius: 8px;
-    margin-top: 8px;
-    border: 2px solid var(--accent2);
-  }
- 
-  #bill {
-    display: none;
-    background: white;
-    color: black;
-    padding: 20px;
-    font-size: 14px;
-  }
- 
-  .action-btns {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 10px;
-  }
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Noto+Sans:wght@400;600&display=swap');
+:root{
+  --bg:#0d1117;--surf:#161b22;--surf2:#1c2230;
+  --accent:#00c8ff;--green:#0af5a0;--red:#ff4d6d;
+  --text:#e6edf3;--muted:#8b949e;--border:#30363d;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans',sans-serif;background:var(--bg);color:var(--text);padding:12px;font-size:15px;}
+h2{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;text-align:center;
+   letter-spacing:3px;color:var(--accent);text-shadow:0 0 18px rgba(0,200,255,.4);
+   margin-bottom:12px;text-transform:uppercase;}
+
+/* INPUTS */
+.row{display:flex;gap:8px;}
+.row input{flex:1;}
+input,select{
+  width:100%;padding:11px 13px;margin:5px 0;font-size:15px;
+  font-family:'Noto Sans',sans-serif;background:var(--surf);
+  border:1px solid var(--border);border-radius:8px;color:var(--text);outline:none;
+}
+input:focus,select:focus{border-color:var(--accent);}
+input::placeholder{color:var(--muted);}
+option{background:var(--surf2);}
+
+/* BUTTONS */
+.btn-row{display:flex;gap:8px;margin:7px 0;}
+button{
+  flex:1;padding:11px 6px;font-size:14px;
+  font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;
+  border:none;border-radius:8px;background:var(--accent);color:#000;cursor:pointer;
+  text-transform:uppercase;transition:transform .1s,opacity .15s;
+}
+button:active{transform:scale(.97);opacity:.85;}
+button.red{background:var(--red);color:#fff;}
+button.grey{background:var(--surf2);color:var(--text);border:1px solid var(--border);}
+button.grn{background:var(--green);color:#000;}
+
+/* SCANNER */
+#scanBox{
+  display:none;background:var(--surf);border:1px solid var(--border);
+  border-radius:10px;padding:10px;margin:8px 0;
+}
+#reader{width:100%;max-width:300px;margin:0 auto;}
+/* hide html5-qrcode default UI clutter */
+#reader img,#reader select,#reader button{display:none!important;}
+#reader video{border-radius:8px;border:2px solid var(--accent);width:100%!important;height:auto!important;}
+#scanStatus{
+  font-family:'Rajdhani',sans-serif;font-size:14px;color:var(--green);
+  text-align:center;margin-top:6px;min-height:20px;letter-spacing:1px;
+}
+#scanFlash{
+  display:none;position:fixed;inset:0;background:rgba(0,200,255,.13);
+  z-index:999;pointer-events:none;
+}
+
+/* TABLE */
+.tbl-wrap{background:var(--surf);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-top:10px;}
+table{width:100%;border-collapse:collapse;}
+thead{background:var(--surf2);}
+th{padding:9px 6px;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;
+   font-size:13px;color:var(--accent);text-transform:uppercase;}
+td{padding:8px 6px;text-align:center;font-size:14px;border-top:1px solid var(--border);}
+tfoot td{background:var(--surf2);font-family:'Rajdhani',sans-serif;font-weight:700;
+         font-size:16px;color:var(--green);border-top:2px solid var(--border);}
+table input{width:76px;padding:5px;margin:0;font-size:13px;border-radius:6px;text-align:center;}
+.del-btn{background:var(--red);padding:5px 9px;font-size:13px;border-radius:6px;color:#fff;}
+@keyframes rowPop{0%{background:rgba(0,200,255,.2);}100%{background:transparent;}}
+.newrow td{animation:rowPop .35s ease;}
+
+/* CAMERA */
+#camBox{display:none;background:var(--surf);border:1px solid var(--border);
+        border-radius:10px;padding:12px;margin:8px 0;text-align:center;}
+#camVid{width:160px;height:120px;border-radius:8px;border:2px solid var(--accent);}
+#preview img{border-radius:8px;margin-top:8px;border:2px solid var(--green);}
+
+/* BILL (hidden, for screenshot) */
+#bill{display:none;background:#fff;color:#000;padding:20px;font-size:14px;}
+.act{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
 </style>
 </head>
 <body>
- 
 <div id="scanFlash"></div>
- 
 <h2>⚡ AKAI DISTRIBUTORS</h2>
- 
+
 <div class="row">
   <input id="challan" placeholder="Challan No">
   <input type="date" id="date">
 </div>
- 
 <select id="dealer">
   <option value="">Select SO</option>
   <option>SAMARENDRA CHANDRA SARKA</option>
@@ -266,455 +100,409 @@
   <option>SOMEN DAS</option>
   <option>CHANDAN DAS</option>
 </select>
- 
 <input list="dealerList" id="dealerName" placeholder="Select Dealer">
 <datalist id="dealerList"></datalist>
- 
+
 <div class="btn-row">
-  <button onclick="openScanner()">📷 Scan QR / Barcode</button>
-  <button class="secondary" onclick="toggleEdit()">✏️ Manual Edit</button>
+  <button id="scanBtn" onclick="toggleScanner()">📷 Scan QR / Barcode</button>
+  <button class="grey" onclick="toggleEdit()">✏️ Manual Edit</button>
 </div>
- 
-<!-- SCANNER BOX -->
-<div id="readerBox">
-  <div id="scanType">DUAL MODE: QR + BARCODE</div>
-  <div class="scan-overlay">
-    <video id="videoEl" autoplay playsinline muted></video>
-    <div class="scan-line"></div>
-  </div>
-  <canvas id="scanCanvas"></canvas>
-  <div id="scanStatus">Scanning...</div>
+
+<!-- SCANNER -->
+<div id="scanBox">
+  <div id="reader"></div>
+  <div id="scanStatus">Point camera at code…</div>
   <div class="btn-row" style="margin-top:8px;">
-    <button class="danger" onclick="closeScanner()">✖ Close Scanner</button>
+    <button class="red" onclick="stopScanner()">✖ Close Scanner</button>
   </div>
 </div>
- 
+
 <!-- TABLE -->
-<div class="table-wrap">
+<div class="tbl-wrap">
   <table>
     <thead>
       <tr>
-        <th>Variant</th>
-        <th>Qty</th>
-        <th>MRP</th>
+        <th>Variant</th><th>Qty</th><th>MRP</th>
         <th id="editHead" style="display:none;">Del</th>
       </tr>
     </thead>
     <tbody id="tbody"></tbody>
     <tfoot>
-      <tr>
-        <td>TOTAL</td>
-        <td id="tQty">0</td>
-        <td id="tMrp">0</td>
-        <td id="tExtra"></td>
-      </tr>
+      <tr><td>TOTAL</td><td id="tQty">0</td><td id="tMrp">0</td><td id="tExtra"></td></tr>
     </tfoot>
   </table>
 </div>
- 
-<!-- ACTION BUTTONS -->
-<div class="action-btns">
-  <button class="secondary" onclick="openCamera()">📸 Confirmation</button>
- 
-  <div id="cameraBox">
-    <video id="video" autoplay></video><br>
+
+<div class="act">
+  <button class="grey" onclick="openCamera()">📸 Confirmation Photo</button>
+  <div id="camBox">
+    <video id="camVid" autoplay></video><br>
     <div class="btn-row" style="margin-top:8px;">
-      <button class="green" onclick="capturePhoto()">✅ Click</button>
-      <button class="secondary" onclick="retakePhoto()">🔄 Retake</button>
+      <button class="grn" onclick="capturePhoto()">✅ Capture</button>
+      <button class="grey" onclick="retakePhoto()">🔄 Retake</button>
     </div>
     <canvas id="canvas" width="150" height="120" style="display:none;"></canvas>
     <div id="preview"></div>
   </div>
- 
   <div class="btn-row">
-    <button onclick="download()">⬇ Download</button>
-    <button class="green" onclick="submitData()">📤 Submit</button>
+    <button onclick="downloadBill()">⬇ Download</button>
+    <button class="grn" onclick="submitData()">📤 Submit</button>
   </div>
 </div>
- 
+
 <div id="bill"></div>
- 
+
 <script>
+/* ════════════════════════════════
+   CONFIG
+════════════════════════════════ */
 const API_URL = "https://script.google.com/macros/s/AKfycbxN1ueHxR9seDLWBPOQffVkYOFInQpexU6W8-wJIJ-Nl82CtgjSBf6Q-gB-517orI_k/exec";
- 
-let items = {};
+
+/* ════════════════════════════════
+   STATE
+════════════════════════════════ */
+let items      = {};
 let manualMode = false;
-let photoData = "";
-let camStream;
- 
-/* ── SCANNER STATE ── */
-let scanRunning = false;
-let videoStream = null;
-let rafId = null;
- 
-const scanCanvas = document.getElementById("scanCanvas");
-const scanCtx    = scanCanvas.getContext("2d", { willReadFrequently: true });
-const videoEl    = document.getElementById("videoEl");
- 
-/* Dedupe: code → last-seen timestamp */
-const recentScans = new Map();
-const DEDUPE_MS   = 2000;
- 
-/* Prevent duplicate in-flight fetch for same code */
-const pendingFetch = new Set();
- 
-/* ZXing barcode reader (lazy-init) */
-let zxingReader = null;
- 
-/* Audio beep */
+let photoData  = "";
+let camStream  = null;
+
+let scanner    = null;
+let scanActive = false;
+
+/* dedupe: same code ignored for 2 s */
+const seen     = new Map();
+const DEDUPE   = 2000;
+const inFlight = new Set();
+
+/* beep */
 const beep = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
- 
-/* ── LOAD DEALERS ── */
-function loadDealers() {
+
+/* ════════════════════════════════
+   DEALERS
+════════════════════════════════ */
+window.onload = function() {
+  const today = new Date().toISOString().split("T")[0];
+  document.getElementById("date").value = today;
+
   fetch(API_URL + "?type=dealers")
     .then(r => r.json())
-    .then(data => {
-      const list = document.getElementById("dealerList");
-      list.innerHTML = "";
-      data.forEach(d => {
-        const opt = document.createElement("option");
-        opt.value = d;
-        list.appendChild(opt);
+    .then(list => {
+      const dl = document.getElementById("dealerList");
+      dl.innerHTML = "";
+      list.forEach(d => {
+        const o = document.createElement("option");
+        o.value = d; dl.appendChild(o);
       });
     }).catch(() => {});
+};
+
+/* ════════════════════════════════
+   SCANNER  (html5-qrcode)
+════════════════════════════════ */
+function toggleScanner() {
+  if (scanActive) { stopScanner(); return; }
+  document.getElementById("scanBox").style.display = "block";
+  document.getElementById("scanBtn").textContent   = "⏹ Stop Scanner";
+
+  scanner = new Html5Qrcode("reader");
+
+  const config = {
+    fps: 30,
+    qrbox: { width: 250, height: 250 },
+    aspectRatio: 1.0,
+    disableFlip: false,
+    experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+    formatsToSupport: [
+      Html5QrcodeSupportedFormats.QR_CODE,
+      Html5QrcodeSupportedFormats.CODE_128,
+      Html5QrcodeSupportedFormats.CODE_39,
+      Html5QrcodeSupportedFormats.EAN_13,
+      Html5QrcodeSupportedFormats.EAN_8,
+      Html5QrcodeSupportedFormats.UPC_A,
+      Html5QrcodeSupportedFormats.UPC_E,
+      Html5QrcodeSupportedFormats.ITF,
+      Html5QrcodeSupportedFormats.CODABAR,
+      Html5QrcodeSupportedFormats.DATA_MATRIX,
+      Html5QrcodeSupportedFormats.PDF_417,
+      Html5QrcodeSupportedFormats.AZTEC
+    ]
+  };
+
+  scanner.start(
+    { facingMode: "environment" },
+    config,
+    onScanSuccess,
+    () => {}   /* silent on no-read */
+  ).then(() => {
+    scanActive = true;
+    document.getElementById("scanStatus").textContent = "📷 Scanning…";
+  }).catch(err => {
+    alert("Camera error: " + err);
+    stopScanner();
+  });
 }
-window.onload = loadDealers;
- 
-/* ── OPEN SCANNER ── */
-async function openScanner() {
-  document.getElementById("readerBox").style.display = "block";
-  if (scanRunning) return;
- 
-  try {
-    videoStream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: { ideal: "environment" },
-        width:     { ideal: 1280 },
-        height:    { ideal: 720 },
-        frameRate: { ideal: 30, min: 15 }
-      }
-    });
-  } catch (e) {
-    alert("Camera error: " + e.message);
-    return;
+
+function stopScanner() {
+  if (scanner && scanActive) {
+    scanner.stop().then(() => {
+      scanner.clear();
+      scanner    = null;
+      scanActive = false;
+      document.getElementById("scanBox").style.display = "none";
+      document.getElementById("scanBtn").textContent   = "📷 Scan QR / Barcode";
+      document.getElementById("scanStatus").textContent = "Point camera at code…";
+    }).catch(() => {});
+  } else {
+    document.getElementById("scanBox").style.display = "none";
+    document.getElementById("scanBtn").textContent   = "📷 Scan QR / Barcode";
+    scanActive = false;
   }
- 
-  videoEl.srcObject = videoStream;
-  await videoEl.play();
- 
-  /* Init ZXing barcode reader once */
-  if (!zxingReader) {
-    const hints = new Map();
-    hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
-      ZXing.BarcodeFormat.CODE_128,
-      ZXing.BarcodeFormat.CODE_39,
-      ZXing.BarcodeFormat.CODE_93,
-      ZXing.BarcodeFormat.EAN_13,
-      ZXing.BarcodeFormat.EAN_8,
-      ZXing.BarcodeFormat.UPC_A,
-      ZXing.BarcodeFormat.UPC_E,
-      ZXing.BarcodeFormat.ITF,
-      ZXing.BarcodeFormat.CODABAR
-    ]);
-    hints.set(ZXing.DecodeHintType.TRY_HARDER, false); // speed over thoroughness
-    zxingReader = new ZXing.MultiFormatReader();
-    zxingReader.setHints(hints);
-  }
- 
-  scanRunning = true;
-  scanLoop();
 }
- 
-/* ── RAF SCAN LOOP ── */
-let frameCount = 0;
- 
-function scanLoop() {
-  if (!scanRunning) return;
- 
-  if (videoEl.readyState === videoEl.HAVE_ENOUGH_DATA) {
-    const w = videoEl.videoWidth;
-    const h = videoEl.videoHeight;
- 
-    if (w && h) {
-      scanCanvas.width  = w;
-      scanCanvas.height = h;
-      scanCtx.drawImage(videoEl, 0, 0, w, h);
- 
-      const imageData = scanCtx.getImageData(0, 0, w, h);
- 
-      /* 1️⃣ jsQR — every frame (ultra fast, ~1-3ms) */
-      const qrResult = jsQR(imageData.data, w, h, { inversionAttempts: "dontInvert" });
-      if (qrResult && qrResult.data) {
-        handleCode(qrResult.data, "QR");
-        rafId = requestAnimationFrame(scanLoop);
-        return;
-      }
- 
-      /* 2️⃣ ZXing barcode — every 3rd frame (saves CPU, still ~10fps) */
-      frameCount++;
-      if (frameCount % 3 === 0) {
-        try {
-          const lum = new ZXing.RGBLuminanceSource(imageData.data, w, h);
-          const bin = new ZXing.HybridBinarizer(lum);
-          const bmp = new ZXing.BinaryBitmap(bin);
-          const result = zxingReader.decode(bmp);
-          if (result && result.getText()) {
-            handleCode(result.getText(), "BARCODE");
-          }
-        } catch (e) {
-          /* NotFoundException is normal — no barcode in frame */
-        }
-      }
-    }
-  }
- 
-  rafId = requestAnimationFrame(scanLoop);
-}
- 
-/* ── CLOSE SCANNER ── */
-function closeScanner() {
-  scanRunning = false;
-  if (rafId) cancelAnimationFrame(rafId);
-  if (videoStream) {
-    videoStream.getTracks().forEach(t => t.stop());
-    videoStream = null;
-  }
-  videoEl.srcObject = null;
-  document.getElementById("readerBox").style.display = "none";
-  document.getElementById("scanStatus").textContent = "Scanning...";
-}
- 
-/* ── HANDLE CODE ── */
-function handleCode(raw, codeType) {
-  let code = raw.trim().replace(/\s/g, "").replace(/\/\/(1|5|10)/g, "");
+
+function onScanSuccess(rawValue) {
+  let code = rawValue.trim().replace(/\s/g,"").replace(/\/\/(1|5|10)/g,"");
   if (!code) return;
- 
+
   const now = Date.now();
-  if (recentScans.has(code) && now - recentScans.get(code) < DEDUPE_MS) return;
-  recentScans.set(code, now);
- 
-  /* clean stale entries */
-  for (const [k, t] of recentScans.entries()) {
-    if (now - t > DEDUPE_MS * 4) recentScans.delete(k);
-  }
- 
-  if (pendingFetch.has(code)) return;
- 
-  /* INSTANT FEEDBACK */
+  if (seen.has(code) && now - seen.get(code) < DEDUPE) return;
+  seen.set(code, now);
+
+  /* clean old entries */
+  seen.forEach((t,k) => { if (now - t > DEDUPE * 4) seen.delete(k); });
+
+  if (inFlight.has(code)) return;
+
+  /* INSTANT feedback */
   beep.currentTime = 0;
-  beep.play().catch(() => {});
+  beep.play().catch(()=>{});
   flashScreen();
-  document.getElementById("scanStatus").textContent =
-    (codeType === "QR" ? "🟦 QR" : "🟧 BAR") + " ⏳ " + code.slice(-14);
-  document.getElementById("scanType").textContent =
-    "LAST: " + codeType + " CODE";
- 
-  pendingFetch.add(code);
- 
+  document.getElementById("scanStatus").textContent = "⏳ Looking up: " + code.slice(-16);
+
+  inFlight.add(code);
+
   fetch(API_URL + "?uid=" + encodeURIComponent(code))
     .then(r => r.json())
     .then(data => {
-      pendingFetch.delete(code);
- 
+      inFlight.delete(code);
+
       if (!data.variant) {
-        document.getElementById("scanStatus").textContent = "❌ Not found: " + code.slice(-12);
+        document.getElementById("scanStatus").textContent = "❌ Not found: " + code.slice(-14);
         return;
       }
- 
-      const key = data.variant;
-      if (!items[key]) {
-        items[key] = { variant: key, qty: 1, mrp: Number(data.mrp) || 0, _new: true };
+
+      const k = data.variant;
+      if (!items[k]) {
+        items[k] = { variant: k, qty: 1, mrp: Number(data.mrp) || 0, _new: true };
       } else {
-        items[key].qty++;
-        items[key]._new = true;
+        items[k].qty++;
+        items[k]._new = true;
       }
- 
-      document.getElementById("scanStatus").textContent =
-        "✅ " + key + " × " + items[key].qty;
+
+      document.getElementById("scanStatus").textContent = "✅ " + k + "  ×" + items[k].qty;
       render();
     })
     .catch(() => {
-      pendingFetch.delete(code);
-      document.getElementById("scanStatus").textContent = "⚠ Network error";
+      inFlight.delete(code);
+      document.getElementById("scanStatus").textContent = "⚠ Network error – retry";
     });
 }
- 
+
 function flashScreen() {
   const f = document.getElementById("scanFlash");
   f.style.display = "block";
-  setTimeout(() => { f.style.display = "none"; }, 110);
+  setTimeout(() => f.style.display = "none", 120);
 }
- 
-/* ── TABLE ── */
+
+/* ════════════════════════════════
+   TABLE
+════════════════════════════════ */
 function toggleEdit() {
   manualMode = !manualMode;
   document.getElementById("editHead").style.display = manualMode ? "" : "none";
   document.getElementById("tExtra").style.display   = manualMode ? "" : "none";
   render();
 }
- 
+
 function render() {
   let html = "", tq = 0, tm = 0;
- 
+
   Object.keys(items).forEach(key => {
     const i   = items[key];
     const qty = Number(i.qty) || 0;
     const mrp = Number(i.mrp) || 0;
-    tq += qty;
-    tm += qty * mrp;
- 
-    const nc = i._new ? ' class="item-new"' : '';
+    tq += qty; tm += qty * mrp;
+
+    const nc = i._new ? ' class="newrow"' : "";
     i._new = false;
- 
+
     if (manualMode) {
       html += `<tr${nc}>
         <td><input value="${i.variant}" onchange="items['${key}'].variant=this.value"></td>
-        <td><input type="number" value="${qty}" onchange="items['${key}'].qty=Number(this.value);render()"></td>
-        <td><input type="number" value="${mrp}" onchange="items['${key}'].mrp=Number(this.value);render()"></td>
-        <td><button class="remove-btn" onclick="removeItem('${key}')">✖</button></td>
+        <td><input type="number" value="${qty}" onchange="items['${key}'].qty=+this.value;render()"></td>
+        <td><input type="number" value="${mrp}" onchange="items['${key}'].mrp=+this.value;render()"></td>
+        <td><button class="del-btn" onclick="removeItem('${key}')">✖</button></td>
       </tr>`;
     } else {
       html += `<tr${nc}>
-        <td style="text-align:left;padding-left:12px;">${i.variant}</td>
+        <td style="text-align:left;padding-left:10px;">${i.variant}</td>
         <td>${qty}</td><td>${mrp}</td><td></td>
       </tr>`;
     }
   });
- 
+
   if (manualMode) {
-    html += `<tr><td colspan="4"><button onclick="addItem()" style="padding:7px;font-size:13px;">➕ Add Item</button></td></tr>`;
+    html += `<tr><td colspan="4" style="padding:6px;">
+      <button onclick="addItem()" style="padding:7px 10px;font-size:13px;">➕ Add Item</button>
+    </td></tr>`;
   }
- 
-  document.getElementById("tbody").innerHTML = html;
+
+  document.getElementById("tbody").innerHTML  = html;
   document.getElementById("tQty").textContent = tq;
   document.getElementById("tMrp").textContent = tm;
 }
- 
+
 function addItem() {
-  const name = prompt("Enter Variant");
+  const name = prompt("Enter Variant Name");
   if (!name) return;
   items[name] = { variant: name, qty: 1, mrp: 0, _new: true };
   render();
 }
- 
+
 function removeItem(k) { delete items[k]; render(); }
- 
-/* ── VALIDATION ── */
+
+/* ════════════════════════════════
+   VALIDATION
+════════════════════════════════ */
 function checkFields() {
-  if (!challan.value || !dealer.value || !date.value) {
-    alert("Enter Challan, SO & Date"); return false;
+  if (!document.getElementById("challan").value ||
+      !document.getElementById("dealer").value  ||
+      !document.getElementById("date").value) {
+    alert("Enter Challan No, SO, and Date"); return false;
   }
-  if (!dealerName.value) { alert("Select Dealer"); return false; }
-  if (!photoData) { alert("Capture Confirmation Photo"); return false; }
+  if (!document.getElementById("dealerName").value) {
+    alert("Select a Dealer"); return false;
+  }
+  if (!photoData) {
+    alert("Please capture a Confirmation Photo first"); return false;
+  }
   return true;
 }
- 
-/* ── CAMERA ── */
+
+/* ════════════════════════════════
+   CONFIRMATION CAMERA
+════════════════════════════════ */
 function openCamera() {
-  navigator.mediaDevices.getUserMedia({ video: true })
+  navigator.mediaDevices.getUserMedia({ video: { facingMode:"environment" } })
     .then(s => {
       camStream = s;
-      document.getElementById("cameraBox").style.display = "block";
-      document.getElementById("video").srcObject = s;
+      document.getElementById("camBox").style.display  = "block";
+      document.getElementById("camVid").srcObject = s;
     }).catch(e => alert("Camera error: " + e.message));
 }
- 
+
 function capturePhoto() {
-  const canvas = document.getElementById("canvas");
-  const video  = document.getElementById("video");
-  canvas.getContext("2d").drawImage(video, 0, 0, 150, 120);
-  photoData = canvas.toDataURL("image/jpeg");
+  const cv = document.getElementById("canvas");
+  cv.getContext("2d").drawImage(document.getElementById("camVid"), 0, 0, 150, 120);
+  photoData = cv.toDataURL("image/jpeg");
   camStream.getTracks().forEach(t => t.stop());
-  video.srcObject = null;
+  document.getElementById("camVid").srcObject = null;
   document.getElementById("preview").innerHTML = `<img src="${photoData}" width="120">`;
 }
- 
+
 function retakePhoto() {
   photoData = "";
   document.getElementById("preview").innerHTML = "";
   openCamera();
 }
- 
-/* ── DOWNLOAD ── */
-function download() {
+
+/* ════════════════════════════════
+   DOWNLOAD
+════════════════════════════════ */
+function downloadBill() {
   if (!checkFields()) return;
   let tq = 0, tm = 0;
   const time = new Date().toLocaleTimeString("en-IN");
- 
-  let html = `<h2 style="text-align:center;font-family:sans-serif;">AKAI DISTRIBUTORS</h2>
-  <p><b>SO:</b> ${dealer.value}</p>
-  <p><b>Dealer:</b> ${dealerName.value}</p>
-  <p><b>Date:</b> ${date.value}</p>
-  <p><b>Time:</b> ${time}</p><hr>
-  <table border="1" style="width:100%;border-collapse:collapse;">
-  <tr><th>Variant</th><th>Qty</th><th>MRP</th></tr>`;
- 
+
+  let html = `
+    <h2 style="text-align:center;font-family:sans-serif;">AKAI DISTRIBUTORS</h2>
+    <p><b>Challan:</b> ${document.getElementById("challan").value}</p>
+    <p><b>SO:</b> ${document.getElementById("dealer").value}</p>
+    <p><b>Dealer:</b> ${document.getElementById("dealerName").value}</p>
+    <p><b>Date:</b> ${document.getElementById("date").value} &nbsp; <b>Time:</b> ${time}</p>
+    <hr>
+    <table border="1" style="width:100%;border-collapse:collapse;">
+    <tr><th>Variant</th><th>Qty</th><th>MRP</th><th>Total</th></tr>`;
+
   Object.values(items).forEach(i => {
     tq += i.qty; tm += i.qty * i.mrp;
-    html += `<tr><td>${i.variant}</td><td>${i.qty}</td><td>${i.mrp}</td></tr>`;
+    html += `<tr><td>${i.variant}</td><td>${i.qty}</td><td>${i.mrp}</td><td>${i.qty*i.mrp}</td></tr>`;
   });
- 
-  html += `<tr><td><b>Total</b></td><td><b>${tq}</b></td><td><b>${tm}</b></td></tr></table>
-  <br><div style="text-align:center;"><img src="${photoData}" width="120"></div>`;
- 
+
+  html += `<tr><td><b>Total</b></td><td><b>${tq}</b></td><td></td><td><b>${tm}</b></td></tr>
+  </table><br>
+  <div style="text-align:center;"><img src="${photoData}" width="140"><br>
+  <small>Confirmation Photo</small></div>`;
+
   const bill = document.getElementById("bill");
   bill.innerHTML = html;
   bill.style.display = "block";
- 
+
   html2canvas(bill).then(c => {
     const a = document.createElement("a");
-    a.href = c.toDataURL();
-    a.download = "Bill.jpg";
+    a.href     = c.toDataURL();
+    a.download = "AKAI_Bill_" + document.getElementById("challan").value + ".jpg";
     a.click();
     bill.style.display = "none";
   });
 }
- 
-/* ── SUBMIT ── */
+
+/* ════════════════════════════════
+   SUBMIT
+════════════════════════════════ */
 function submitData() {
   if (!checkFields()) return;
- 
+
   const cleanItems = Object.values(items).map(i => ({
     variant: String(i.variant).trim(),
-    qty: Number(i.qty) || 0
+    qty:     Number(i.qty) || 0
   }));
- 
+
+  const payload = {
+    challan: document.getElementById("challan").value.trim(),
+    so:      document.getElementById("dealer").value.trim(),
+    dealer:  document.getElementById("dealerName").value,
+    date:    document.getElementById("date").value,
+    items:   cleanItems,
+    photo:   photoData
+  };
+
   fetch(API_URL, {
     method: "POST",
-    body: new URLSearchParams({
-      data: JSON.stringify({
-        challan: String(challan.value).trim(),
-        so:      String(dealer.value).trim(),
-        dealer:  dealerName.value,
-        date:    date.value,
-        items:   cleanItems,
-        photo:   photoData
-      })
-    })
+    body: new URLSearchParams({ data: JSON.stringify(payload) })
   })
   .then(async res => {
     const text = await res.text();
     let data;
     try { data = JSON.parse(text); }
-    catch { throw new Error("Invalid JSON from server"); }
- 
+    catch { throw new Error("Invalid response from server"); }
+
     if (data.status !== "success") throw new Error(data.message || "Server error");
- 
+
     let temp = {};
     (data.notMatched || []).forEach(i => { temp[i.variant] = i; });
     items = temp;
     render();
- 
+
     if (!data.notMatched || data.notMatched.length === 0) {
-      alert("✅ Data Submitted");
+      alert("✅ Submitted successfully!");
       location.reload();
     } else {
-      alert("⚠ Some items not matched");
+      alert("⚠ Some items did not match — check the table.");
     }
   })
   .catch(err => {
     console.error(err);
-    alert("❌ Submit Failed: " + err.message);
+    alert("❌ Submit failed: " + err.message);
   });
 }
 </script>
