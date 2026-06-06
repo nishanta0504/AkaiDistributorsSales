@@ -1,421 +1,1069 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta charset="UTF-8">
+<title>AKAI Distributors</title>
+ 
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
+ 
 <style>
-body { font-family: Arial; background:#f4f6fb; padding:10px; }
-h2 { text-align:center; color:#1a237e; }
-
-.row { display:flex; gap:8px; }
-.row input { flex:1; }
-
-input, select {
-  width:100%;
-  padding:12px;
-  margin:6px 0;
-  font-size:16px;A
+:root {
+  --navy:    #0d1b3e;
+  --navy2:   #162250;
+  --blue:    #1a56db;
+  --blue2:   #3b82f6;
+  --accent:  #f59e0b;
+  --green:   #10b981;
+  --red:     #ef4444;
+  --light:   #f0f4ff;
+  --white:   #ffffff;
+  --border:  #d1daf7;
+  --text:    #1e293b;
+  --muted:   #64748b;
+  --shadow:  0 4px 24px rgba(13,27,62,0.10);
+  --radius:  14px;
+  --radius-sm: 8px;
 }
-
-button {
-  width:100%;
-  padding:10px;
-  margin-top:6px;
-  font-size:14px;
-  border:none;
-  border-radius:6px;
-  background:#1a73e8;
-  color:white;
+ 
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: linear-gradient(135deg, #e8eeff 0%, #f4f7ff 60%, #fdf6e3 100%);
+  min-height: 100vh;
+  color: var(--text);
 }
-
-#readerBox { display:none; position:relative; }
-#reader { width:220px; margin:auto; }
-
+ 
+/* ── HEADER ─────────────────────────────── */
+.header {
+  background: linear-gradient(120deg, var(--navy) 0%, var(--navy2) 100%);
+  padding: 18px 20px 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 4px 20px rgba(13,27,62,0.25);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+ 
+.header-logo {
+  width: 44px; height: 44px;
+  background: var(--accent);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800; font-size: 18px;
+  color: var(--navy);
+  letter-spacing: -1px;
+  flex-shrink: 0;
+}
+ 
+.header-text h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px; font-weight: 800;
+  color: var(--white);
+  letter-spacing: 0.5px;
+  line-height: 1.1;
+}
+.header-text p {
+  font-size: 11px; color: rgba(255,255,255,0.55);
+  font-weight: 400; letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+ 
+.header-badge {
+  margin-left: auto;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.6);
+  font-weight: 500;
+  white-space: nowrap;
+}
+ 
+/* ── MAIN WRAPPER ──────────────────────── */
+.container { padding: 16px; max-width: 600px; margin: 0 auto; }
+ 
+/* ── CARDS ──────────────────────────────── */
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  margin-bottom: 14px;
+  border: 1px solid rgba(209,218,247,0.5);
+}
+ 
+.card-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 12px; font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 6px;
+}
+.card-title::before {
+  content: '';
+  display: inline-block;
+  width: 3px; height: 14px;
+  background: var(--blue);
+  border-radius: 2px;
+}
+ 
+/* ── FORM INPUTS ─────────────────────────── */
+.row { display: flex; gap: 10px; }
+.row .field { flex: 1; }
+.field { margin-bottom: 10px; }
+.field label {
+  display: block;
+  font-size: 11px; font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 4px;
+}
+ 
+input[type="text"],
+input[type="date"],
+input[list],
+select {
+  width: 100%;
+  padding: 11px 13px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: #f8faff;
+  color: var(--text);
+  transition: border 0.2s, box-shadow 0.2s;
+  outline: none;
+  appearance: none;
+}
+input:focus, select:focus {
+  border-color: var(--blue2);
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+  background: var(--white);
+}
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+ 
+/* ── BUTTONS ─────────────────────────────── */
+.btn-row { display: flex; gap: 8px; margin-bottom: 6px; }
+.btn-row .btn { flex: 1; }
+ 
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 11px 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 600;
+  border: none; border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: transform 0.12s, box-shadow 0.12s, opacity 0.2s;
+  text-align: center;
+  white-space: nowrap;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+ 
+.btn-primary {
+  background: linear-gradient(135deg, var(--blue) 0%, var(--blue2) 100%);
+  color: white;
+  box-shadow: 0 3px 12px rgba(26,86,219,0.3);
+}
+.btn-primary:hover:not(:disabled) { box-shadow: 0 5px 16px rgba(26,86,219,0.4); }
+ 
+.btn-accent {
+  background: linear-gradient(135deg, var(--accent) 0%, #f97316 100%);
+  color: var(--navy);
+  box-shadow: 0 3px 12px rgba(245,158,11,0.28);
+}
+.btn-accent:hover:not(:disabled) { box-shadow: 0 5px 16px rgba(245,158,11,0.38); }
+ 
+.btn-success {
+  background: linear-gradient(135deg, #059669 0%, var(--green) 100%);
+  color: white;
+  box-shadow: 0 3px 12px rgba(16,185,129,0.28);
+}
+.btn-success:hover:not(:disabled) { box-shadow: 0 5px 16px rgba(16,185,129,0.38); }
+ 
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid var(--border);
+  color: var(--text);
+}
+.btn-outline:hover:not(:disabled) { border-color: var(--blue2); color: var(--blue); background: #f0f4ff; }
+ 
+.btn-danger {
+  background: var(--red);
+  color: white;
+}
+ 
+.btn-sm {
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 6px;
+}
+ 
+/* Icon inside button */
+.btn svg { flex-shrink: 0; }
+ 
+/* ── SCANNER ─────────────────────────────── */
+#readerBox {
+  display: none;
+  position: relative;
+  background: var(--navy);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+#reader { width: 100%; }
+#reader video { border-radius: var(--radius); }
+ 
+.scanner-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px 0;
+}
+.scanner-header span {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px; font-weight: 700;
+  color: var(--white);
+  display: flex; align-items: center; gap: 6px;
+}
+.pulse-dot {
+  width: 8px; height: 8px;
+  background: var(--green);
+  border-radius: 50%;
+  animation: pulse 1.2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+ 
 #closeScan {
-  position:absolute;
-  right:5px;
-  top:5px;
-  background:red;
-  color:white;
-  border-radius:50%;
-  width:30px;
-  height:30px;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px; height: 30px;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
 }
-
+#closeScan:hover { background: var(--red); }
+ 
+.scan-feedback {
+  text-align: center;
+  padding: 6px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.55);
+  font-style: italic;
+}
+ 
+/* ── TABLE ───────────────────────────────── */
+.table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
 table {
-  width:100%;
-  margin-top:10px;
-  background:white;
-  border-collapse:collapse;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
 }
-
-td,th { padding:10px; text-align:center; }
-
-.total { background:#e3f2fd; font-weight:bold; }
-
-#bill { display:none; background:white; padding:20px; }
+thead tr {
+  background: linear-gradient(90deg, #e8eeff, #f0f4ff);
+}
+th {
+  padding: 10px 12px;
+  text-align: center;
+  font-family: 'Syne', sans-serif;
+  font-size: 11px; font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  border-bottom: 2px solid var(--border);
+}
+td {
+  padding: 9px 12px;
+  text-align: center;
+  border-bottom: 1px solid #eef1fb;
+  vertical-align: middle;
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: #f8faff; }
+ 
+.tfoot-row {
+  background: linear-gradient(90deg, #dbeafe, #eff6ff);
+}
+.tfoot-row td {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--navy);
+  border-top: 2px solid var(--border);
+}
+ 
+/* Table edit inputs */
+td input[type="number"], td input[type="text"] {
+  width: 70px;
+  padding: 5px 7px;
+  font-size: 13px;
+  border: 1.5px solid var(--border);
+  border-radius: 5px;
+  background: white;
+  text-align: center;
+}
+td input:focus { border-color: var(--blue2); outline: none; }
+ 
+/* Item count badge */
+.item-badge {
+  display: inline-flex;
+  align-items: center;
+  background: var(--blue);
+  color: white;
+  border-radius: 20px;
+  padding: 1px 9px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-left: 8px;
+}
+ 
+/* empty state */
+.empty-state {
+  text-align: center;
+  padding: 30px 20px;
+  color: var(--muted);
+}
+.empty-state svg { margin-bottom: 8px; opacity: 0.35; }
+.empty-state p { font-size: 13px; }
+ 
+/* ── CAMERA ─────────────────────────────── */
+#cameraBox {
+  display: none;
+  text-align: center;
+  background: var(--navy);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 14px;
+}
+#cameraBox .cam-title {
+  color: white;
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+#video {
+  border-radius: 10px;
+  border: 2px solid rgba(255,255,255,0.2);
+  width: 100%;
+  max-width: 280px;
+}
+#canvas { display: none; }
+#preview { margin-top: 10px; }
+#preview img {
+  border-radius: 10px;
+  border: 3px solid var(--green);
+  max-width: 200px;
+}
+.cam-btns { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+ 
+/* ── PROCESSING OVERLAY ─────────────────── */
+#processingOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(13,27,62,0.75);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+#processingOverlay.active { display: flex; }
+ 
+.spinner {
+  width: 52px; height: 52px;
+  border: 4px solid rgba(255,255,255,0.15);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+ 
+.processing-text {
+  font-family: 'Syne', sans-serif;
+  font-size: 16px; font-weight: 700;
+  color: white;
+}
+.processing-sub {
+  font-size: 12px; color: rgba(255,255,255,0.55);
+}
+ 
+/* ── TOAST NOTIFICATIONS ────────────────── */
+.toast-container {
+  position: fixed;
+  top: 72px; right: 16px;
+  z-index: 10000;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.toast {
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+  padding: 12px 16px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; font-weight: 500;
+  border-left: 4px solid var(--blue);
+  animation: slideIn 0.25s ease;
+  max-width: 280px;
+}
+.toast.success { border-color: var(--green); }
+.toast.error   { border-color: var(--red); }
+.toast.warning { border-color: var(--accent); }
+ 
+@keyframes slideIn {
+  from { transform: translateX(110%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+ 
+/* ── SCAN FLASH ──────────────────────────── */
+.scan-flash {
+  position: fixed; inset: 0;
+  background: white;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 999;
+  transition: opacity 0.05s;
+}
+.scan-flash.flash { opacity: 0.35; }
+ 
+/* ── BILL (hidden, for capture) ─────────── */
+#bill {
+  display: none;
+  background: white;
+  padding: 24px;
+  font-family: 'DM Sans', sans-serif;
+  width: 600px;
+}
+ 
+/* ── SCROLLBAR ───────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+ 
+/* ── DIVIDER ─────────────────────────────── */
+.divider { height: 1px; background: var(--border); margin: 10px 0; }
+ 
+/* ── STATUS BAR ──────────────────────────── */
+.status-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.status-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px; font-weight: 700;
+  color: var(--navy);
+  display: flex; align-items: center; gap: 6px;
+}
 </style>
 </head>
-
 <body>
-
-<h2>AKAI DISTRIBUTORS</h2>
-
-<div class="row">
-<input id="challan" placeholder="Challan No">
-<input type="date" id="date">
+ 
+<!-- PROCESSING OVERLAY -->
+<div id="processingOverlay">
+  <div class="spinner"></div>
+  <div class="processing-text">Submitting Data...</div>
+  <div class="processing-sub">Please wait, do not close this page</div>
 </div>
-
-<select id="dealer">
-<option value="">Select SO</option>
-<option>SAMARENDRA CHANDRA SARKA</option>
-<option>AJAY SINGHA</option>
-<option>SOMEN DAS</option>
-<option>CHANDAN DAS</option>
-</select>
-
-<input list="dealerList" id="dealerName" placeholder="Select Dealer">
-<datalist id="dealerList"></datalist>
-
-<button onclick="openScanner()">Scan QR</button>
-<button onclick="toggleEdit()">Manual Edit</button>
-
-<div id="readerBox">
-<button id="closeScan" onclick="closeScanner()">×</button>
-<div id="reader"></div>
+ 
+<!-- SCAN FLASH -->
+<div class="scan-flash" id="scanFlash"></div>
+ 
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+ 
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">A</div>
+  <div class="header-text">
+    <h1>AKAI DISTRIBUTORS</h1>
+    <p>Sales Entry System</p>
+  </div>
+  <div class="header-badge" id="headerDate"></div>
 </div>
-
-<table>
-<thead>
-<tr>
-<th>Variant</th>
-<th>Qty</th>
-<th>MRP</th>
-<th id="editHead" style="display:none;">Action</th>
-</tr>
-</thead>
-<tbody id="tbody"></tbody>
-
-<tfoot>
-<tr class="total">
-<td>Total</td>
-<td id="tQty">0</td>
-<td id="tMrp">0</td>
-<td></td>
-</tr>
-</tfoot>
-</table>
-
-<!-- ✅ ADDED ONLY -->
-<button onclick="openCamera()">Confirmation</button>
-
-<div id="cameraBox" style="display:none;text-align:center;">
-  <video id="video" width="150" height="120" autoplay></video><br>
-  <button onclick="capturePhoto()">Click</button>
-  <button onclick="retakePhoto()">Retake</button>
-  <canvas id="canvas" width="150" height="120" style="display:none;"></canvas>
-  <div id="preview"></div>
-</div>
-
-<button onclick="download()">Download</button>
-<button onclick="submitData()">Submit</button>
-
+ 
+<div class="container">
+ 
+  <!-- ORDER DETAILS CARD -->
+  <div class="card">
+    <div class="card-title">Order Details</div>
+ 
+    <div class="row">
+      <div class="field">
+        <label>Challan No.</label>
+        <input type="text" id="challan" placeholder="e.g. CH-2024">
+      </div>
+      <div class="field">
+        <label>Date</label>
+        <input type="date" id="date">
+      </div>
+    </div>
+ 
+    <div class="field">
+      <label>Sales Officer (SO)</label>
+      <select id="dealer">
+        <option value="">— Select SO —</option>
+        <option>SAMARENDRA CHANDRA SARKA</option>
+        <option>AJAY SINGHA</option>
+        <option>SOMEN DAS</option>
+        <option>CHANDAN DAS</option>
+      </select>
+    </div>
+ 
+    <div class="field">
+      <label>Dealer Name</label>
+      <input list="dealerList" id="dealerName" placeholder="Type to search dealer...">
+      <datalist id="dealerList"></datalist>
+    </div>
+  </div>
+ 
+  <!-- SCAN CARD -->
+  <div class="card">
+    <div class="card-title">Scan &amp; Entry</div>
+ 
+    <div class="btn-row">
+      <button class="btn btn-accent" onclick="openScanner()" id="scanBtn">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2"/><rect x="7" y="7" width="10" height="10" rx="1"/></svg>
+        Scan QR
+      </button>
+      <button class="btn btn-outline" onclick="toggleEdit()" id="editBtn">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Manual Edit
+      </button>
+    </div>
+ 
+    <!-- SCANNER BOX -->
+    <div id="readerBox">
+      <div class="scanner-header">
+        <span>
+          <div class="pulse-dot"></div>
+          Scanner Active
+        </span>
+        <button id="closeScan" onclick="closeScanner()">×</button>
+      </div>
+      <div id="reader"></div>
+      <div class="scan-feedback" id="scanFeedback">Point camera at QR code</div>
+    </div>
+  </div>
+ 
+  <!-- ITEMS TABLE CARD -->
+  <div class="card">
+    <div class="status-bar">
+      <div class="status-label">
+        Items
+        <span class="item-badge" id="itemCount">0</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted);">Total Qty: <b id="tQtyTop">0</b></div>
+    </div>
+ 
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Variant</th>
+            <th>Qty</th>
+            <th>MRP (₹)</th>
+            <th id="editHead" style="display:none;">Action</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr id="emptyRow">
+            <td colspan="4">
+              <div class="empty-state">
+                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                <p>No items scanned yet.<br>Scan QR or add manually.</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr class="tfoot-row">
+            <td><b>TOTAL</b></td>
+            <td id="tQty">0</td>
+            <td id="tMrp">₹0</td>
+            <td id="tActionFoot" style="display:none;"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+ 
+  <!-- CONFIRMATION PHOTO CARD -->
+  <div class="card">
+    <div class="card-title">Confirmation Photo</div>
+ 
+    <button class="btn btn-outline" onclick="openCamera()" style="width:100%;margin-bottom:10px;">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      Open Camera
+    </button>
+ 
+    <div id="cameraBox">
+      <div class="cam-title">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="13" r="4"/><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/></svg>
+        Live Camera
+      </div>
+      <video id="video" autoplay playsinline></video>
+      <div class="cam-btns">
+        <button class="btn btn-success btn-sm" onclick="capturePhoto()">📸 Capture</button>
+        <button class="btn btn-outline btn-sm" onclick="retakePhoto()">🔄 Retake</button>
+      </div>
+      <canvas id="canvas" width="320" height="240"></canvas>
+      <div id="preview"></div>
+    </div>
+  </div>
+ 
+  <!-- SUBMIT CARD -->
+  <div class="card">
+    <button class="btn btn-success" style="width:100%;padding:14px;font-size:15px;" onclick="submitData()" id="submitBtn">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+      Submit &amp; Download
+    </button>
+    <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--muted);">
+      Submitted items will download as image. Unmatched items stay on screen.
+    </div>
+  </div>
+ 
+</div><!-- /container -->
+ 
+<!-- BILL DIV (hidden, for html2canvas) -->
 <div id="bill"></div>
-
+ 
 <script>
-
+// ──────────────────────────────────────────────────────────
+// CONFIG
+// ──────────────────────────────────────────────────────────
 const API_URL = "https://script.google.com/macros/s/AKfycbxN1ueHxR9seDLWBPOQffVkYOFInQpexU6W8-wJIJ-Nl82CtgjSBf6Q-gB-517orI_k/exec";
-
+ 
 let items = {};
-let scanner, scanning=false;
+let scanner = null, scanning = false;
 let manualMode = false;
 let scanLock = false;
-
-const beep = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
-
-/* ✅ ADDED */
 let photoData = "";
-let stream;
-
-/* LOAD DEALERS */
-function loadDealers(){
+let stream = null;
+ 
+// Beep audio
+const beep = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+ 
+// ──────────────────────────────────────────────────────────
+// INIT
+// ──────────────────────────────────────────────────────────
+window.onload = function() {
+  // Set today's date
+  const today = new Date();
+  document.getElementById("date").value = today.toISOString().split("T")[0];
+  document.getElementById("headerDate").textContent = today.toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" });
+  loadDealers();
+};
+ 
+// ──────────────────────────────────────────────────────────
+// LOAD DEALERS
+// ──────────────────────────────────────────────────────────
+function loadDealers() {
   fetch(API_URL + "?type=dealers")
-  .then(res=>res.json())
-  .then(data=>{
-    let list = document.getElementById("dealerList");
-    list.innerHTML="";
-    data.forEach(d=>{
-      let opt=document.createElement("option");
-      opt.value=d;
-      list.appendChild(opt);
-    });
-  });
-}
-window.onload = loadDealers;
-
-/* SCANNER (UNCHANGED) */
-function openScanner(){
-  document.getElementById("readerBox").style.display="block";
-  if(scanning) return;
-
-  scanner = new Html5Qrcode("reader");
-
-  scanner.start(
-    { facingMode:"environment" },
-    { fps:20, qrbox:180 },
-    qr => {
-
-      if(scanLock) return;
-      scanLock = true;
-
-      beep.currentTime = 0;
-      beep.play();
-
-      fetch(API_URL+"?uid="+encodeURIComponent(qr))
-      .then(r=>r.json())
-      .then(data=>{
-
-        if(!data.variant){
-          alert("❌ Not Found - "+qr);
-          return;
-        }
-
-        if(!items[data.variant]){
-          items[data.variant] = {
-            variant:data.variant,
-            qty:1,
-            mrp:Number(data.mrp)||0
-          };
-        } else {
-          items[data.variant].qty++;
-        }
-
-        render();
+    .then(r => r.json())
+    .then(data => {
+      const list = document.getElementById("dealerList");
+      list.innerHTML = "";
+      data.forEach(d => {
+        const opt = document.createElement("option");
+        opt.value = d;
+        list.appendChild(opt);
       });
-
-      setTimeout(()=>scanLock=false,1500);
-    }
-  );
-
-  scanning=true;
+    })
+    .catch(() => {}); // silent fail
 }
-
-/* KEEP ALL YOUR FUNCTIONS SAME BELOW (NO CHANGE) */
-
-function closeScanner(){
-  if(scanner){
-    scanner.stop().then(()=>{
-      scanning=false;
-      readerBox.style.display="none";
+ 
+// ──────────────────────────────────────────────────────────
+// TOAST NOTIFICATIONS
+// ──────────────────────────────────────────────────────────
+function showToast(msg, type="info", duration=3000) {
+  const icons = { success:"✅", error:"❌", warning:"⚠️", info:"ℹ️" };
+  const container = document.getElementById("toastContainer");
+  const toast = document.createElement("div");
+  toast.className = "toast " + type;
+  toast.innerHTML = `<span>${icons[type]||"•"}</span><span>${msg}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = "0"; toast.style.transition = "opacity 0.3s"; setTimeout(()=>toast.remove(), 300); }, duration);
+}
+ 
+// ──────────────────────────────────────────────────────────
+// SCANNER
+// ──────────────────────────────────────────────────────────
+function openScanner() {
+  document.getElementById("readerBox").style.display = "block";
+  if (scanning) return;
+ 
+  scanner = new Html5Qrcode("reader");
+  scanner.start(
+    { facingMode: "environment" },
+    {
+      fps: 30,          // faster fps
+      qrbox: { width: 200, height: 200 },
+      aspectRatio: 1.0,
+      disableFlip: false,
+      experimentalFeatures: { useBarCodeDetectorIfSupported: true }  // use native API if available
+    },
+    qrCode => {
+      if (scanLock) return;
+      scanLock = true;
+ 
+      // Flash effect
+      const flash = document.getElementById("scanFlash");
+      flash.classList.add("flash");
+      setTimeout(() => flash.classList.remove("flash"), 150);
+ 
+      beep.currentTime = 0;
+      beep.play().catch(() => {});
+ 
+      document.getElementById("scanFeedback").textContent = "⏳ Looking up: " + qrCode.substring(0,20) + "...";
+ 
+      fetch(API_URL + "?uid=" + encodeURIComponent(qrCode))
+        .then(r => r.json())
+        .then(data => {
+          if (!data.variant) {
+            showToast("Not found: " + qrCode.substring(0,16), "error");
+            document.getElementById("scanFeedback").textContent = "❌ Item not found. Scan another.";
+          } else {
+            if (!items[data.variant]) {
+              items[data.variant] = { variant: data.variant, qty: 1, mrp: Number(data.mrp) || 0 };
+            } else {
+              items[data.variant].qty++;
+            }
+            render();
+            document.getElementById("scanFeedback").textContent = "✅ " + data.variant + " — Qty: " + items[data.variant].qty;
+            showToast(data.variant + " ×" + items[data.variant].qty, "success", 2000);
+          }
+        })
+        .catch(() => {
+          showToast("Network error. Try again.", "error");
+        })
+        .finally(() => {
+          // 1.2s gap between same scan but fast for different items
+          setTimeout(() => { scanLock = false; }, 1200);
+        });
+    },
+    () => {} // error callback silent
+  );
+ 
+  scanning = true;
+}
+ 
+function closeScanner() {
+  if (scanner && scanning) {
+    scanner.stop().then(() => {
+      scanning = false;
+      document.getElementById("readerBox").style.display = "none";
+      document.getElementById("scanFeedback").textContent = "Point camera at QR code";
+    }).catch(() => {
+      scanning = false;
+      document.getElementById("readerBox").style.display = "none";
     });
   }
 }
-
-function toggleEdit(){
-  manualMode=!manualMode;
-  editHead.style.display = manualMode ? "" : "none";
+ 
+// ──────────────────────────────────────────────────────────
+// MANUAL EDIT TOGGLE
+// ──────────────────────────────────────────────────────────
+function toggleEdit() {
+  manualMode = !manualMode;
+  document.getElementById("editHead").style.display = manualMode ? "" : "none";
+  document.getElementById("tActionFoot").style.display = manualMode ? "" : "none";
+  document.getElementById("editBtn").innerHTML = manualMode
+    ? `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg> Lock Edit`
+    : `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Manual Edit`;
   render();
 }
-
-function render(){
-  let html="";
-  let tq=0, tm=0;
-
-  Object.keys(items).forEach(key=>{
-    let i=items[key];
-    tq+=Number(i.qty)||0;
-    tm+=(Number(i.qty)||0)*(Number(i.mrp)||0);
-
-    html+=`<tr>
-      <td>${manualMode ? `<input value="${i.variant}">` : i.variant}</td>
-      <td>${manualMode ? `<input type="number" value="${i.qty}" onchange="items['${key}'].qty=Number(this.value);render()">` : i.qty}</td>
-      <td>${manualMode ? `<input type="number" value="${i.mrp}" onchange="items['${key}'].mrp=Number(this.value);render()">` : i.mrp}</td>
-      ${manualMode ? `<td><button onclick="removeItem('${key}')">➖</button></td>` : `<td></td>`}
+ 
+// ──────────────────────────────────────────────────────────
+// RENDER TABLE
+// ──────────────────────────────────────────────────────────
+function render() {
+  let html = "";
+  let tq = 0, tm = 0;
+  const keys = Object.keys(items);
+ 
+  document.getElementById("itemCount").textContent = keys.length;
+ 
+  if (keys.length === 0) {
+    document.getElementById("tbody").innerHTML = `<tr id="emptyRow"><td colspan="4"><div class="empty-state"><svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><p>No items yet. Scan QR or add manually.</p></div></td></tr>`;
+    document.getElementById("tQty").textContent = "0";
+    document.getElementById("tMrp").textContent = "₹0";
+    document.getElementById("tQtyTop").textContent = "0";
+    return;
+  }
+ 
+  keys.forEach(key => {
+    const i = items[key];
+    tq += Number(i.qty) || 0;
+    tm += (Number(i.qty) || 0) * (Number(i.mrp) || 0);
+ 
+    html += `<tr>
+      <td style="text-align:left;font-weight:500;">${manualMode ? `<input type="text" value="${i.variant}" style="width:100%;text-align:left;" onchange="items['${key}'].variant=this.value;">` : i.variant}</td>
+      <td>${manualMode ? `<input type="number" value="${i.qty}" onchange="items['${key}'].qty=Number(this.value);render()">` : `<b>${i.qty}</b>`}</td>
+      <td>${manualMode ? `<input type="number" value="${i.mrp}" onchange="items['${key}'].mrp=Number(this.value);render()">` : `₹${i.mrp}`}</td>
+      ${manualMode ? `<td><button class="btn btn-danger btn-sm" onclick="removeItem('${key}')">✕</button></td>` : `<td></td>`}
     </tr>`;
   });
-
-  if(manualMode){
-    html+=`<tr><td colspan="4"><button onclick="addItem()">➕ Add Item</button></td></tr>`;
+ 
+  if (manualMode) {
+    html += `<tr><td colspan="4" style="padding:8px;"><button class="btn btn-outline btn-sm" style="width:100%;" onclick="addItem()">＋ Add Item</button></td></tr>`;
   }
-
-  tbody.innerHTML=html;
-  tQty.innerText=tq;
-  tMrp.innerText=tm;
+ 
+  document.getElementById("tbody").innerHTML = html;
+  document.getElementById("tQty").textContent = tq;
+  document.getElementById("tMrp").textContent = "₹" + tm.toLocaleString("en-IN");
+  document.getElementById("tQtyTop").textContent = tq;
 }
-
-function addItem(){
-  let name=prompt("Enter Variant");
-  if(!name) return;
-  items[name]={variant:name,qty:1,mrp:0};
+ 
+function addItem() {
+  const name = prompt("Enter Variant Name:");
+  if (!name) return;
+  items[name.trim()] = { variant: name.trim(), qty: 1, mrp: 0 };
   render();
 }
-
-function removeItem(k){
+ 
+function removeItem(k) {
   delete items[k];
   render();
 }
-
-function checkFields(){
-  if(!challan.value || !dealer.value || !date.value){
-    alert("Enter Challan, SO & Date");
-    return false;
-  }
-  if(!dealerName.value){
-    alert("Select Dealer");
-    return false;
-  }
-
-  /* ✅ ADDED */
-  if(!photoData){
-    alert("Capture Confirmation Photo");
-    return false;
-  }
-
+ 
+// ──────────────────────────────────────────────────────────
+// VALIDATION
+// ──────────────────────────────────────────────────────────
+function checkFields() {
+  const challan = document.getElementById("challan").value.trim();
+  const dealer  = document.getElementById("dealer").value;
+  const date    = document.getElementById("date").value;
+  const dname   = document.getElementById("dealerName").value.trim();
+ 
+  if (!challan) { showToast("Please enter Challan No.", "error"); return false; }
+  if (!dealer)  { showToast("Please select a Sales Officer.", "error"); return false; }
+  if (!date)    { showToast("Please select a date.", "error"); return false; }
+  if (!dname)   { showToast("Please enter Dealer Name.", "error"); return false; }
+  if (!photoData) { showToast("Please capture confirmation photo.", "error"); return false; }
+  if (Object.keys(items).length === 0) { showToast("No items to submit.", "error"); return false; }
+ 
   return true;
 }
-
-/* CAMERA */
-function openCamera(){
-  navigator.mediaDevices.getUserMedia({video:true})
-  .then(s=>{
-    stream=s;
-    document.getElementById("cameraBox").style.display="block";
-    document.getElementById("video").srcObject=s;
-  });
+ 
+// ──────────────────────────────────────────────────────────
+// CAMERA
+// ──────────────────────────────────────────────────────────
+function openCamera() {
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+    .then(s => {
+      stream = s;
+      document.getElementById("cameraBox").style.display = "block";
+      document.getElementById("video").srcObject = s;
+    })
+    .catch(() => showToast("Camera access denied.", "error"));
 }
-
-function capturePhoto(){
-  let ctx=canvas.getContext("2d");
-  ctx.drawImage(video,0,0,150,120);
-  photoData=canvas.toDataURL("image/jpeg");
-
-  stream.getTracks().forEach(t=>t.stop());
-  video.srcObject=null;
-
-  preview.innerHTML=`<img src="${photoData}" width="120">`;
+ 
+function capturePhoto() {
+  const canvas = document.getElementById("canvas");
+  const video  = document.getElementById("video");
+  const ctx = canvas.getContext("2d");
+  canvas.width = video.videoWidth || 320;
+  canvas.height = video.videoHeight || 240;
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  photoData = canvas.toDataURL("image/jpeg", 0.85);
+ 
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  document.getElementById("video").srcObject = null;
+  document.getElementById("preview").innerHTML = `<img src="${photoData}" style="max-width:200px;border-radius:10px;border:3px solid var(--green);margin-top:8px;">`;
+  showToast("Photo captured!", "success");
 }
-
-function retakePhoto(){
-  photoData="";
-  preview.innerHTML="";
+ 
+function retakePhoto() {
+  photoData = "";
+  document.getElementById("preview").innerHTML = "";
   openCamera();
 }
-
-/* DOWNLOAD */
-function download(){
-
-  if(!checkFields()) return;
-
-  let tq=0, tm=0;
-  let now = new Date();
-  let time = now.toLocaleTimeString("en-IN");
-
-  let html=`
-  <h2 style="text-align:center;">AKAI DISTRIBUTORS</h2>
-  <p><b>SO:</b> ${dealer.value}</p>
-  <p><b>Dealer:</b> ${dealerName.value}</p>
-  <p><b>Date:</b> ${date.value}</p>
-  <p><b>Time:</b> ${time}</p>
-  <hr>
-  <table border="1" style="width:100%;border-collapse:collapse;">
-  <tr><th>Variant</th><th>Qty</th><th>MRP</th></tr>
-  `;
-
-  Object.values(items).forEach(i=>{
-    tq+=i.qty;
-    tm+=i.qty*i.mrp;
-    html+=`<tr><td>${i.variant}</td><td>${i.qty}</td><td>${i.mrp}</td></tr>`;
+ 
+// ──────────────────────────────────────────────────────────
+// DOWNLOAD BILL IMAGE (only for matched items)
+// ──────────────────────────────────────────────────────────
+function downloadBill(matchedItems) {
+  const challan    = document.getElementById("challan").value;
+  const dealer     = document.getElementById("dealer").value;
+  const dealerName = document.getElementById("dealerName").value;
+  const date       = document.getElementById("date").value;
+  const now        = new Date();
+  const time       = now.toLocaleTimeString("en-IN");
+ 
+  let tq = 0, tm = 0;
+  let rows = "";
+  matchedItems.forEach(i => {
+    tq += Number(i.qty) || 0;
+    tm += (Number(i.qty) || 0) * (Number(i.mrp) || 0);
+    rows += `<tr><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;text-align:left;">${i.variant}</td><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;text-align:center;">${i.qty}</td><td style="padding:8px 12px;border-bottom:1px solid #e2e8f0;text-align:right;">₹${i.mrp}</td></tr>`;
   });
-
-  html+=`<tr><td><b>Total</b></td><td><b>${tq}</b></td><td><b>${tm}</b></td></tr></table>`;
-
-  /* ✅ ADDED PHOTO */
-  html+=`<br><div style="text-align:center;"><img src="${photoData}" width="120"></div>`;
-
-  bill.innerHTML=html;
-  bill.style.display="block";
-
-  html2canvas(bill).then(canvas=>{
-    let a=document.createElement("a");
-    a.href=canvas.toDataURL();
-    a.download="Bill.jpg";
+ 
+  const html = `
+  <div style="font-family:'DM Sans',Arial,sans-serif;background:white;padding:32px;width:560px;">
+    <div style="background:linear-gradient(135deg,#0d1b3e,#162250);padding:20px 24px;border-radius:12px;margin-bottom:20px;display:flex;align-items:center;gap:14px;">
+      <div style="background:#f59e0b;border-radius:8px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#0d1b3e;">A</div>
+      <div>
+        <div style="font-size:18px;font-weight:800;color:white;letter-spacing:0.5px;">AKAI DISTRIBUTORS</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;">Sales Delivery Challan</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;">
+      <div style="background:#f8faff;border-radius:8px;padding:12px;border:1px solid #d1daf7;">
+        <div style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;">Challan No.</div>
+        <div style="font-weight:700;font-size:14px;">${challan}</div>
+      </div>
+      <div style="background:#f8faff;border-radius:8px;padding:12px;border:1px solid #d1daf7;">
+        <div style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;">Date &amp; Time</div>
+        <div style="font-weight:700;font-size:14px;">${date} <span style="font-size:11px;color:#64748b;">${time}</span></div>
+      </div>
+      <div style="background:#f8faff;border-radius:8px;padding:12px;border:1px solid #d1daf7;">
+        <div style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;">Sales Officer</div>
+        <div style="font-weight:700;font-size:14px;">${dealer}</div>
+      </div>
+      <div style="background:#f8faff;border-radius:8px;padding:12px;border:1px solid #d1daf7;">
+        <div style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;">Dealer</div>
+        <div style="font-weight:700;font-size:14px;">${dealerName}</div>
+      </div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;">
+      <thead>
+        <tr style="background:linear-gradient(90deg,#e8eeff,#f0f4ff);">
+          <th style="padding:10px 12px;text-align:left;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.8px;border-bottom:2px solid #d1daf7;">Variant</th>
+          <th style="padding:10px 12px;text-align:center;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.8px;border-bottom:2px solid #d1daf7;">Qty</th>
+          <th style="padding:10px 12px;text-align:right;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.8px;border-bottom:2px solid #d1daf7;">MRP</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+      <tfoot>
+        <tr style="background:linear-gradient(90deg,#dbeafe,#eff6ff);">
+          <td style="padding:10px 12px;font-weight:800;font-size:14px;">TOTAL</td>
+          <td style="padding:10px 12px;text-align:center;font-weight:800;font-size:14px;">${tq}</td>
+          <td style="padding:10px 12px;text-align:right;font-weight:800;font-size:14px;">₹${tm.toLocaleString("en-IN")}</td>
+        </tr>
+      </tfoot>
+    </table>
+    ${photoData ? `<div style="margin-top:16px;text-align:center;"><div style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;">Confirmation Photo</div><img src="${photoData}" style="max-width:160px;border-radius:8px;border:2px solid #10b981;"></div>` : ""}
+    <div style="margin-top:16px;text-align:center;font-size:10px;color:#94a3b8;">Generated by AKAI Distributors Sales System</div>
+  </div>`;
+ 
+  const bill = document.getElementById("bill");
+  bill.innerHTML = html;
+  bill.style.display = "block";
+ 
+  html2canvas(bill, { scale: 2, useCORS: true, backgroundColor: "#ffffff" }).then(canvas => {
+    const a = document.createElement("a");
+    a.href = canvas.toDataURL("image/jpeg", 0.92);
+    a.download = `AKAI_${challan}_${date}.jpg`;
     a.click();
-    bill.style.display="none";
+    bill.style.display = "none";
   });
 }
-
-/* SUBMIT */
-function submitData(){
-
-  if(!checkFields()) return;
-
-  // ✅ FIX: define BEFORE fetch
+ 
+// ──────────────────────────────────────────────────────────
+// SUBMIT
+// ──────────────────────────────────────────────────────────
+function submitData() {
+  if (!checkFields()) return;
+ 
+  // Block UI
+  document.getElementById("processingOverlay").classList.add("active");
+  document.getElementById("submitBtn").disabled = true;
+ 
+  const challanVal = document.getElementById("challan").value.trim();
+  const soVal      = document.getElementById("dealer").value.trim();
+  const dealerVal  = document.getElementById("dealerName").value.trim();
+  const dateVal    = document.getElementById("date").value;
+ 
   const cleanItems = Object.values(items).map(i => ({
     variant: String(i.variant).trim(),
-    qty: Number(i.qty) || 0
+    qty:     Number(i.qty) || 0,
+    mrp:     Number(i.mrp) || 0
   }));
-
-  fetch(API_URL,{
-    method:"POST",
-
-    // ❌ NO headers
-    // ❌ NO mode: no-cors
-
+ 
+  fetch(API_URL, {
+    method: "POST",
     body: new URLSearchParams({
       data: JSON.stringify({
-        challan: String(challan.value).trim(),
-        so: String(dealer.value).trim(),
-        dealer: dealerName.value,
-        date: date.value,
-        items: cleanItems,
-        photo: photoData
+        challan: challanVal,
+        so:      soVal,
+        dealer:  dealerVal,
+        date:    dateVal,
+        items:   cleanItems,
+        photo:   photoData
       })
     })
   })
-  .then(async (res)=>{
-
-    let text = await res.text();
-
+  .then(async res => {
+    const text = await res.text();
     let data;
-    try {
-      data = JSON.parse(text);
-    } catch {
-      throw new Error("Invalid JSON from server");
+    try { data = JSON.parse(text); } catch { throw new Error("Invalid response from server"); }
+    if (data.status !== "success") throw new Error(data.message || "Server error");
+ 
+    // Items that matched = submitted items
+    const notMatchedKeys = new Set((data.notMatched || []).map(i => i.variant));
+    const matchedItems   = cleanItems.filter(i => !notMatchedKeys.has(i.variant));
+ 
+    // Download bill only for matched items
+    if (matchedItems.length > 0) {
+      downloadBill(matchedItems);
     }
-
-    if(data.status !== "success"){
-      throw new Error(data.message || "Server error");
-    }
-
-    // ✅ KEEP YOUR EXISTING LOGIC
+ 
+    // Keep only unmatched items in the table
     let temp = {};
-    (data.notMatched || []).forEach(i=>{
-      temp[i.variant] = i;
-    });
-
+    (data.notMatched || []).forEach(i => { temp[i.variant] = i; });
     items = temp;
     render();
-
-    if(!data.notMatched || data.notMatched.length === 0){
-      alert("✅ Data Submitted");
-      location.reload();
+ 
+    if (!data.notMatched || data.notMatched.length === 0) {
+      showToast("All items submitted successfully!", "success", 4000);
+      // Reset form after short delay
+      setTimeout(() => {
+        document.getElementById("challan").value = "";
+        document.getElementById("dealer").value = "";
+        document.getElementById("dealerName").value = "";
+        photoData = "";
+        document.getElementById("preview").innerHTML = "";
+      }, 1500);
     } else {
-      alert("⚠ Some items not matched");
+      showToast(`⚠ ${data.notMatched.length} item(s) not matched. Remaining on screen.`, "warning", 5000);
     }
-
   })
-  .catch(err=>{
+  .catch(err => {
+    showToast("Submit failed: " + err.message, "error", 5000);
     console.error(err);
-    alert("❌ Submit Failed: " + err.message);
+  })
+  .finally(() => {
+    document.getElementById("processingOverlay").classList.remove("active");
+    document.getElementById("submitBtn").disabled = false;
   });
-
 }
- 	
-
 </script>
-
+ 
 </body>
 </html>
