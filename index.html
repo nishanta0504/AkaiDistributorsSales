@@ -10,7 +10,7 @@
 <style>
 :root{
   --navy:#0d1b3e;--navy2:#162250;--blue:#1a56db;--blue2:#3b82f6;
-  --accent:#f59e0b;--green:#10b981;--red:#ef4444;--white:#fff;
+  --accent:#f59e0b;--green:#10b981;--red:#ef4444;--orange:#f97316;--white:#fff;
   --border:#d1daf7;--text:#1e293b;--muted:#64748b;
   --shadow:0 4px 24px rgba(13,27,62,.10);--r:14px;--rs:8px;
 }
@@ -19,50 +19,23 @@ html,body{height:100%;overflow-x:hidden}
 body{font-family:'DM Sans',sans-serif;background:linear-gradient(135deg,#e8eeff 0%,#f4f7ff 60%,#fdf6e3 100%);min-height:100vh;color:var(--text);-webkit-tap-highlight-color:transparent}
 
 /* ── HEADER ── */
-.header{
-  background:linear-gradient(120deg,var(--navy) 0%,var(--navy2) 100%);
-  padding:12px 14px 10px;
-  display:flex;align-items:center;gap:10px;
-  box-shadow:0 4px 20px rgba(13,27,62,.25);
-  position:sticky;top:0;z-index:200;
-  min-height:56px;
-}
-.header-logo{
-  width:38px;height:38px;min-width:38px;
-  background:var(--accent);border-radius:8px;
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Syne',sans-serif;font-weight:800;font-size:13px;
-  color:var(--navy);letter-spacing:-0.5px;flex-shrink:0;line-height:1;
-  text-align:center;
-}
+.header{background:linear-gradient(120deg,var(--navy) 0%,var(--navy2) 100%);padding:12px 14px 10px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(13,27,62,.25);position:sticky;top:0;z-index:200;min-height:56px;}
+.header-logo{width:38px;height:38px;min-width:38px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:var(--navy);flex-shrink:0;line-height:1;text-align:center;}
 .header-text{flex:1;min-width:0}
-.header-text h1{
-  font-family:'Syne',sans-serif;font-size:15px;font-weight:800;
-  color:#fff;letter-spacing:0.3px;line-height:1.15;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
+.header-text h1{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#fff;letter-spacing:0.3px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .header-text p{font-size:10px;color:rgba(255,255,255,.5);font-weight:400;letter-spacing:.6px;text-transform:uppercase;margin-top:1px}
-.header-date{
-  flex-shrink:0;
-  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
-  border-radius:16px;padding:3px 9px;
-  font-size:10px;color:rgba(255,255,255,.7);font-weight:500;
-  white-space:nowrap;
-}
+.header-date{flex-shrink:0;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:3px 9px;font-size:10px;color:rgba(255,255,255,.7);font-weight:500;white-space:nowrap;}
 
-/* ── PAGE STEPPER ── */
-.stepper{
-  display:flex;align-items:center;justify-content:center;
-  background:var(--navy2);padding:8px 16px 10px;gap:0;
-}
+/* ── CACHE STATUS BAR ── */
+#cacheBar{background:var(--navy2);padding:4px 14px;font-size:10px;text-align:center;font-weight:500;transition:.3s}
+#cacheBar.loading{color:var(--accent)}
+#cacheBar.ready{color:rgba(16,185,129,.9)}
+#cacheBar.error{color:#f87171}
+
+/* ── STEPPER ── */
+.stepper{display:flex;align-items:center;justify-content:center;background:var(--navy2);padding:7px 16px 9px;gap:0;}
 .step{display:flex;align-items:center;gap:6px;cursor:pointer}
-.step-num{
-  width:26px;height:26px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Syne',sans-serif;font-size:12px;font-weight:700;
-  border:2px solid rgba(255,255,255,.25);color:rgba(255,255,255,.4);
-  transition:.25s;flex-shrink:0;
-}
+.step-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;border:2px solid rgba(255,255,255,.25);color:rgba(255,255,255,.4);transition:.25s;flex-shrink:0;}
 .step-label{font-size:11px;color:rgba(255,255,255,.4);font-weight:500;transition:.25s;white-space:nowrap}
 .step.active .step-num{background:var(--accent);border-color:var(--accent);color:var(--navy)}
 .step.active .step-label{color:#fff}
@@ -80,11 +53,7 @@ body{font-family:'DM Sans',sans-serif;background:linear-gradient(135deg,#e8eeff 
 
 /* ── CARDS ── */
 .card{background:#fff;border-radius:var(--r);box-shadow:var(--shadow);padding:14px;margin-bottom:12px;border:1px solid rgba(209,218,247,.5)}
-.card-title{
-  font-family:'Syne',sans-serif;font-size:11px;font-weight:700;
-  color:var(--muted);text-transform:uppercase;letter-spacing:1.1px;
-  margin-bottom:11px;display:flex;align-items:center;gap:6px;
-}
+.card-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.1px;margin-bottom:11px;display:flex;align-items:center;gap:6px;}
 .card-title::before{content:'';display:inline-block;width:3px;height:13px;background:var(--blue);border-radius:2px}
 
 /* ── INPUTS ── */
@@ -92,30 +61,14 @@ body{font-family:'DM Sans',sans-serif;background:linear-gradient(135deg,#e8eeff 
 .row .field{flex:1}
 .field{margin-bottom:9px}
 .field label{display:block;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px}
-input[type="text"],input[type="date"],input[list],select{
-  width:100%;padding:11px 12px;font-size:14px;font-family:'DM Sans',sans-serif;
-  border:1.5px solid var(--border);border-radius:var(--rs);
-  background:#f8faff;color:var(--text);
-  transition:border .18s,box-shadow .18s;outline:none;appearance:none;
-  -webkit-appearance:none;
-}
+input[type="text"],input[type="date"],input[list],select{width:100%;padding:11px 12px;font-size:14px;font-family:'DM Sans',sans-serif;border:1.5px solid var(--border);border-radius:var(--rs);background:#f8faff;color:var(--text);transition:border .18s,box-shadow .18s;outline:none;appearance:none;-webkit-appearance:none;}
 input:focus,select:focus{border-color:var(--blue2);box-shadow:0 0 0 3px rgba(59,130,246,.12);background:#fff}
-select{
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 11px center;padding-right:30px;
-}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:30px;}
 
 /* ── BUTTONS ── */
 .btn-row{display:flex;gap:8px;margin-bottom:6px}
 .btn-row .btn{flex:1}
-.btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:6px;
-  padding:12px 16px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;
-  border:none;border-radius:var(--rs);cursor:pointer;
-  transition:transform .1s,box-shadow .12s,opacity .18s;
-  text-align:center;white-space:nowrap;-webkit-tap-highlight-color:transparent;
-  touch-action:manipulation;
-}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 16px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;border:none;border-radius:var(--rs);cursor:pointer;transition:transform .1s,box-shadow .12s,opacity .18s;text-align:center;white-space:nowrap;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 .btn:active{transform:scale(.96)}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 .btn-primary{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;box-shadow:0 3px 12px rgba(26,86,219,.28)}
@@ -128,10 +81,7 @@ select{
 .btn-sm{padding:7px 10px;font-size:12px;border-radius:6px}
 
 /* ── SCANNER ── */
-#readerBox{
-  display:none;border-radius:var(--r);overflow:hidden;
-  background:var(--navy);margin-bottom:12px;
-}
+#readerBox{display:none;border-radius:var(--r);overflow:hidden;background:var(--navy);margin-bottom:12px;}
 .scanner-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 0}
 .scanner-hdr span{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px}
 .pulse-dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:pulse 1.2s infinite}
@@ -139,7 +89,7 @@ select{
 #closeScan{background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:50%;width:28px;height:28px;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 #closeScan:active{background:var(--red)}
 #reader{width:100%}
-.scan-fb{text-align:center;padding:6px 12px 8px;font-size:12px;color:rgba(255,255,255,.55);font-style:italic;min-height:32px}
+.scan-fb{text-align:center;padding:6px 12px 8px;font-size:12px;color:rgba(255,255,255,.6);min-height:32px;transition:.15s}
 
 /* ── TABLE ── */
 .table-wrap{overflow-x:auto;border-radius:var(--rs);border:1px solid var(--border)}
@@ -157,6 +107,16 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
 .status-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .status-label{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:5px}
 
+/* ── QTY EXCEEDED BADGE ── */
+.exceeded-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.35);
+  color:var(--red);border-radius:20px;padding:1px 8px;
+  font-size:10px;font-weight:700;margin-left:5px;
+  white-space:nowrap;
+}
+.exceeded-row td{background:rgba(239,68,68,.03)}
+
 /* ── CAMERA ── */
 #cameraBox{display:none;text-align:center;background:var(--navy);border-radius:var(--r);padding:14px;margin-bottom:12px}
 .cam-title{color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;margin-bottom:10px}
@@ -167,11 +127,7 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
 .cam-btns{display:flex;gap:8px;justify-content:center;margin-top:10px}
 
 /* ── PROCESSING OVERLAY ── */
-#processingOverlay{
-  display:none;position:fixed;inset:0;
-  background:rgba(13,27,62,.78);backdrop-filter:blur(4px);
-  z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:14px;
-}
+#processingOverlay{display:none;position:fixed;inset:0;background:rgba(13,27,62,.78);backdrop-filter:blur(4px);z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:14px;}
 #processingOverlay.active{display:flex}
 .spinner{width:50px;height:50px;border:4px solid rgba(255,255,255,.15);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -180,12 +136,7 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
 
 /* ── TOASTS ── */
 .toast-container{position:fixed;top:70px;right:12px;z-index:10000;display:flex;flex-direction:column;gap:7px;pointer-events:none}
-.toast{
-  background:#fff;border-radius:var(--rs);box-shadow:0 6px 20px rgba(0,0,0,.13);
-  padding:10px 14px;display:flex;align-items:center;gap:8px;
-  font-size:12px;font-weight:500;border-left:4px solid var(--blue);
-  animation:slideIn .22s ease;max-width:260px;
-}
+.toast{background:#fff;border-radius:var(--rs);box-shadow:0 6px 20px rgba(0,0,0,.13);padding:10px 14px;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:500;border-left:4px solid var(--blue);animation:slideIn .22s ease;max-width:265px;}
 .toast.success{border-color:var(--green)}
 .toast.error{border-color:var(--red)}
 .toast.warning{border-color:var(--accent)}
@@ -193,17 +144,13 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
 
 /* ── SCAN FLASH ── */
 .scan-flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:999;transition:opacity .05s}
-.scan-flash.flash{opacity:.35}
+.scan-flash.flash{opacity:.3}
 
-/* ── BILL (hidden) ── */
+/* ── BILL (offscreen) ── */
 #bill{display:none;background:#fff;padding:24px;width:580px;position:fixed;left:-9999px;top:0}
 
-/* ── PHOTO PREVIEW ON PAGE 2 ── */
-.photo-confirmed{
-  display:flex;align-items:center;gap:10px;
-  background:rgba(16,185,129,.08);border:1.5px solid var(--green);
-  border-radius:var(--rs);padding:10px 12px;margin-bottom:10px;
-}
+/* ── PHOTO CONFIRMED ── */
+.photo-confirmed{display:flex;align-items:center;gap:10px;background:rgba(16,185,129,.08);border:1.5px solid var(--green);border-radius:var(--rs);padding:10px 12px;margin-bottom:10px;}
 .photo-confirmed img{width:52px;height:40px;object-fit:cover;border-radius:6px;border:2px solid var(--green)}
 .photo-confirmed .pc-text{font-size:12px;color:#059669;font-weight:600}
 .photo-confirmed .pc-sub{font-size:11px;color:var(--muted);margin-top:1px}
@@ -211,17 +158,13 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
 </head>
 <body>
 
-<!-- PROCESSING OVERLAY -->
 <div id="processingOverlay">
   <div class="spinner"></div>
   <div class="processing-text">Submitting Data...</div>
   <div class="processing-sub">Please wait, do not close this page</div>
 </div>
 
-<!-- SCAN FLASH -->
 <div class="scan-flash" id="scanFlash"></div>
-
-<!-- TOASTS -->
 <div class="toast-container" id="toastContainer"></div>
 
 <!-- HEADER -->
@@ -234,15 +177,18 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
   <div class="header-date" id="headerDate"></div>
 </div>
 
+<!-- CACHE STATUS -->
+<div id="cacheBar" class="loading">⏳ Loading product cache…</div>
+
 <!-- STEPPER -->
 <div class="stepper">
   <div class="step active" id="step1tab" onclick="goPage(1)">
-    <div class="step-num" id="sn1">1</div>
+    <div class="step-num">1</div>
     <div class="step-label">Entry</div>
   </div>
   <div class="step-line"></div>
   <div class="step" id="step2tab" onclick="goPage(2)">
-    <div class="step-num" id="sn2">2</div>
+    <div class="step-num">2</div>
     <div class="step-label">Confirm &amp; Submit</div>
   </div>
 </div>
@@ -251,13 +197,12 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
 <div class="page active" id="page1">
 <div class="container">
 
-  <!-- Order Details -->
   <div class="card">
     <div class="card-title">Order Details</div>
     <div class="row">
       <div class="field">
         <label>Challan No.</label>
-        <input type="text" id="challan" placeholder="e.g. CH-2024">
+        <input type="text" id="challan" placeholder="e.g. 93,40 ">
       </div>
       <div class="field">
         <label>Date</label>
@@ -281,7 +226,6 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
     </div>
   </div>
 
-  <!-- Scan & Entry -->
   <div class="card">
     <div class="card-title">Scan &amp; Entry</div>
     <div class="btn-row">
@@ -305,7 +249,6 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
     </div>
   </div>
 
-  <!-- Items Table -->
   <div class="card">
     <div class="status-bar">
       <div class="status-label">Items<span class="item-badge" id="itemCount">0</span></div>
@@ -336,7 +279,6 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
     </div>
   </div>
 
-  <!-- Next Page Button -->
   <div class="card" style="padding:12px">
     <button class="btn btn-nav" style="width:100%;padding:13px;font-size:14px" onclick="goToPage2()">
       Next: Confirmation &amp; Submit
@@ -345,19 +287,17 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
   </div>
 
 </div>
-</div><!-- /page1 -->
+</div>
 
 <!-- ══════════════ PAGE 2 ══════════════ -->
 <div class="page" id="page2">
 <div class="container">
 
-  <!-- Summary -->
   <div class="card">
     <div class="card-title">Order Summary</div>
-    <div id="summaryBox" style="font-size:13px;color:var(--text)"></div>
+    <div id="summaryBox"></div>
   </div>
 
-  <!-- Confirmation Photo -->
   <div class="card">
     <div class="card-title">Confirmation Photo</div>
     <div id="photoConfirmedBox" style="display:none"></div>
@@ -377,16 +317,14 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
     </div>
   </div>
 
-  <!-- Submit -->
   <div class="card" style="padding:12px">
     <button class="btn btn-success" style="width:100%;padding:13px;font-size:15px" onclick="submitData()" id="submitBtn">
       <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>
       Submit &amp; Download
     </button>
-    <div style="text-align:center;margin-top:7px;font-size:11px;color:var(--muted)">Matched items download as challan image. Unmatched stay on screen.</div>
+    <div style="text-align:center;margin-top:7px;font-size:11px;color:var(--muted)">Matched items download as challan. Items with exceeded qty stay on screen.</div>
   </div>
 
-  <!-- Back Button -->
   <div class="card" style="padding:12px">
     <button class="btn btn-outline" style="width:100%;padding:12px" onclick="goPage(1)">
       <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
@@ -395,134 +333,161 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
   </div>
 
 </div>
-</div><!-- /page2 -->
+</div>
 
-<!-- BILL (hidden offscreen for html2canvas) -->
 <div id="bill"></div>
 
 <script>
-/* ─────────────────────────────────────────
-   CONFIG — EDIT BILL NUMBER HERE IF NEEDED
-   ─────────────────────────────────────────
-   To change starting number: set BILL_NUMBER_OFFSET
-   This value is ADDED to the server count.
-   Example: server returns 1001, offset=0 → 1001
-            If you want to reset to 2001, set offset=1000
-            If you want to go back to 1001, set offset=0
-   ───────────────────────────────────────── */
-const BILL_NUMBER_OFFSET = 0; // ← CHANGE THIS to shift bill numbers up/down
+/* ══════════════════════════════════════════════════════
+   BILL NUMBER CONFIG
+   Change BILL_NUMBER_OFFSET to shift numbers up or down.
+   Example: set 1000 to jump from 1001 → 2001
+   ══════════════════════════════════════════════════════ */
+const BILL_NUMBER_OFFSET = 0;
 
 const API_URL = "https://script.google.com/macros/s/AKfycbxN1ueHxR9seDLWBPOQffVkYOFInQpexU6W8-wJIJ-Nl82CtgjSBf6Q-gB-517orI_k/exec";
 
-let items = {};
-let scanner = null, scanning = false;
-let manualMode = false;
-let scanLock = false;
-let photoData = "";
-let stream = null;
-let currentPage = 1;
+/* ── STATE ── */
+let items        = {};   // { variantName: {variant, qty, mrp, exceeded} }
+let scanner      = null;
+let scanning     = false;
+let manualMode   = false;
+let scanLock     = false;
+let photoData    = "";
+let stream       = null;
+let currentPage  = 1;
 
-// Fast beep
+/* ══════════════════════════════════════════════════════
+   LOCAL CACHE  ← KEY CHANGE FOR INSTANT SCAN
+   The entire Stock Sheet is loaded once on startup into
+   stockCache: { uid → { variant, mrp } }
+   QR scan then does an instant in-memory lookup — zero
+   network round-trip per scan.
+   ══════════════════════════════════════════════════════ */
+let stockCache     = {};   // uid → { variant, mrp }
+let cacheReady     = false;
+let cacheLoadFail  = false;
+
+function loadStockCache() {
+  const bar = document.getElementById("cacheBar");
+  bar.className = "loading";
+  bar.textContent = "⏳ Loading product cache…";
+
+  fetch(API_URL + "?type=stockcache")
+    .then(r => r.json())
+    .then(data => {
+      stockCache = {};
+      if (Array.isArray(data)) {
+        data.forEach(row => {
+          if (row.uid) stockCache[String(row.uid).trim()] = { variant: row.variant || "", mrp: Number(row.mrp) || 0 };
+        });
+      }
+      cacheReady = true;
+      const count = Object.keys(stockCache).length;
+      bar.className = "ready";
+      bar.textContent = `✅ ${count} products loaded — scanner ready`;
+      setTimeout(() => { bar.style.display = "none"; }, 3000);
+    })
+    .catch(() => {
+      cacheLoadFail = true;
+      bar.className = "error";
+      bar.textContent = "⚠ Cache load failed — will use live lookup per scan";
+      setTimeout(() => { bar.style.display = "none"; }, 4000);
+    });
+}
+
+/* Lookup from cache, fallback to network if cache not ready */
+function lookupUID(uid) {
+  const key = String(uid).trim();
+  if (cacheReady && stockCache[key]) {
+    return Promise.resolve(stockCache[key]);
+  }
+  // fallback (cache miss or not loaded yet)
+  return fetch(API_URL + "?uid=" + encodeURIComponent(uid))
+    .then(r => r.json())
+    .then(d => d.variant ? d : null);
+}
+
+/* ── AUDIO BEEP (Web Audio — instant, no file load) ── */
 const beep = (() => {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     return () => {
       try {
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
+        const o = ctx.createOscillator(), g = ctx.createGain();
         o.connect(g); g.connect(ctx.destination);
-        o.frequency.value = 880;
-        g.gain.setValueAtTime(0.3, ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
-        o.start(); o.stop(ctx.currentTime + 0.08);
+        o.frequency.value = 900;
+        g.gain.setValueAtTime(0.28, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.07);
+        o.start(); o.stop(ctx.currentTime + 0.07);
       } catch(e){}
     };
-  } catch(e) { return () => {}; }
+  } catch(e){ return ()=>{}; }
 })();
 
 /* ── INIT ── */
-window.onload = function(){
+window.onload = function() {
   const today = new Date();
   document.getElementById("date").value = today.toISOString().split("T")[0];
   document.getElementById("headerDate").textContent =
-    today.toLocaleDateString("en-IN",{day:"2-digit",month:"short"});
+    today.toLocaleDateString("en-IN", { day:"2-digit", month:"short" });
   loadDealers();
+  loadStockCache();   // ← preload cache on startup
 };
 
 /* ── DEALERS ── */
-function loadDealers(){
-  fetch(API_URL+"?type=dealers")
-    .then(r=>r.json())
-    .then(data=>{
+function loadDealers() {
+  fetch(API_URL + "?type=dealers")
+    .then(r => r.json())
+    .then(data => {
       const list = document.getElementById("dealerList");
       list.innerHTML = "";
-      data.forEach(d=>{
-        const o = document.createElement("option");
-        o.value = d; list.appendChild(o);
-      });
-    }).catch(()=>{});
+      data.forEach(d => { const o = document.createElement("option"); o.value = d; list.appendChild(o); });
+    }).catch(() => {});
 }
 
 /* ── TOAST ── */
-function showToast(msg, type="info", dur=2800){
-  const icons={success:"✅",error:"❌",warning:"⚠️",info:"ℹ️"};
+function showToast(msg, type="info", dur=2600) {
+  const icons = { success:"✅", error:"❌", warning:"⚠️", info:"ℹ️" };
   const c = document.getElementById("toastContainer");
   const t = document.createElement("div");
-  t.className = "toast "+type;
+  t.className = "toast " + type;
   t.innerHTML = `<span>${icons[type]||"•"}</span><span>${msg}</span>`;
   c.appendChild(t);
-  setTimeout(()=>{ t.style.cssText="opacity:0;transition:opacity .25s"; setTimeout(()=>t.remove(),260); }, dur);
+  setTimeout(() => { t.style.cssText="opacity:0;transition:opacity .25s"; setTimeout(()=>t.remove(),260); }, dur);
 }
 
-/* ── PAGE NAVIGATION ── */
-function goPage(n){
+/* ── PAGE NAV ── */
+function goPage(n) {
   currentPage = n;
   document.getElementById("page1").classList.toggle("active", n===1);
   document.getElementById("page2").classList.toggle("active", n===2);
   document.getElementById("step1tab").className = "step" + (n===1?" active": n>1?" done":"");
   document.getElementById("step2tab").className = "step" + (n===2?" active":"");
-  if(n===2) refreshSummary();
-  window.scrollTo(0,0);
+  if (n===2) refreshSummary();
+  window.scrollTo(0, 0);
 }
 
-function goToPage2(){
-  const ch = document.getElementById("challan").value.trim();
-  const so = document.getElementById("dealer").value;
-  const dt = document.getElementById("date").value;
-  const dn = document.getElementById("dealerName").value.trim();
-  if(!ch){ showToast("Enter Challan No.","error"); return; }
-  if(!so){ showToast("Select Sales Officer","error"); return; }
-  if(!dt){ showToast("Select Date","error"); return; }
-  if(!dn){ showToast("Enter Dealer Name","error"); return; }
-  if(Object.keys(items).length===0){ showToast("Add at least one item","error"); return; }
+function goToPage2() {
+  if (!document.getElementById("challan").value.trim()) { showToast("Enter Challan No.","error"); return; }
+  if (!document.getElementById("dealer").value)          { showToast("Select Sales Officer","error"); return; }
+  if (!document.getElementById("date").value)            { showToast("Select Date","error"); return; }
+  if (!document.getElementById("dealerName").value.trim()){ showToast("Enter Dealer Name","error"); return; }
+  if (Object.keys(items).length === 0)                   { showToast("Add at least one item","error"); return; }
   goPage(2);
 }
 
-function refreshSummary(){
-  const ch = document.getElementById("challan").value;
-  const so = document.getElementById("dealer").value;
-  const dn = document.getElementById("dealerName").value;
-  const dt = document.getElementById("date").value;
-  let tq=0, tm=0;
+function refreshSummary() {
+  const ch=document.getElementById("challan").value, so=document.getElementById("dealer").value;
+  const dn=document.getElementById("dealerName").value, dt=document.getElementById("date").value;
+  let tq=0,tm=0;
   Object.values(items).forEach(i=>{ tq+=Number(i.qty)||0; tm+=(Number(i.qty)||0)*(Number(i.mrp)||0); });
   document.getElementById("summaryBox").innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px">
-      <div style="background:#f8faff;border-radius:8px;padding:10px;border:1px solid #d1daf7">
-        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Challan</div>
-        <div style="font-weight:700;font-size:13px">${ch}</div>
-      </div>
-      <div style="background:#f8faff;border-radius:8px;padding:10px;border:1px solid #d1daf7">
-        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Date</div>
-        <div style="font-weight:700;font-size:13px">${dt}</div>
-      </div>
-      <div style="background:#f8faff;border-radius:8px;padding:10px;border:1px solid #d1daf7">
-        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">SO</div>
-        <div style="font-weight:700;font-size:13px">${so}</div>
-      </div>
-      <div style="background:#f8faff;border-radius:8px;padding:10px;border:1px solid #d1daf7">
-        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Dealer</div>
-        <div style="font-weight:700;font-size:13px">${dn}</div>
-      </div>
+      <div style="background:#f8faff;border-radius:8px;padding:10px;border:1px solid #d1daf7"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Challan</div><div style="font-weight:700;font-size:13px">${ch}</div></div>
+      <div style="background:#f8faff;border-radius:8px;padding:10px;border:1px solid #d1daf7"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Date</div><div style="font-weight:700;font-size:13px">${dt}</div></div>
+      <div style="background:#f8faff;border-radius:8px;padding:10px;border:1px solid #d1daf7"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">SO</div><div style="font-weight:700;font-size:13px">${so}</div></div>
+      <div style="background:#f8faff;border-radius:8px;padding:10px;border:1px solid #d1daf7"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Dealer</div><div style="font-weight:700;font-size:13px">${dn}</div></div>
     </div>
     <div style="background:linear-gradient(90deg,#dbeafe,#eff6ff);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;margin-top:6px;border:1px solid #bfdbfe">
       <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:var(--navy)">${Object.keys(items).length} VARIANTS</span>
@@ -530,75 +495,73 @@ function refreshSummary(){
     </div>`;
 }
 
-/* ── SCANNER ── */
-function openScanner(){
+/* ══════════════════════════════════════════════════════
+   SCANNER — instant lookup via local cache
+   ══════════════════════════════════════════════════════ */
+function openScanner() {
   document.getElementById("readerBox").style.display = "block";
-  if(scanning) return;
+  if (scanning) return;
 
   scanner = new Html5Qrcode("reader", { verbose: false });
   scanner.start(
-    { facingMode:"environment" },
+    { facingMode: "environment" },
     {
-      fps: 25,
+      fps: 30,
       qrbox: { width: 220, height: 220 },
       aspectRatio: 1.0,
       disableFlip: false,
       experimentalFeatures: { useBarCodeDetectorIfSupported: true }
     },
     qrCode => {
-      if(scanLock) return;
+      if (scanLock) return;
       scanLock = true;
 
-      // Visual flash
+      // Instant feedback — flash + beep happen before any lookup
       const flash = document.getElementById("scanFlash");
       flash.classList.add("flash");
-      setTimeout(()=>flash.classList.remove("flash"), 120);
+      setTimeout(() => flash.classList.remove("flash"), 110);
       beep();
 
-      document.getElementById("scanFeedback").textContent = "⏳ " + qrCode.substring(0,22) + "…";
+      const fb = document.getElementById("scanFeedback");
+      fb.textContent = "🔍 " + qrCode.substring(0, 20) + "…";
 
-      fetch(API_URL+"?uid="+encodeURIComponent(qrCode))
-        .then(r=>r.json())
-        .then(data=>{
-          if(!data.variant){
-            showToast("Not found: "+qrCode.substring(0,14),"error");
-            document.getElementById("scanFeedback").textContent = "❌ Not found. Try another.";
+      lookupUID(qrCode)           // ← instant from cache if loaded
+        .then(data => {
+          if (!data || !data.variant) {
+            showToast("Not found: " + qrCode.substring(0, 14), "error");
+            fb.textContent = "❌ Item not found";
           } else {
-            if(!items[data.variant]){
-              items[data.variant]={variant:data.variant, qty:1, mrp:Number(data.mrp)||0};
+            if (!items[data.variant]) {
+              items[data.variant] = { variant: data.variant, qty: 1, mrp: Number(data.mrp)||0, exceeded: false };
             } else {
               items[data.variant].qty++;
             }
             render();
-            document.getElementById("scanFeedback").textContent = "✅ "+data.variant+" ×"+items[data.variant].qty;
-            showToast(data.variant+" ×"+items[data.variant].qty,"success",1800);
+            fb.textContent = "✅ " + data.variant + "  ×" + items[data.variant].qty;
+            showToast(data.variant + " ×" + items[data.variant].qty, "success", 1600);
           }
         })
-        .catch(()=>{ showToast("Network error","error"); })
-        .finally(()=>{ setTimeout(()=>{ scanLock=false; }, 1000); });
+        .catch(() => { showToast("Lookup error", "error"); fb.textContent = "❌ Error"; })
+        .finally(() => { setTimeout(() => { scanLock = false; }, 900); });
     },
-    ()=>{}
+    () => {}
   );
   scanning = true;
 }
 
-function closeScanner(){
-  if(scanner && scanning){
-    scanner.stop().then(()=>{
-      scanning=false;
-      document.getElementById("readerBox").style.display="none";
-    }).catch(()=>{
-      scanning=false;
-      document.getElementById("readerBox").style.display="none";
-    });
+function closeScanner() {
+  if (scanner && scanning) {
+    scanner.stop()
+      .then(() => { scanning = false; document.getElementById("readerBox").style.display = "none"; })
+      .catch(() => { scanning = false; document.getElementById("readerBox").style.display = "none"; });
   }
 }
 
 /* ── MANUAL EDIT ── */
-function toggleEdit(){
+function toggleEdit() {
   manualMode = !manualMode;
-  document.getElementById("editHead").style.display = manualMode?"":"none";
-  document.getElementById("tActionFoot").style.display = manualMode?"":"none";
+  document.getElementById("editHead").style.display = manualMode ? "" : "none";
+  document.getElementById("tActionFoot").style.display = manualMode ? "" : "none";
   document.getElementById("editBtn").innerHTML = manualMode
     ? `<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg> Lock`
     : `<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Manual`;
@@ -606,109 +569,112 @@ function toggleEdit(){
 }
 
 /* ── RENDER TABLE ── */
-function render(){
+function render() {
   const keys = Object.keys(items);
   document.getElementById("itemCount").textContent = keys.length;
 
-  if(keys.length===0){
-    document.getElementById("tbody").innerHTML=`<tr><td colspan="4"><div class="empty-state"><svg width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><p>No items yet.<br>Scan QR or add manually.</p></div></td></tr>`;
-    document.getElementById("tQty").textContent="0";
-    document.getElementById("tMrp").textContent="₹0";
-    document.getElementById("tQtyTop").textContent="0";
+  if (keys.length === 0) {
+    document.getElementById("tbody").innerHTML = `<tr><td colspan="4"><div class="empty-state"><svg width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><p>No items yet.<br>Scan QR or add manually.</p></div></td></tr>`;
+    document.getElementById("tQty").textContent = "0";
+    document.getElementById("tMrp").textContent = "₹0";
+    document.getElementById("tQtyTop").textContent = "0";
     return;
   }
 
-  let html="", tq=0, tm=0;
-  keys.forEach(key=>{
-    const i=items[key];
-    tq+=Number(i.qty)||0; tm+=(Number(i.qty)||0)*(Number(i.mrp)||0);
-    html+=`<tr>
-      <td style="text-align:left;font-weight:500;font-size:12px">${manualMode?`<input type="text" value="${i.variant}" style="width:100%;text-align:left" onchange="items['${key}'].variant=this.value">`:i.variant}</td>
-      <td>${manualMode?`<input type="number" value="${i.qty}" onchange="items['${key}'].qty=Number(this.value);render()">`:`<b>${i.qty}</b>`}</td>
-      <td>${manualMode?`<input type="number" value="${i.mrp}" onchange="items['${key}'].mrp=Number(this.value);render()">`:`₹${i.mrp}`}</td>
-      ${manualMode?`<td><button class="btn btn-danger btn-sm" onclick="removeItem('${key}')">✕</button></td>`:`<td></td>`}
+  let html = "", tq = 0, tm = 0;
+  keys.forEach(key => {
+    const i = items[key];
+    const q = Number(i.qty) || 0;
+    const m = Number(i.mrp) || 0;
+    tq += q; tm += q * m;
+
+    const excBadge = i.exceeded
+      ? `<span class="exceeded-badge">⚠ Qty Exceeded</span>` : "";
+    const rowClass = i.exceeded ? "exceeded-row" : "";
+
+    html += `<tr class="${rowClass}">
+      <td style="text-align:left;font-weight:500;font-size:12px">
+        ${manualMode ? `<input type="text" value="${i.variant}" style="width:100%;text-align:left" onchange="items['${key}'].variant=this.value">` : i.variant}
+        ${!manualMode ? excBadge : ""}
+      </td>
+      <td>${manualMode ? `<input type="number" value="${q}" onchange="items['${key}'].qty=Number(this.value);render()">` : `<b>${q}</b>`}</td>
+      <td>${manualMode ? `<input type="number" value="${m}" onchange="items['${key}'].mrp=Number(this.value);render()">` : `₹${m}`}</td>
+      ${manualMode ? `<td><button class="btn btn-danger btn-sm" onclick="removeItem('${key}')">✕</button></td>` : `<td></td>`}
     </tr>`;
   });
-  if(manualMode) html+=`<tr><td colspan="4" style="padding:6px"><button class="btn btn-outline btn-sm" style="width:100%" onclick="addItem()">＋ Add Item</button></td></tr>`;
 
-  document.getElementById("tbody").innerHTML=html;
-  document.getElementById("tQty").textContent=tq;
-  document.getElementById("tMrp").textContent="₹"+tm.toLocaleString("en-IN");
-  document.getElementById("tQtyTop").textContent=tq;
+  if (manualMode) html += `<tr><td colspan="4" style="padding:6px"><button class="btn btn-outline btn-sm" style="width:100%" onclick="addItem()">＋ Add Item</button></td></tr>`;
+
+  document.getElementById("tbody").innerHTML = html;
+  document.getElementById("tQty").textContent = tq;
+  document.getElementById("tMrp").textContent = "₹" + tm.toLocaleString("en-IN");
+  document.getElementById("tQtyTop").textContent = tq;
 }
 
-function addItem(){
-  const n=prompt("Variant Name:");
-  if(!n) return;
-  items[n.trim()]={variant:n.trim(),qty:1,mrp:0};
+function addItem() {
+  const n = prompt("Variant Name:");
+  if (!n) return;
+  items[n.trim()] = { variant: n.trim(), qty: 1, mrp: 0, exceeded: false };
   render();
 }
-function removeItem(k){ delete items[k]; render(); }
+function removeItem(k) { delete items[k]; render(); }
 
 /* ── VALIDATION ── */
-function checkFields(){
-  if(!document.getElementById("challan").value.trim()){ showToast("Enter Challan No.","error"); return false; }
-  if(!document.getElementById("dealer").value){ showToast("Select Sales Officer","error"); return false; }
-  if(!document.getElementById("date").value){ showToast("Select Date","error"); return false; }
-  if(!document.getElementById("dealerName").value.trim()){ showToast("Enter Dealer Name","error"); return false; }
-  if(!photoData){ showToast("Capture confirmation photo","error"); return false; }
-  if(Object.keys(items).length===0){ showToast("No items to submit","error"); return false; }
+function checkFields() {
+  if (!document.getElementById("challan").value.trim())  { showToast("Enter Challan No.","error"); return false; }
+  if (!document.getElementById("dealer").value)           { showToast("Select Sales Officer","error"); return false; }
+  if (!document.getElementById("date").value)             { showToast("Select Date","error"); return false; }
+  if (!document.getElementById("dealerName").value.trim()){ showToast("Enter Dealer Name","error"); return false; }
+  if (!photoData)                                         { showToast("Capture confirmation photo","error"); return false; }
+  if (Object.keys(items).length === 0)                    { showToast("No items to submit","error"); return false; }
   return true;
 }
 
 /* ── CAMERA ── */
-function openCamera(){
-  navigator.mediaDevices.getUserMedia({video:{facingMode:"environment",width:{ideal:1280},height:{ideal:720}}})
-    .then(s=>{
-      stream=s;
-      document.getElementById("cameraBox").style.display="block";
-      document.getElementById("video").srcObject=s;
+function openCamera() {
+  navigator.mediaDevices.getUserMedia({ video: { facingMode:"environment", width:{ideal:1280}, height:{ideal:720} } })
+    .then(s => {
+      stream = s;
+      document.getElementById("cameraBox").style.display = "block";
+      document.getElementById("video").srcObject = s;
     })
-    .catch(()=>showToast("Camera access denied","error"));
+    .catch(() => showToast("Camera access denied","error"));
 }
-function capturePhoto(){
-  const canvas=document.getElementById("canvas");
-  const video=document.getElementById("video");
-  canvas.width=video.videoWidth||320;
-  canvas.height=video.videoHeight||240;
-  canvas.getContext("2d").drawImage(video,0,0,canvas.width,canvas.height);
-  photoData=canvas.toDataURL("image/jpeg",0.82);
-  if(stream) stream.getTracks().forEach(t=>t.stop());
-  document.getElementById("video").srcObject=null;
-  document.getElementById("cameraBox").style.display="none";
-  document.getElementById("preview").innerHTML="";
-  // Show confirmed box
-  document.getElementById("photoConfirmedBox").style.display="flex";
-  document.getElementById("photoConfirmedBox").className="photo-confirmed";
-  document.getElementById("photoConfirmedBox").innerHTML=`
+function capturePhoto() {
+  const canvas = document.getElementById("canvas"), video = document.getElementById("video");
+  canvas.width = video.videoWidth || 320; canvas.height = video.videoHeight || 240;
+  canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+  photoData = canvas.toDataURL("image/jpeg", 0.82);
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  document.getElementById("video").srcObject = null;
+  document.getElementById("cameraBox").style.display = "none";
+  document.getElementById("preview").innerHTML = "";
+  document.getElementById("photoConfirmedBox").style.display = "flex";
+  document.getElementById("photoConfirmedBox").className = "photo-confirmed";
+  document.getElementById("photoConfirmedBox").innerHTML = `
     <img src="${photoData}" alt="photo">
     <div><div class="pc-text">✅ Photo Captured</div><div class="pc-sub">Tap Retake to change</div></div>
     <button class="btn btn-outline btn-sm" onclick="retakePhoto()" style="margin-left:auto">Retake</button>`;
-  document.getElementById("openCamBtn").style.display="none";
+  document.getElementById("openCamBtn").style.display = "none";
   showToast("Photo captured!","success");
 }
-function retakePhoto(){
-  photoData="";
-  document.getElementById("photoConfirmedBox").style.display="none";
-  document.getElementById("openCamBtn").style.display="flex";
+function retakePhoto() {
+  photoData = "";
+  document.getElementById("photoConfirmedBox").style.display = "none";
+  document.getElementById("openCamBtn").style.display = "flex";
   openCamera();
 }
 
 /* ── DOWNLOAD BILL ── */
-function downloadBill(matchedItems){
-  const ch = document.getElementById("challan").value;
-  const so = document.getElementById("dealer").value;
-  const dn = document.getElementById("dealerName").value;
-  const dt = document.getElementById("date").value;
+function downloadBill(matchedItems) {
+  const ch=document.getElementById("challan").value, so=document.getElementById("dealer").value;
+  const dn=document.getElementById("dealerName").value, dt=document.getElementById("date").value;
   const time = new Date().toLocaleTimeString("en-IN");
-
   let tq=0,tm=0,rows="";
   matchedItems.forEach(i=>{
-    tq+=Number(i.qty)||0;
-    tm+=(Number(i.qty)||0)*(Number(i.mrp)||0);
+    tq+=Number(i.qty)||0; tm+=(Number(i.qty)||0)*(Number(i.mrp)||0);
     rows+=`<tr><td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;text-align:left;font-size:13px">${i.variant}</td><td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;text-align:center;font-size:13px">${i.qty}</td><td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;text-align:right;font-size:13px">₹${i.mrp}</td></tr>`;
   });
-
   const html=`<div style="font-family:'DM Sans',Arial,sans-serif;background:#fff;padding:28px;width:540px">
     <div style="background:linear-gradient(135deg,#0d1b3e,#162250);padding:18px 20px;border-radius:10px;margin-bottom:18px;display:flex;align-items:center;gap:12px">
       <div style="background:#f59e0b;border-radius:7px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#0d1b3e;flex-shrink:0">AD</div>
@@ -737,7 +703,7 @@ function downloadBill(matchedItems){
       </tr></tfoot>
     </table>
     ${photoData?`<div style="margin-top:14px;text-align:center"><div style="font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px">Confirmation Photo</div><img src="${photoData}" style="max-width:140px;border-radius:7px;border:2px solid #10b981"></div>`:""}
-    <div style="margin-top:14px;text-align:center;font-size:9px;color:#94a3b8">AKAI Distributors — Approval Challan System</div>
+    <div style="margin-top:14px;text-align:center;font-size:9px;color:#94a3b8">AKAI Distributors — Approval Challan</div>
   </div>`;
 
   const bill=document.getElementById("bill");
@@ -751,74 +717,114 @@ function downloadBill(matchedItems){
   });
 }
 
-/* ── SUBMIT ── */
-function submitData(){
-  if(!checkFields()) return;
+/* ══════════════════════════════════════════════════════
+   SUBMIT — with partial quantity overflow handling
+
+   The server now returns:
+     matched: [ { variant, qtyAccepted, qtyExceeded, mrp } ]
+     notMatched: [ { variant, qty, mrp } ]
+
+   qtyAccepted  = how much was written to Data Sheet
+   qtyExceeded  = remainder that had no available rows to fill
+
+   Items with qtyExceeded > 0 stay in the table with the
+   "Qty Exceeded" badge and the remaining quantity.
+   Items fully accepted are removed from the table.
+   Items in notMatched (no challan/SO match at all) also stay.
+   ══════════════════════════════════════════════════════ */
+function submitData() {
+  if (!checkFields()) return;
 
   document.getElementById("processingOverlay").classList.add("active");
-  document.getElementById("submitBtn").disabled=true;
+  document.getElementById("submitBtn").disabled = true;
 
   const challanVal = document.getElementById("challan").value.trim();
   const soVal      = document.getElementById("dealer").value.trim();
   const dealerVal  = document.getElementById("dealerName").value.trim();
   const dateVal    = document.getElementById("date").value;
 
-  const cleanItems = Object.values(items).map(i=>({
+  const cleanItems = Object.values(items).map(i => ({
     variant: String(i.variant).trim(),
-    qty:     Number(i.qty)||0,
-    mrp:     Number(i.mrp)||0
+    qty:     Number(i.qty) || 0,
+    mrp:     Number(i.mrp) || 0
   }));
 
-  fetch(API_URL,{
-    method:"POST",
+  fetch(API_URL, {
+    method: "POST",
     body: new URLSearchParams({
       data: JSON.stringify({
-        challan:challanVal, so:soVal, dealer:dealerVal,
-        date:dateVal, items:cleanItems, photo:photoData,
+        challan: challanVal, so: soVal, dealer: dealerVal,
+        date: dateVal, items: cleanItems, photo: photoData,
         billOffset: BILL_NUMBER_OFFSET
       })
     })
   })
-  .then(async res=>{
-    const text=await res.text();
+  .then(async res => {
+    const text = await res.text();
     let data;
-    try{ data=JSON.parse(text); }catch{ throw new Error("Invalid server response"); }
-    if(data.status!=="success") throw new Error(data.message||"Server error");
+    try { data = JSON.parse(text); } catch { throw new Error("Invalid server response"); }
+    if (data.status !== "success") throw new Error(data.message || "Server error");
 
-    const notMatchedKeys = new Set((data.notMatched||[]).map(i=>i.variant));
-    const matchedItems   = cleanItems.filter(i=>!notMatchedKeys.has(i.variant));
+    /* ── Build download list and new items state ── */
+    const matchedForBill = [];
+    let newItems = {};
 
-    if(matchedItems.length>0) downloadBill(matchedItems);
+    // Handle fully/partially matched items
+    (data.matched || []).forEach(m => {
+      if (m.qtyAccepted > 0) {
+        matchedForBill.push({ variant: m.variant, qty: m.qtyAccepted, mrp: m.mrp });
+      }
+      if (m.qtyExceeded > 0) {
+        newItems[m.variant] = {
+          variant: m.variant,
+          qty: m.qtyExceeded,
+          mrp: m.mrp,
+          exceeded: true    // ← triggers red badge in render()
+        };
+      }
+    });
 
-    let temp={};
-    (data.notMatched||[]).forEach(i=>{ temp[i.variant]=i; });
-    items=temp;
+    // Handle completely not-matched items (no row in Data Sheet at all)
+    (data.notMatched || []).forEach(i => {
+      newItems[i.variant] = { variant: i.variant, qty: i.qty, mrp: i.mrp, exceeded: false };
+    });
+
+    items = newItems;
     render();
 
-    if(!data.notMatched||data.notMatched.length===0){
-      showToast("All items submitted!","success",4000);
-      setTimeout(()=>{
-        document.getElementById("challan").value="";
-        document.getElementById("dealer").value="";
-        document.getElementById("dealerName").value="";
-        photoData="";
-        document.getElementById("preview").innerHTML="";
-        document.getElementById("photoConfirmedBox").style.display="none";
-        document.getElementById("openCamBtn").style.display="flex";
+    if (matchedForBill.length > 0) downloadBill(matchedForBill);
+
+    const exceedCount  = (data.matched || []).filter(m => m.qtyExceeded > 0).length;
+    const noMatchCount = (data.notMatched || []).length;
+    const leftover     = exceedCount + noMatchCount;
+
+    if (leftover === 0) {
+      showToast("All items submitted successfully!", "success", 4000);
+      setTimeout(() => {
+        document.getElementById("challan").value = "";
+        document.getElementById("dealer").value = "";
+        document.getElementById("dealerName").value = "";
+        photoData = "";
+        document.getElementById("preview").innerHTML = "";
+        document.getElementById("photoConfirmedBox").style.display = "none";
+        document.getElementById("openCamBtn").style.display = "flex";
         goPage(1);
-      },1600);
+      }, 1600);
     } else {
-      showToast(`⚠ ${data.notMatched.length} item(s) unmatched — back to entry`,"warning",5000);
-      setTimeout(()=>goPage(1), 2000);
+      let msg = "";
+      if (exceedCount > 0)  msg += `${exceedCount} variant(s) qty exceeded. `;
+      if (noMatchCount > 0) msg += `${noMatchCount} variant(s) not matched.`;
+      showToast("⚠ " + msg.trim() + " Check table.", "warning", 6000);
+      setTimeout(() => goPage(1), 2200);
     }
   })
-  .catch(err=>{
-    showToast("Submit failed: "+err.message,"error",5000);
+  .catch(err => {
+    showToast("Submit failed: " + err.message, "error", 5000);
     console.error(err);
   })
-  .finally(()=>{
+  .finally(() => {
     document.getElementById("processingOverlay").classList.remove("active");
-    document.getElementById("submitBtn").disabled=false;
+    document.getElementById("submitBtn").disabled = false;
   });
 }
 </script>
