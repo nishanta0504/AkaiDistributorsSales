@@ -117,6 +117,16 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
 }
 .exceeded-row td{background:rgba(239,68,68,.03)}
 
+/* ── ALREADY FILLED BADGE ── */
+.filled-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.4);
+  color:#b45309;border-radius:20px;padding:1px 8px;
+  font-size:10px;font-weight:700;margin-left:5px;
+  white-space:nowrap;
+}
+.filled-row td{background:rgba(245,158,11,.03)}
+
 /* ── CAMERA ── */
 #cameraBox{display:none;text-align:center;background:var(--navy);border-radius:var(--r);padding:14px;margin-bottom:12px}
 .cam-title{color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;margin-bottom:10px}
@@ -202,7 +212,7 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
     <div class="row">
       <div class="field">
         <label>Challan No.</label>
-        <input type="text" id="challan" placeholder="e.g. 93,40 ">
+        <input type="text" id="challan" placeholder="e.g. 93,40">
       </div>
       <div class="field">
         <label>Date</label>
@@ -408,21 +418,36 @@ function lookupUID(uid) {
     .then(d => d.variant ? d : null);
 }
 
-/* ── AUDIO BEEP (Web Audio — instant, no file load) ── */
+/* ── SCANNER BEEP (realistic barcode scanner chirp) ──
+   Two-tone sweep: low→high in ~80ms, same as handheld scanners.
+   No file load, instant, works offline.                        */
 const beep = (() => {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     return () => {
       try {
-        const o = ctx.createOscillator(), g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.frequency.value = 900;
-        g.gain.setValueAtTime(0.28, ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.07);
-        o.start(); o.stop(ctx.currentTime + 0.07);
+        const t   = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const env = ctx.createGain();
+        osc.connect(env);
+        env.connect(ctx.destination);
+
+        // Frequency sweep: 1200 Hz → 1800 Hz over 80ms (scanner chirp)
+        osc.type = "square";
+        osc.frequency.setValueAtTime(1200, t);
+        osc.frequency.linearRampToValueAtTime(1800, t + 0.08);
+
+        // Volume envelope: sharp attack, quick decay
+        env.gain.setValueAtTime(0, t);
+        env.gain.linearRampToValueAtTime(0.22, t + 0.005);
+        env.gain.setValueAtTime(0.22, t + 0.06);
+        env.gain.linearRampToValueAtTime(0, t + 0.1);
+
+        osc.start(t);
+        osc.stop(t + 0.1);
       } catch(e){}
     };
-  } catch(e){ return ()=>{}; }
+  } catch(e){ return () => {}; }
 })();
 
 /* ── INIT ── */
@@ -590,12 +615,14 @@ function render() {
 
     const excBadge = i.exceeded
       ? `<span class="exceeded-badge">⚠ Qty Exceeded</span>` : "";
-    const rowClass = i.exceeded ? "exceeded-row" : "";
+    const filledBadge = i.alreadyFull
+      ? `<span class="filled-badge">🔒 Already Filled</span>` : "";
+    const rowClass = i.exceeded ? "exceeded-row" : i.alreadyFull ? "filled-row" : "";
 
     html += `<tr class="${rowClass}">
       <td style="text-align:left;font-weight:500;font-size:12px">
         ${manualMode ? `<input type="text" value="${i.variant}" style="width:100%;text-align:left" onchange="items['${key}'].variant=this.value">` : i.variant}
-        ${!manualMode ? excBadge : ""}
+        ${!manualMode ? excBadge + filledBadge : ""}
       </td>
       <td>${manualMode ? `<input type="number" value="${q}" onchange="items['${key}'].qty=Number(this.value);render()">` : `<b>${q}</b>`}</td>
       <td>${manualMode ? `<input type="number" value="${m}" onchange="items['${key}'].mrp=Number(this.value);render()">` : `₹${m}`}</td>
