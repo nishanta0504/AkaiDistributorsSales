@@ -10,7 +10,7 @@
 <style>
 :root{
   --navy:#0d1b3e;--navy2:#162250;--blue:#1a56db;--blue2:#3b82f6;
-  --accent:#f59e0b;--green:#10b981;--red:#ef4444;--orange:#f97316;--white:#fff;
+  --accent:#f59e0b;--green:#10b981;--red:#ef4444;--orange:#f97316;
   --border:#d1daf7;--text:#1e293b;--muted:#64748b;
   --shadow:0 4px 24px rgba(13,27,62,.10);--r:14px;--rs:8px;
 }
@@ -18,24 +18,41 @@
 html,body{height:100%;overflow-x:hidden}
 body{font-family:'DM Sans',sans-serif;background:linear-gradient(135deg,#e8eeff 0%,#f4f7ff 60%,#fdf6e3 100%);min-height:100vh;color:var(--text);-webkit-tap-highlight-color:transparent}
 
-/* ── HEADER ── */
-.header{background:linear-gradient(120deg,var(--navy) 0%,var(--navy2) 100%);padding:12px 14px 10px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(13,27,62,.25);position:sticky;top:0;z-index:200;min-height:56px;}
-.header-logo{width:38px;height:38px;min-width:38px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:var(--navy);flex-shrink:0;line-height:1;text-align:center;}
+/* ════ HEADER ════ */
+.header{background:linear-gradient(120deg,var(--navy),var(--navy2));padding:12px 14px 10px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 20px rgba(13,27,62,.25);position:sticky;top:0;z-index:200;min-height:56px}
+.header-logo{width:38px;height:38px;min-width:38px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:var(--navy);flex-shrink:0}
 .header-text{flex:1;min-width:0}
-.header-text h1{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#fff;letter-spacing:0.3px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.header-text p{font-size:10px;color:rgba(255,255,255,.5);font-weight:400;letter-spacing:.6px;text-transform:uppercase;margin-top:1px}
-.header-date{flex-shrink:0;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:3px 9px;font-size:10px;color:rgba(255,255,255,.7);font-weight:500;white-space:nowrap;}
+.header-text h1{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#fff;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.header-text p{font-size:10px;color:rgba(255,255,255,.5);letter-spacing:.6px;text-transform:uppercase;margin-top:1px}
+.header-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.header-date{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:3px 9px;font-size:10px;color:rgba(255,255,255,.7);font-weight:500;white-space:nowrap}
 
-/* ── CACHE STATUS BAR ── */
+/* ════ THREE-DOT MENU ════ */
+.menu-btn{width:32px;height:32px;border:none;background:rgba(255,255,255,.12);border-radius:8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;flex-shrink:0;transition:.15s}
+.menu-btn:active{background:rgba(255,255,255,.22)}
+.menu-btn span{width:4px;height:4px;background:#fff;border-radius:50%;display:block}
+.menu-dropdown{position:absolute;top:54px;right:10px;background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(13,27,62,.22);overflow:hidden;z-index:9999;min-width:200px;border:1px solid rgba(209,218,247,.6);display:none}
+.menu-dropdown.open{display:block;animation:ddIn .15s ease}
+@keyframes ddIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.menu-item{display:flex;align-items:center;gap:10px;padding:13px 16px;cursor:pointer;transition:background .12s;border-bottom:1px solid #f0f4ff}
+.menu-item:last-child{border-bottom:none}
+.menu-item:active{background:#f0f4ff}
+.menu-item-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.menu-item-icon.qr{background:rgba(26,86,219,.1)}
+.menu-item-icon.bc{background:rgba(245,158,11,.1)}
+.menu-item-label{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--navy)}
+.menu-item-sub{font-size:10px;color:var(--muted);margin-top:1px}
+
+/* ════ CACHE BAR ════ */
 #cacheBar{background:var(--navy2);padding:4px 14px;font-size:10px;text-align:center;font-weight:500;transition:.3s}
 #cacheBar.loading{color:var(--accent)}
 #cacheBar.ready{color:rgba(16,185,129,.9)}
 #cacheBar.error{color:#f87171}
 
-/* ── STEPPER ── */
-.stepper{display:flex;align-items:center;justify-content:center;background:var(--navy2);padding:7px 16px 9px;gap:0;}
+/* ════ STEPPER ════ */
+.stepper{display:flex;align-items:center;justify-content:center;background:var(--navy2);padding:7px 16px 9px;gap:0}
 .step{display:flex;align-items:center;gap:6px;cursor:pointer}
-.step-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;border:2px solid rgba(255,255,255,.25);color:rgba(255,255,255,.4);transition:.25s;flex-shrink:0;}
+.step-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;border:2px solid rgba(255,255,255,.25);color:rgba(255,255,255,.4);transition:.25s;flex-shrink:0}
 .step-label{font-size:11px;color:rgba(255,255,255,.4);font-weight:500;transition:.25s;white-space:nowrap}
 .step.active .step-num{background:var(--accent);border-color:var(--accent);color:var(--navy)}
 .step.active .step-label{color:#fff}
@@ -43,36 +60,35 @@ body{font-family:'DM Sans',sans-serif;background:linear-gradient(135deg,#e8eeff 
 .step.done .step-label{color:rgba(255,255,255,.7)}
 .step-line{flex:1;height:2px;background:rgba(255,255,255,.15);margin:0 8px;max-width:60px}
 
-/* ── CONTAINER ── */
+/* ════ CONTAINER ════ */
 .container{padding:14px;max-width:560px;margin:0 auto}
-
-/* ── PAGE VIEWS ── */
 .page{display:none;animation:fadeIn .2s ease}
 .page.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
-/* ── CARDS ── */
+/* ════ CARDS ════ */
 .card{background:#fff;border-radius:var(--r);box-shadow:var(--shadow);padding:14px;margin-bottom:12px;border:1px solid rgba(209,218,247,.5)}
-.card-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.1px;margin-bottom:11px;display:flex;align-items:center;gap:6px;}
+.card-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.1px;margin-bottom:11px;display:flex;align-items:center;gap:6px}
 .card-title::before{content:'';display:inline-block;width:3px;height:13px;background:var(--blue);border-radius:2px}
 
-/* ── INPUTS ── */
+/* ════ INPUTS ════ */
 .row{display:flex;gap:10px}
 .row .field{flex:1}
 .field{margin-bottom:9px}
 .field label{display:block;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px}
-input[type="text"],input[type="date"],input[list],select{width:100%;padding:11px 12px;font-size:14px;font-family:'DM Sans',sans-serif;border:1.5px solid var(--border);border-radius:var(--rs);background:#f8faff;color:var(--text);transition:border .18s,box-shadow .18s;outline:none;appearance:none;-webkit-appearance:none;}
+input[type="text"],input[type="date"],input[list],select{width:100%;padding:11px 12px;font-size:14px;font-family:'DM Sans',sans-serif;border:1.5px solid var(--border);border-radius:var(--rs);background:#f8faff;color:var(--text);transition:border .18s,box-shadow .18s;outline:none;appearance:none;-webkit-appearance:none}
 input:focus,select:focus{border-color:var(--blue2);box-shadow:0 0 0 3px rgba(59,130,246,.12);background:#fff}
-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:30px;}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:30px}
 
-/* ── BUTTONS ── */
+/* ════ BUTTONS ════ */
 .btn-row{display:flex;gap:8px;margin-bottom:6px}
 .btn-row .btn{flex:1}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 16px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;border:none;border-radius:var(--rs);cursor:pointer;transition:transform .1s,box-shadow .12s,opacity .18s;text-align:center;white-space:nowrap;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 16px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;border:none;border-radius:var(--rs);cursor:pointer;transition:transform .1s,opacity .18s;text-align:center;white-space:nowrap;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .btn:active{transform:scale(.96)}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 .btn-primary{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;box-shadow:0 3px 12px rgba(26,86,219,.28)}
 .btn-accent{background:linear-gradient(135deg,var(--accent),#f97316);color:var(--navy);box-shadow:0 3px 12px rgba(245,158,11,.28)}
+.btn-accent2{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;box-shadow:0 3px 12px rgba(124,58,237,.28)}
 .btn-success{background:linear-gradient(135deg,#059669,var(--green));color:#fff;box-shadow:0 3px 12px rgba(16,185,129,.28)}
 .btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}
 .btn-outline:active{border-color:var(--blue2);color:var(--blue);background:#f0f4ff}
@@ -80,8 +96,8 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .btn-nav{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;box-shadow:0 3px 12px rgba(79,70,229,.3)}
 .btn-sm{padding:7px 10px;font-size:12px;border-radius:6px}
 
-/* ── SCANNER ── */
-#readerBox{display:none;border-radius:var(--r);overflow:hidden;background:var(--navy);margin-bottom:12px;}
+/* ════ QR SCANNER (html5-qrcode, Product Mode) ════ */
+#readerBox{display:none;border-radius:var(--r);overflow:hidden;background:var(--navy);margin-bottom:12px}
 .scanner-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 0}
 .scanner-hdr span{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px}
 .pulse-dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:pulse 1.2s infinite}
@@ -89,9 +105,36 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 #closeScan{background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:50%;width:28px;height:28px;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 #closeScan:active{background:var(--red)}
 #reader{width:100%}
-.scan-fb{text-align:center;padding:6px 12px 8px;font-size:12px;color:rgba(255,255,255,.6);min-height:32px;transition:.15s}
+.scan-fb{text-align:center;padding:6px 12px 8px;font-size:12px;color:rgba(255,255,255,.6);min-height:32px}
 
-/* ── TABLE ── */
+/* ════ BARCODE SCANNER (native, Spare Part Mode) ════ */
+#bcBox{display:none;border-radius:var(--r);overflow:hidden;background:#0a0a0f;margin-bottom:12px;position:relative}
+.bc-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 0;position:relative;z-index:5}
+.bc-hdr span{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px}
+#closeBc{background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:50%;width:28px;height:28px;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+#closeBc:active{background:var(--red)}
+.bc-video-wrap{position:relative;width:100%;height:200px;overflow:hidden}
+#bcVideo{width:100%;height:100%;object-fit:cover;display:block}
+/* vignette */
+.bc-vignette{position:absolute;inset:0;pointer-events:none;background:
+  linear-gradient(to bottom,rgba(0,0,0,.55) 0%,transparent 25%,transparent 75%,rgba(0,0,0,.55) 100%),
+  linear-gradient(to right,rgba(0,0,0,.45) 0%,transparent 15%,transparent 85%,rgba(0,0,0,.45) 100%)}
+/* scan window */
+.bc-window{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:86%;max-width:340px;height:72px;border-radius:6px;box-shadow:0 0 0 9999px rgba(0,0,0,.48);z-index:3}
+.bc-corner{position:absolute;width:20px;height:20px;border-color:#a855f7;border-style:solid}
+.bc-corner.tl{top:-1px;left:-1px;border-width:3px 0 0 3px;border-radius:5px 0 0 0}
+.bc-corner.tr{top:-1px;right:-1px;border-width:3px 3px 0 0;border-radius:0 5px 0 0}
+.bc-corner.bl{bottom:-1px;left:-1px;border-width:0 0 3px 3px;border-radius:0 0 0 5px}
+.bc-corner.br{bottom:-1px;right:-1px;border-width:0 3px 3px 0;border-radius:0 0 5px 0}
+.bc-laser{position:absolute;left:4px;right:4px;height:2px;background:linear-gradient(90deg,transparent 0%,#a855f7 20%,#a855f7 80%,transparent 100%);box-shadow:0 0 8px 2px #a855f788;border-radius:2px;animation:bcScan 1.6s ease-in-out infinite;top:10px;z-index:4}
+@keyframes bcScan{0%{top:10px;opacity:1}48%{opacity:1}50%{top:calc(100% - 12px);opacity:.6}98%{opacity:.6}100%{top:10px;opacity:1}}
+.bc-win-label{position:absolute;bottom:-22px;left:0;right:0;text-align:center;font-size:10px;font-weight:600;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase;z-index:5}
+.bc-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:9;transition:opacity .05s}
+.bc-flash.pop{opacity:.3}
+.bc-fb{text-align:center;padding:6px 12px 8px;font-size:12px;min-height:30px;color:rgba(255,255,255,.55)}
+#bcCanvas{display:none}
+
+/* ════ TABLE ════ */
 .table-wrap{overflow-x:auto;border-radius:var(--rs);border:1px solid var(--border)}
 table{width:100%;border-collapse:collapse;font-size:13px}
 thead tr{background:linear-gradient(90deg,#e8eeff,#f0f4ff)}
@@ -106,28 +149,12 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
 .empty-state p{font-size:12px;margin-top:6px}
 .status-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .status-label{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:5px}
-
-/* ── QTY EXCEEDED BADGE ── */
-.exceeded-badge{
-  display:inline-flex;align-items:center;gap:4px;
-  background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.35);
-  color:var(--red);border-radius:20px;padding:1px 8px;
-  font-size:10px;font-weight:700;margin-left:5px;
-  white-space:nowrap;
-}
+.exceeded-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.35);color:var(--red);border-radius:20px;padding:1px 8px;font-size:10px;font-weight:700;margin-left:5px;white-space:nowrap}
 .exceeded-row td{background:rgba(239,68,68,.03)}
-
-/* ── ALREADY FILLED BADGE ── */
-.filled-badge{
-  display:inline-flex;align-items:center;gap:4px;
-  background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.4);
-  color:#b45309;border-radius:20px;padding:1px 8px;
-  font-size:10px;font-weight:700;margin-left:5px;
-  white-space:nowrap;
-}
+.filled-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.4);color:#b45309;border-radius:20px;padding:1px 8px;font-size:10px;font-weight:700;margin-left:5px;white-space:nowrap}
 .filled-row td{background:rgba(245,158,11,.03)}
 
-/* ── CAMERA ── */
+/* ════ CAMERA ════ */
 #cameraBox{display:none;text-align:center;background:var(--navy);border-radius:var(--r);padding:14px;margin-bottom:12px}
 .cam-title{color:#fff;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;margin-bottom:10px}
 #video{border-radius:10px;border:2px solid rgba(255,255,255,.2);width:100%;max-width:300px}
@@ -136,34 +163,39 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
 #preview img{border-radius:10px;border:3px solid var(--green);max-width:180px}
 .cam-btns{display:flex;gap:8px;justify-content:center;margin-top:10px}
 
-/* ── PROCESSING OVERLAY ── */
-#processingOverlay{display:none;position:fixed;inset:0;background:rgba(13,27,62,.78);backdrop-filter:blur(4px);z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:14px;}
+/* ════ PROCESSING ════ */
+#processingOverlay{display:none;position:fixed;inset:0;background:rgba(13,27,62,.78);backdrop-filter:blur(4px);z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:14px}
 #processingOverlay.active{display:flex}
 .spinner{width:50px;height:50px;border:4px solid rgba(255,255,255,.15);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .processing-text{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#fff}
 .processing-sub{font-size:11px;color:rgba(255,255,255,.5)}
 
-/* ── TOASTS ── */
+/* ════ TOASTS ════ */
 .toast-container{position:fixed;top:70px;right:12px;z-index:10000;display:flex;flex-direction:column;gap:7px;pointer-events:none}
-.toast{background:#fff;border-radius:var(--rs);box-shadow:0 6px 20px rgba(0,0,0,.13);padding:10px 14px;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:500;border-left:4px solid var(--blue);animation:slideIn .22s ease;max-width:265px;}
+.toast{background:#fff;border-radius:var(--rs);box-shadow:0 6px 20px rgba(0,0,0,.13);padding:10px 14px;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:500;border-left:4px solid var(--blue);animation:slideIn .22s ease;max-width:265px}
 .toast.success{border-color:var(--green)}
 .toast.error{border-color:var(--red)}
 .toast.warning{border-color:var(--accent)}
 @keyframes slideIn{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
 
-/* ── SCAN FLASH ── */
+/* ════ SCAN FLASH ════ */
 .scan-flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:999;transition:opacity .05s}
 .scan-flash.flash{opacity:.3}
 
-/* ── BILL (offscreen) ── */
-#bill{display:none;background:#fff;padding:24px;width:580px;position:fixed;left:-9999px;top:0}
-
-/* ── PHOTO CONFIRMED ── */
-.photo-confirmed{display:flex;align-items:center;gap:10px;background:rgba(16,185,129,.08);border:1.5px solid var(--green);border-radius:var(--rs);padding:10px 12px;margin-bottom:10px;}
+/* ════ PHOTO CONFIRMED ════ */
+.photo-confirmed{display:flex;align-items:center;gap:10px;background:rgba(16,185,129,.08);border:1.5px solid var(--green);border-radius:var(--rs);padding:10px 12px;margin-bottom:10px}
 .photo-confirmed img{width:52px;height:40px;object-fit:cover;border-radius:6px;border:2px solid var(--green)}
 .photo-confirmed .pc-text{font-size:12px;color:#059669;font-weight:600}
 .photo-confirmed .pc-sub{font-size:11px;color:var(--muted);margin-top:1px}
+
+/* ════ BILL ════ */
+#bill{display:none;background:#fff;padding:24px;width:580px;position:fixed;left:-9999px;top:0}
+
+/* ════ SCAN MODE BADGE ════ */
+.scan-mode-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;border-radius:20px;padding:3px 10px;margin-bottom:8px;letter-spacing:.5px}
+.scan-mode-badge.qr{background:rgba(26,86,219,.08);border:1px solid rgba(26,86,219,.2);color:var(--blue)}
+.scan-mode-badge.bc{background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.2);color:#7c3aed}
 </style>
 </head>
 <body>
@@ -177,20 +209,43 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
 <div class="scan-flash" id="scanFlash"></div>
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- HEADER -->
-<div class="header">
+<!-- ════ HEADER ════ -->
+<div class="header" style="position:relative">
   <div class="header-logo">AD</div>
   <div class="header-text">
     <h1>AKAI DISTRIBUTORS</h1>
     <p>Approval Challan</p>
   </div>
-  <div class="header-date" id="headerDate"></div>
+  <div class="header-right">
+    <div class="header-date" id="headerDate"></div>
+    <!-- THREE-DOT MENU -->
+    <button class="menu-btn" onclick="toggleMenu()" id="menuBtn" aria-label="Options">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <!-- DROPDOWN -->
+  <div class="menu-dropdown" id="menuDropdown">
+    <div class="menu-item" onclick="switchScanMode('qr')">
+      <div class="menu-item-icon qr">📦</div>
+      <div>
+        <div class="menu-item-label">Product Scanner</div>
+        <div class="menu-item-sub">QR code — product lookup</div>
+      </div>
+    </div>
+    <div class="menu-item" onclick="switchScanMode('barcode')">
+      <div class="menu-item-icon bc">🔧</div>
+      <div>
+        <div class="menu-item-label">Spare Part Scanner</div>
+        <div class="menu-item-sub">Barcode — spare part lookup</div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- CACHE STATUS -->
+<!-- ════ CACHE BAR ════ -->
 <div id="cacheBar" class="loading">⏳ Loading product cache…</div>
 
-<!-- STEPPER -->
+<!-- ════ STEPPER ════ -->
 <div class="stepper">
   <div class="step active" id="step1tab" onclick="goPage(1)">
     <div class="step-num">1</div>
@@ -203,7 +258,7 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
   </div>
 </div>
 
-<!-- ══════════════ PAGE 1 ══════════════ -->
+<!-- ══════════════════ PAGE 1 ══════════════════ -->
 <div class="page active" id="page1">
 <div class="container">
 
@@ -238,10 +293,20 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
 
   <div class="card">
     <div class="card-title">Scan &amp; Entry</div>
+
+    <!-- active mode badge -->
+    <div id="scanModeBadge" class="scan-mode-badge qr">📦 Product Scanner (QR)</div>
+
     <div class="btn-row">
-      <button class="btn btn-accent" onclick="openScanner()" id="scanBtn">
+      <!-- QR scan button -->
+      <button class="btn btn-accent" onclick="openQRScanner()" id="scanQRBtn">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2"/><rect x="7" y="7" width="10" height="10" rx="1"/></svg>
         Scan QR
+      </button>
+      <!-- Barcode scan button -->
+      <button class="btn btn-accent2" onclick="openBCScanner()" id="scanBCBtn" style="display:none">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="4" width="3" height="16"/><rect x="7" y="4" width="1" height="16"/><rect x="10" y="4" width="2" height="16"/><rect x="15" y="4" width="1" height="16"/><rect x="18" y="4" width="3" height="16"/></svg>
+        Scan Barcode
       </button>
       <button class="btn btn-outline" onclick="toggleEdit()" id="editBtn">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -249,13 +314,37 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
       </button>
     </div>
 
+    <!-- QR READER (html5-qrcode) -->
     <div id="readerBox">
       <div class="scanner-hdr">
-        <span><div class="pulse-dot"></div>Scanner Active</span>
-        <button id="closeScan" onclick="closeScanner()">×</button>
+        <span><div class="pulse-dot"></div>QR Scanner Active</span>
+        <button id="closeScan" onclick="closeQRScanner()">×</button>
       </div>
       <div id="reader"></div>
       <div class="scan-fb" id="scanFeedback">Point camera at QR code</div>
+    </div>
+
+    <!-- BARCODE READER (native BarcodeDetector / ZXing) -->
+    <div id="bcBox">
+      <div class="bc-hdr">
+        <span><div class="pulse-dot" style="background:#a855f7"></div>Barcode Scanner Active</span>
+        <button id="closeBc" onclick="closeBCScanner()">×</button>
+      </div>
+      <div class="bc-video-wrap">
+        <video id="bcVideo" autoplay playsinline muted></video>
+        <div class="bc-vignette"></div>
+        <div class="bc-window">
+          <div class="bc-corner tl"></div>
+          <div class="bc-corner tr"></div>
+          <div class="bc-corner bl"></div>
+          <div class="bc-corner br"></div>
+          <div class="bc-laser"></div>
+          <div class="bc-win-label">Align barcode within frame</div>
+        </div>
+        <div class="bc-flash" id="bcFlash"></div>
+      </div>
+      <div class="bc-fb" id="bcFeedback">Point camera at barcode</div>
+      <canvas id="bcCanvas"></canvas>
     </div>
   </div>
 
@@ -275,7 +364,7 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
           </tr>
         </thead>
         <tbody id="tbody">
-          <tr><td colspan="4"><div class="empty-state"><svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><p>No items yet.<br>Scan QR or add manually.</p></div></td></tr>
+          <tr><td colspan="4"><div class="empty-state"><svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><p>No items yet.<br>Scan or add manually.</p></div></td></tr>
         </tbody>
         <tfoot>
           <tr class="tfoot-row">
@@ -299,7 +388,7 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
 </div>
 </div>
 
-<!-- ══════════════ PAGE 2 ══════════════ -->
+<!-- ══════════════════ PAGE 2 ══════════════════ -->
 <div class="page" id="page2">
 <div class="container">
 
@@ -348,165 +437,498 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
 <div id="bill"></div>
 
 <script>
-/* ══════════════════════════════════════════════════════
-   BILL NUMBER CONFIG
-   Change BILL_NUMBER_OFFSET to shift numbers up or down.
-   Example: set 1000 to jump from 1001 → 2001
-   ══════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════
+   CONFIG
+   ════════════════════════════════════════════════════════ */
 const BILL_NUMBER_OFFSET = 0;
+// ▼▼▼  PASTE YOUR NEW WEB APP DEPLOYMENT URL HERE  ▼▼▼
+const API_URL = "https://script.google.com/macros/s/AKfycbz_VAjxgrMJHPYWmJQAVJKiHtPo7z705wPVNMMXQk0cNj1PcU-9YZ9f7MyjNdP3OjRC/exec";
 
-const API_URL = "https://script.google.com/macros/s/AKfycbxN1ueHxR9seDLWBPOQffVkYOFInQpexU6W8-wJIJ-Nl82CtgjSBf6Q-gB-517orI_k/exec";
+/* ════ STATE ════ */
+let items       = {};
+let qrScanner   = null;
+let qrScanning  = false;
+let manualMode  = false;
+let photoData   = "";
+let camStream   = null;
+let currentPage = 1;
+let activeScanMode = "qr"; // "qr" | "barcode"
 
-/* ── STATE ── */
-let items        = {};   // { variantName: {variant, qty, mrp, exceeded} }
-let scanner      = null;
-let scanning     = false;
-let manualMode   = false;
-let scanLock     = false;
-let photoData    = "";
-let stream       = null;
-let currentPage  = 1;
+/* ════ CACHE ════ */
+let stockCache    = {};
+let cacheReady    = false;
 
-/* ══════════════════════════════════════════════════════
-   LOCAL CACHE  ← KEY CHANGE FOR INSTANT SCAN
-   The entire Stock Sheet is loaded once on startup into
-   stockCache: { uid → { variant, mrp } }
-   QR scan then does an instant in-memory lookup — zero
-   network round-trip per scan.
-   ══════════════════════════════════════════════════════ */
-let stockCache     = {};   // uid → { variant, mrp }
-let cacheReady     = false;
-let cacheLoadFail  = false;
+/* ════ BARCODE ENGINE ════ */
+let bcDetector  = null;   // native BarcodeDetector instance
+let bcZXing     = null;   // ZXing fallback
+let bcUseZXing  = false;
+let bcStream    = null;
+let bcInterval  = null;   // throttled interval (not rAF) to prevent slowdown
+let bcDecoding  = false;  // true while an async decode call is in-flight
 
-function loadStockCache() {
-  const bar = document.getElementById("cacheBar");
-  bar.className = "loading";
-  bar.textContent = "⏳ Loading product cache…";
+/* ════ SMART DEDUP ═══════════════════════════════════════════════════
+   SAME_CODE_COOLDOWN : same code cannot fire again within this window.
+   Different codes are accepted INSTANTLY — rapid multi-item scanning
+   stays fast.  Prevents "same barcode fires 3× while held in frame".
+   ════════════════════════════════════════════════════════════════════ */
+const SAME_CODE_COOLDOWN = 2500; // ms before same barcode re-fires
+const SAME_QR_COOLDOWN   = 2500; // same for QR mode
+let lastBcCode  = "";            // last raw barcode value accepted
+let lastBcTime  = 0;             // Date.now() of last accepted barcode
+let lastQrCode  = "";            // last QR value accepted
+let lastQrTime  = 0;             // Date.now() of last accepted QR
 
-  fetch(API_URL + "?type=stockcache")
-    .then(r => r.json())
-    .then(data => {
-      stockCache = {};
-      if (Array.isArray(data)) {
-        data.forEach(row => {
-          if (row.uid) stockCache[String(row.uid).trim()] = { variant: row.variant || "", mrp: Number(row.mrp) || 0 };
-        });
-      }
-      cacheReady = true;
-      const count = Object.keys(stockCache).length;
-      bar.className = "ready";
-      bar.textContent = `✅ ${count} products loaded — scanner ready`;
-      setTimeout(() => { bar.style.display = "none"; }, 3000);
-    })
-    .catch(() => {
-      cacheLoadFail = true;
-      bar.className = "error";
-      bar.textContent = "⚠ Cache load failed — will use live lookup per scan";
-      setTimeout(() => { bar.style.display = "none"; }, 4000);
-    });
-}
-
-/* Lookup from cache, fallback to network if cache not ready */
-function lookupUID(uid) {
-  const key = String(uid).trim();
-  if (cacheReady && stockCache[key]) {
-    return Promise.resolve(stockCache[key]);
-  }
-  // fallback (cache miss or not loaded yet)
-  return fetch(API_URL + "?uid=" + encodeURIComponent(uid))
-    .then(r => r.json())
-    .then(d => d.variant ? d : null);
-}
-
-/* ── SCANNER BEEP (realistic barcode scanner chirp) ──
-   Two-tone sweep: low→high in ~80ms, same as handheld scanners.
-   No file load, instant, works offline.                        */
+/* ════════════════════════════════════════════════════════
+   BEEP — realistic scanner chirp
+   ════════════════════════════════════════════════════════ */
 const beep = (() => {
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const actx = new (window.AudioContext || window.webkitAudioContext)();
     return () => {
       try {
-        const t   = ctx.currentTime;
-        const osc = ctx.createOscillator();
-        const env = ctx.createGain();
-        osc.connect(env);
-        env.connect(ctx.destination);
-
-        // Frequency sweep: 1200 Hz → 1800 Hz over 80ms (scanner chirp)
-        osc.type = "square";
-        osc.frequency.setValueAtTime(1200, t);
-        osc.frequency.linearRampToValueAtTime(1800, t + 0.08);
-
-        // Volume envelope: sharp attack, quick decay
-        env.gain.setValueAtTime(0, t);
-        env.gain.linearRampToValueAtTime(0.22, t + 0.005);
-        env.gain.setValueAtTime(0.22, t + 0.06);
-        env.gain.linearRampToValueAtTime(0, t + 0.1);
-
-        osc.start(t);
-        osc.stop(t + 0.1);
+        const t=actx.currentTime, o=actx.createOscillator(), g=actx.createGain();
+        o.connect(g); g.connect(actx.destination);
+        o.type="square";
+        o.frequency.setValueAtTime(1200,t);
+        o.frequency.linearRampToValueAtTime(1800,t+0.08);
+        g.gain.setValueAtTime(0,t);
+        g.gain.linearRampToValueAtTime(0.22,t+0.005);
+        g.gain.setValueAtTime(0.22,t+0.06);
+        g.gain.linearRampToValueAtTime(0,t+0.1);
+        o.start(t); o.stop(t+0.1);
       } catch(e){}
     };
-  } catch(e){ return () => {}; }
+  } catch(e){ return ()=>{}; }
 })();
 
-/* ── INIT ── */
+/* ════════════════════════════════════════════════════════
+   INIT
+   ════════════════════════════════════════════════════════ */
 window.onload = function() {
   const today = new Date();
   document.getElementById("date").value = today.toISOString().split("T")[0];
   document.getElementById("headerDate").textContent =
-    today.toLocaleDateString("en-IN", { day:"2-digit", month:"short" });
+    today.toLocaleDateString("en-IN",{day:"2-digit",month:"short"});
   loadDealers();
-  loadStockCache();   // ← preload cache on startup
+  loadStockCache();
+  // Pre-init barcode detector in background so first scan is instant
+  initBarcodeDetector();
+  // Close menu on outside tap
+  document.addEventListener("click", e => {
+    if (!e.target.closest("#menuBtn") && !e.target.closest("#menuDropdown"))
+      document.getElementById("menuDropdown").classList.remove("open");
+  });
 };
 
-/* ── DEALERS ── */
+/* ════ DEALERS ════ */
 function loadDealers() {
-  fetch(API_URL + "?type=dealers")
-    .then(r => r.json())
-    .then(data => {
-      const list = document.getElementById("dealerList");
-      list.innerHTML = "";
-      data.forEach(d => { const o = document.createElement("option"); o.value = d; list.appendChild(o); });
-    }).catch(() => {});
+  fetch(API_URL+"?type=dealers")
+    .then(r=>r.json())
+    .then(data=>{
+      const list=document.getElementById("dealerList");
+      list.innerHTML="";
+      data.forEach(d=>{const o=document.createElement("option");o.value=d;list.appendChild(o);});
+    }).catch(()=>{});
 }
 
-/* ── TOAST ── */
-function showToast(msg, type="info", dur=2600) {
-  const icons = { success:"✅", error:"❌", warning:"⚠️", info:"ℹ️" };
-  const c = document.getElementById("toastContainer");
-  const t = document.createElement("div");
-  t.className = "toast " + type;
-  t.innerHTML = `<span>${icons[type]||"•"}</span><span>${msg}</span>`;
+/* ════ CACHE ════ */
+function loadStockCache() {
+  const bar=document.getElementById("cacheBar");
+  bar.className="loading"; bar.textContent="⏳ Loading product cache…";
+  fetch(API_URL+"?type=stockcache")
+    .then(r=>r.json())
+    .then(data=>{
+      stockCache={};
+      if(Array.isArray(data))
+        data.forEach(row=>{ if(row.uid) stockCache[String(row.uid).trim()]={variant:row.variant||"",mrp:Number(row.mrp)||0}; });
+      cacheReady=true;
+      const count=Object.keys(stockCache).length;
+      bar.className="ready"; bar.textContent=`✅ ${count} products loaded — scanner ready`;
+      setTimeout(()=>{bar.style.display="none";},3000);
+    })
+    .catch(()=>{
+      bar.className="error"; bar.textContent="⚠ Cache load failed — live lookup per scan";
+      setTimeout(()=>{bar.style.display="none";},4000);
+    });
+}
+
+/* ════ LOOKUP ════ */
+function lookupUID(uid) {
+  const key=String(uid).trim();
+  if(cacheReady && stockCache[key]) return Promise.resolve(stockCache[key]);
+  return fetch(API_URL+"?uid="+encodeURIComponent(uid))
+    .then(r=>r.json())
+    .then(d=>d.variant?d:null);
+}
+
+/* ════════════════════════════════════════════════════════
+   SPARE PART BARCODE CLEANER
+   Strips //1  //5  //10  (and variants like /1 /5 /10)
+   from the raw barcode value before lookup.
+   ════════════════════════════════════════════════════════ */
+function cleanBarcodeValue(raw) {
+  // Remove trailing //N or /N where N is one or more digits
+  return raw.replace(/\/{1,2}\d+$/, "").trim();
+}
+
+/* ════════════════════════════════════════════════════════
+   THREE-DOT MENU
+   ════════════════════════════════════════════════════════ */
+function toggleMenu() {
+  document.getElementById("menuDropdown").classList.toggle("open");
+}
+
+function switchScanMode(mode) {
+  document.getElementById("menuDropdown").classList.remove("open");
+
+  // Close any open scanner
+  if(qrScanning) closeQRScanner();
+  if(bcStream)   closeBCScanner();
+
+  activeScanMode = mode;
+  const badge    = document.getElementById("scanModeBadge");
+  const qrBtn    = document.getElementById("scanQRBtn");
+  const bcBtn    = document.getElementById("scanBCBtn");
+
+  if(mode === "qr") {
+    badge.className="scan-mode-badge qr"; badge.textContent="📦 Product Scanner (QR)";
+    qrBtn.style.display=""; bcBtn.style.display="none";
+    showToast("Switched to Product Scanner (QR)","info",2000);
+  } else {
+    badge.className="scan-mode-badge bc"; badge.textContent="🔧 Spare Part Scanner (Barcode)";
+    qrBtn.style.display="none"; bcBtn.style.display="";
+    showToast("Switched to Spare Part Scanner (Barcode)","info",2000);
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   QR SCANNER (html5-qrcode) — Product Mode
+   Identical to original, same speed
+   ════════════════════════════════════════════════════════ */
+function openQRScanner() {
+  document.getElementById("readerBox").style.display="block";
+  if(qrScanning) return;
+
+  qrScanner = new Html5Qrcode("reader",{verbose:false});
+  qrScanner.start(
+    {facingMode:"environment"},
+    {fps:30, qrbox:{width:220,height:220}, aspectRatio:1.0, disableFlip:false,
+     experimentalFeatures:{useBarCodeDetectorIfSupported:true}},
+    code => {
+      const now = Date.now();
+      // Block if SAME code scanned within cooldown window
+      if(code === lastQrCode && (now - lastQrTime) < SAME_QR_COOLDOWN) return;
+      // Accept — record immediately so rapid re-fires are blocked
+      lastQrCode = code;
+      lastQrTime = now;
+
+      const flash=document.getElementById("scanFlash");
+      flash.classList.add("flash"); setTimeout(()=>flash.classList.remove("flash"),110);
+      beep();
+      document.getElementById("scanFeedback").textContent="🔍 "+code.substring(0,20)+"…";
+      lookupUID(code)
+        .then(data=>{
+          if(!data||!data.variant){
+            showToast("Not found: "+code.substring(0,14),"error");
+            document.getElementById("scanFeedback").textContent="❌ Item not found";
+            // Reset so the same unknown code can be retried after cooldown
+            lastQrTime = now - SAME_QR_COOLDOWN + 3000; // allow retry after 3s
+          } else {
+            addOrIncrItem(data.variant, Number(data.mrp)||0);
+            document.getElementById("scanFeedback").textContent="✅ "+data.variant+" ×"+items[data.variant].qty;
+            showToast(data.variant+" ×"+items[data.variant].qty,"success",1600);
+          }
+        })
+        .catch(()=>{
+          showToast("Lookup error","error");
+          document.getElementById("scanFeedback").textContent="❌ Error";
+          lastQrTime = 0; // allow immediate retry on network error
+        });
+    },
+    ()=>{}
+  );
+  qrScanning=true;
+}
+
+function closeQRScanner() {
+  if(qrScanner && qrScanning) {
+    qrScanner.stop()
+      .then(()=>{qrScanning=false; document.getElementById("readerBox").style.display="none"; lastQrCode=""; lastQrTime=0;})
+      .catch(()=>{qrScanning=false; document.getElementById("readerBox").style.display="none"; lastQrCode=""; lastQrTime=0;});
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   BARCODE SCANNER ENGINE INIT
+   Called once on page load in background — so first open
+   is instant with no "initialising" delay.
+   Priority: native BarcodeDetector → ZXing fallback
+   ════════════════════════════════════════════════════════ */
+async function initBarcodeDetector() {
+  if("BarcodeDetector" in window) {
+    try {
+      const supported = await BarcodeDetector.getSupportedFormats();
+      const has1D = supported.some(f=>["code_128","code_39","ean_13","upc_a","itf","codabar"].includes(f));
+      if(has1D) {
+        bcDetector = new BarcodeDetector({formats: supported});
+        return;
+      }
+    } catch(e){}
+  }
+  // Load ZXing fallback
+  return new Promise(resolve=>{
+    const s=document.createElement("script");
+    s.src="https://cdnjs.cloudflare.com/ajax/libs/zxing-js/0.20.0/index.min.js";
+    s.onload=()=>{
+      try { bcZXing=new ZXing.BrowserMultiFormatReader(); bcUseZXing=true; } catch(e){}
+      resolve();
+    };
+    s.onerror=()=>resolve();
+    document.head.appendChild(s);
+  });
+}
+
+/* ════════════════════════════════════════════════════════
+   BARCODE SCANNER OPEN / CLOSE — Spare Part Mode
+
+   KEY SPEED FIX:
+   Instead of requestAnimationFrame (which fires ~60fps and
+   causes async decode pile-up + slowdown), we use
+   setInterval at 80ms (~12fps decode attempts).
+   Camera still runs at full frame rate — only the DECODE
+   call is throttled. This prevents the main thread from
+   being blocked by stacked async calls.
+   ════════════════════════════════════════════════════════ */
+async function openBCScanner() {
+  const box = document.getElementById("bcBox");
+  box.style.display="block";
+  if(bcStream) return; // already running
+
+  try {
+    bcStream = await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:{ideal:"environment"}, width:{ideal:1280}, height:{ideal:720}}
+    });
+    const vid=document.getElementById("bcVideo");
+    vid.srcObject=bcStream;
+    await vid.play();
+  } catch(e) {
+    showToast("Camera access denied","error");
+    document.getElementById("bcBox").style.display="none";
+    bcStream=null;
+    return;
+  }
+
+  document.getElementById("bcFeedback").textContent="Point camera at barcode";
+  bcDecoding=false;
+  lastBcCode="";   // reset dedup on each scanner open
+  lastBcTime=0;
+
+  // Throttled interval — decode every 40ms (~25 decode attempts/sec)
+  // Fast enough for quick 1D barcode detection, no pile-up
+  bcInterval = setInterval(()=>{ bcDecodeFrame(); }, 40);
+
+  // Keep screen awake
+  try{ if("wakeLock" in navigator) navigator.wakeLock.request("screen"); }catch(e){}
+}
+
+function closeBCScanner() {
+  if(bcInterval){ clearInterval(bcInterval); bcInterval=null; }
+  if(bcStream){ bcStream.getTracks().forEach(t=>t.stop()); bcStream=null; }
+  const vid=document.getElementById("bcVideo");
+  vid.srcObject=null;
+  document.getElementById("bcBox").style.display="none";
+  bcDecoding=false;
+  lastBcCode=""; lastBcTime=0;
+}
+
+/* ════════════════════════════════════════════════════════
+   BARCODE DECODE FRAME
+   - bcDecoding flag prevents overlapping async calls
+   - Smart dedup: same code blocked for SAME_CODE_COOLDOWN,
+     different code accepted instantly
+   ════════════════════════════════════════════════════════ */
+async function bcDecodeFrame() {
+  // Skip if a decode call is still running (prevents async pile-up)
+  if(bcDecoding) return;
+  const vid=document.getElementById("bcVideo");
+  if(!vid || vid.readyState<2 || vid.videoWidth===0) return;
+
+  bcDecoding=true;
+  const cvs=document.getElementById("bcCanvas");
+  const ctx=cvs.getContext("2d",{willReadFrequently:true});
+
+  // Decode at 960px max width — fast decode, still sharp enough for 1D barcodes
+  const MAX_W = 960;
+  const scale = vid.videoWidth > MAX_W ? MAX_W / vid.videoWidth : 1;
+  cvs.width  = Math.round(vid.videoWidth  * scale);
+  cvs.height = Math.round(vid.videoHeight * scale);
+  ctx.drawImage(vid, 0, 0, cvs.width, cvs.height);
+
+  let code=null;
+  try {
+    if(!bcUseZXing && bcDetector) {
+      const results=await bcDetector.detect(cvs);
+      if(results.length>0) code=results[0].rawValue;
+    } else if(bcUseZXing && bcZXing) {
+      try {
+        const res=await bcZXing.decodeFromCanvas(cvs);
+        if(res) code=res.getText();
+      } catch(e){ /* NotFoundException = no barcode in frame, normal */ }
+    }
+  } catch(e){}
+
+  bcDecoding=false; // release immediately so next frame can be attempted
+
+  if(code) {
+    const now = Date.now();
+    const rawCode = String(code);
+
+    // ── SMART DEDUP ──────────────────────────────────────────
+    // Same code within cooldown window → silently skip (no beep,
+    // no toast, no UI update — camera just keeps scanning)
+    if(rawCode === lastBcCode && (now - lastBcTime) < SAME_CODE_COOLDOWN) return;
+
+    // Different code OR cooldown expired → accept and record
+    lastBcCode = rawCode;
+    lastBcTime = now;
+    onBarcodeFound(rawCode);
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   ON BARCODE FOUND — Spare Part Mode
+   1. Clean suffix (//1, //5, //10 etc.)
+   2. Lookup from cache/sheet
+   3. Add to items table
+   ════════════════════════════════════════════════════════ */
+function onBarcodeFound(rawCode) {
+  beep();
+  // Flash inside barcode viewfinder
+  const fl=document.getElementById("bcFlash");
+  fl.classList.add("pop"); setTimeout(()=>fl.classList.remove("pop"),100);
+  // Full-screen flash
+  const sf=document.getElementById("scanFlash");
+  sf.classList.add("flash"); setTimeout(()=>sf.classList.remove("flash"),110);
+
+  const cleanCode = cleanBarcodeValue(rawCode);
+  document.getElementById("bcFeedback").textContent="🔍 "+cleanCode.substring(0,22)+"…";
+
+  lookupUID(cleanCode)
+    .then(data=>{
+      if(!data||!data.variant){
+        showToast("Not found: "+cleanCode.substring(0,16),"error",2500);
+        document.getElementById("bcFeedback").textContent="❌ Not found: "+cleanCode.substring(0,18);
+        // Allow the same code to be retried after 3s on a not-found
+        lastBcTime = Date.now() - SAME_CODE_COOLDOWN + 3000;
+      } else {
+        addOrIncrItem(data.variant, Number(data.mrp)||0);
+        document.getElementById("bcFeedback").textContent="✅ "+data.variant+" ×"+items[data.variant].qty;
+        showToast(data.variant+" ×"+items[data.variant].qty,"success",1600);
+      }
+    })
+    .catch(()=>{
+      showToast("Lookup error","error");
+      document.getElementById("bcFeedback").textContent="❌ Lookup error";
+      lastBcTime=0; // network error → allow immediate retry
+    });
+}
+
+/* ════ SHARED ITEM ADD/INCREMENT ════ */
+function addOrIncrItem(variant, mrp) {
+  if(!items[variant]) items[variant]={variant,qty:1,mrp,exceeded:false};
+  else items[variant].qty++;
+  render();
+}
+
+/* ════════════════════════════════════════════════════════
+   MANUAL EDIT
+   ════════════════════════════════════════════════════════ */
+function toggleEdit() {
+  manualMode=!manualMode;
+  document.getElementById("editHead").style.display=manualMode?"":"none";
+  document.getElementById("tActionFoot").style.display=manualMode?"":"none";
+  document.getElementById("editBtn").innerHTML=manualMode
+    ? `<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg> Lock`
+    : `<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Manual`;
+  render();
+}
+
+/* ════════════════════════════════════════════════════════
+   RENDER TABLE
+   ════════════════════════════════════════════════════════ */
+function render() {
+  const keys=Object.keys(items);
+  document.getElementById("itemCount").textContent=keys.length;
+  if(keys.length===0){
+    document.getElementById("tbody").innerHTML=`<tr><td colspan="4"><div class="empty-state"><svg width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><p>No items yet.<br>Scan or add manually.</p></div></td></tr>`;
+    document.getElementById("tQty").textContent="0";
+    document.getElementById("tMrp").textContent="₹0";
+    document.getElementById("tQtyTop").textContent="0";
+    return;
+  }
+  let html="",tq=0,tm=0;
+  keys.forEach(key=>{
+    const i=items[key], q=Number(i.qty)||0, m=Number(i.mrp)||0;
+    tq+=q; tm+=q*m;
+    const excBadge=i.exceeded?`<span class="exceeded-badge">⚠ Qty Exceeded</span>`:"";
+    const filledBadge=i.alreadyFull?`<span class="filled-badge">🔒 Already Filled</span>`:"";
+    const rowClass=i.exceeded?"exceeded-row":i.alreadyFull?"filled-row":"";
+    html+=`<tr class="${rowClass}">
+      <td style="text-align:left;font-weight:500;font-size:12px">
+        ${manualMode?`<input type="text" value="${i.variant}" style="width:100%;text-align:left" onchange="items['${key}'].variant=this.value">`:i.variant}
+        ${!manualMode?excBadge+filledBadge:""}
+      </td>
+      <td>${manualMode?`<input type="number" value="${q}" onchange="items['${key}'].qty=Number(this.value);render()">`:`<b>${q}</b>`}</td>
+      <td>${manualMode?`<input type="number" value="${m}" onchange="items['${key}'].mrp=Number(this.value);render()">`:`₹${m}`}</td>
+      ${manualMode?`<td><button class="btn btn-danger btn-sm" onclick="removeItem('${key}')">✕</button></td>`:`<td></td>`}
+    </tr>`;
+  });
+  if(manualMode) html+=`<tr><td colspan="4" style="padding:6px"><button class="btn btn-outline btn-sm" style="width:100%" onclick="addItem()">＋ Add Item</button></td></tr>`;
+  document.getElementById("tbody").innerHTML=html;
+  document.getElementById("tQty").textContent=tq;
+  document.getElementById("tMrp").textContent="₹"+tm.toLocaleString("en-IN");
+  document.getElementById("tQtyTop").textContent=tq;
+}
+
+function addItem(){const n=prompt("Variant Name:");if(!n)return;items[n.trim()]={variant:n.trim(),qty:1,mrp:0,exceeded:false};render();}
+function removeItem(k){delete items[k];render();}
+
+/* ════ TOAST ════ */
+function showToast(msg,type="info",dur=2600){
+  const icons={success:"✅",error:"❌",warning:"⚠️",info:"ℹ️"};
+  const c=document.getElementById("toastContainer");
+  const t=document.createElement("div");
+  t.className="toast "+type;
+  t.innerHTML=`<span>${icons[type]||"•"}</span><span>${msg}</span>`;
   c.appendChild(t);
-  setTimeout(() => { t.style.cssText="opacity:0;transition:opacity .25s"; setTimeout(()=>t.remove(),260); }, dur);
+  setTimeout(()=>{t.style.cssText="opacity:0;transition:opacity .25s";setTimeout(()=>t.remove(),260);},dur);
 }
 
-/* ── PAGE NAV ── */
-function goPage(n) {
-  currentPage = n;
-  document.getElementById("page1").classList.toggle("active", n===1);
-  document.getElementById("page2").classList.toggle("active", n===2);
-  document.getElementById("step1tab").className = "step" + (n===1?" active": n>1?" done":"");
-  document.getElementById("step2tab").className = "step" + (n===2?" active":"");
-  if (n===2) refreshSummary();
-  window.scrollTo(0, 0);
+/* ════ PAGE NAV ════ */
+function goPage(n){
+  currentPage=n;
+  document.getElementById("page1").classList.toggle("active",n===1);
+  document.getElementById("page2").classList.toggle("active",n===2);
+  document.getElementById("step1tab").className="step"+(n===1?" active":n>1?" done":"");
+  document.getElementById("step2tab").className="step"+(n===2?" active":"");
+  if(n===2) refreshSummary();
+  window.scrollTo(0,0);
 }
 
-function goToPage2() {
-  if (!document.getElementById("challan").value.trim()) { showToast("Enter Challan No.","error"); return; }
-  if (!document.getElementById("dealer").value)          { showToast("Select Sales Officer","error"); return; }
-  if (!document.getElementById("date").value)            { showToast("Select Date","error"); return; }
-  if (!document.getElementById("dealerName").value.trim()){ showToast("Enter Dealer Name","error"); return; }
-  if (Object.keys(items).length === 0)                   { showToast("Add at least one item","error"); return; }
+function goToPage2(){
+  if(!document.getElementById("challan").value.trim()){showToast("Enter Challan No.","error");return;}
+  if(!document.getElementById("dealer").value){showToast("Select Sales Officer","error");return;}
+  if(!document.getElementById("date").value){showToast("Select Date","error");return;}
+  if(!document.getElementById("dealerName").value.trim()){showToast("Enter Dealer Name","error");return;}
+  if(Object.keys(items).length===0){showToast("Add at least one item","error");return;}
   goPage(2);
 }
 
-function refreshSummary() {
-  const ch=document.getElementById("challan").value, so=document.getElementById("dealer").value;
-  const dn=document.getElementById("dealerName").value, dt=document.getElementById("date").value;
+function refreshSummary(){
+  const ch=document.getElementById("challan").value,so=document.getElementById("dealer").value;
+  const dn=document.getElementById("dealerName").value,dt=document.getElementById("date").value;
   let tq=0,tm=0;
-  Object.values(items).forEach(i=>{ tq+=Number(i.qty)||0; tm+=(Number(i.qty)||0)*(Number(i.mrp)||0); });
+  Object.values(items).forEach(i=>{tq+=Number(i.qty)||0;tm+=(Number(i.qty)||0)*(Number(i.mrp)||0);});
   document.getElementById("summaryBox").innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px">
       <div style="background:#f8faff;border-radius:8px;padding:10px;border:1px solid #d1daf7"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Challan</div><div style="font-weight:700;font-size:13px">${ch}</div></div>
@@ -520,183 +942,57 @@ function refreshSummary() {
     </div>`;
 }
 
-/* ══════════════════════════════════════════════════════
-   SCANNER — instant lookup via local cache
-   ══════════════════════════════════════════════════════ */
-function openScanner() {
-  document.getElementById("readerBox").style.display = "block";
-  if (scanning) return;
-
-  scanner = new Html5Qrcode("reader", { verbose: false });
-  scanner.start(
-    { facingMode: "environment" },
-    {
-      fps: 30,
-      qrbox: { width: 220, height: 220 },
-      aspectRatio: 1.0,
-      disableFlip: false,
-      experimentalFeatures: { useBarCodeDetectorIfSupported: true }
-    },
-    qrCode => {
-      if (scanLock) return;
-      scanLock = true;
-
-      // Instant feedback — flash + beep happen before any lookup
-      const flash = document.getElementById("scanFlash");
-      flash.classList.add("flash");
-      setTimeout(() => flash.classList.remove("flash"), 110);
-      beep();
-
-      const fb = document.getElementById("scanFeedback");
-      fb.textContent = "🔍 " + qrCode.substring(0, 20) + "…";
-
-      lookupUID(qrCode)           // ← instant from cache if loaded
-        .then(data => {
-          if (!data || !data.variant) {
-            showToast("Not found: " + qrCode.substring(0, 14), "error");
-            fb.textContent = "❌ Item not found";
-          } else {
-            if (!items[data.variant]) {
-              items[data.variant] = { variant: data.variant, qty: 1, mrp: Number(data.mrp)||0, exceeded: false };
-            } else {
-              items[data.variant].qty++;
-            }
-            render();
-            fb.textContent = "✅ " + data.variant + "  ×" + items[data.variant].qty;
-            showToast(data.variant + " ×" + items[data.variant].qty, "success", 1600);
-          }
-        })
-        .catch(() => { showToast("Lookup error", "error"); fb.textContent = "❌ Error"; })
-        .finally(() => { setTimeout(() => { scanLock = false; }, 900); });
-    },
-    () => {}
-  );
-  scanning = true;
-}
-
-function closeScanner() {
-  if (scanner && scanning) {
-    scanner.stop()
-      .then(() => { scanning = false; document.getElementById("readerBox").style.display = "none"; })
-      .catch(() => { scanning = false; document.getElementById("readerBox").style.display = "none"; });
-  }
-}
-
-/* ── MANUAL EDIT ── */
-function toggleEdit() {
-  manualMode = !manualMode;
-  document.getElementById("editHead").style.display = manualMode ? "" : "none";
-  document.getElementById("tActionFoot").style.display = manualMode ? "" : "none";
-  document.getElementById("editBtn").innerHTML = manualMode
-    ? `<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg> Lock`
-    : `<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Manual`;
-  render();
-}
-
-/* ── RENDER TABLE ── */
-function render() {
-  const keys = Object.keys(items);
-  document.getElementById("itemCount").textContent = keys.length;
-
-  if (keys.length === 0) {
-    document.getElementById("tbody").innerHTML = `<tr><td colspan="4"><div class="empty-state"><svg width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><p>No items yet.<br>Scan QR or add manually.</p></div></td></tr>`;
-    document.getElementById("tQty").textContent = "0";
-    document.getElementById("tMrp").textContent = "₹0";
-    document.getElementById("tQtyTop").textContent = "0";
-    return;
-  }
-
-  let html = "", tq = 0, tm = 0;
-  keys.forEach(key => {
-    const i = items[key];
-    const q = Number(i.qty) || 0;
-    const m = Number(i.mrp) || 0;
-    tq += q; tm += q * m;
-
-    const excBadge = i.exceeded
-      ? `<span class="exceeded-badge">⚠ Qty Exceeded</span>` : "";
-    const filledBadge = i.alreadyFull
-      ? `<span class="filled-badge">🔒 Already Filled</span>` : "";
-    const rowClass = i.exceeded ? "exceeded-row" : i.alreadyFull ? "filled-row" : "";
-
-    html += `<tr class="${rowClass}">
-      <td style="text-align:left;font-weight:500;font-size:12px">
-        ${manualMode ? `<input type="text" value="${i.variant}" style="width:100%;text-align:left" onchange="items['${key}'].variant=this.value">` : i.variant}
-        ${!manualMode ? excBadge + filledBadge : ""}
-      </td>
-      <td>${manualMode ? `<input type="number" value="${q}" onchange="items['${key}'].qty=Number(this.value);render()">` : `<b>${q}</b>`}</td>
-      <td>${manualMode ? `<input type="number" value="${m}" onchange="items['${key}'].mrp=Number(this.value);render()">` : `₹${m}`}</td>
-      ${manualMode ? `<td><button class="btn btn-danger btn-sm" onclick="removeItem('${key}')">✕</button></td>` : `<td></td>`}
-    </tr>`;
-  });
-
-  if (manualMode) html += `<tr><td colspan="4" style="padding:6px"><button class="btn btn-outline btn-sm" style="width:100%" onclick="addItem()">＋ Add Item</button></td></tr>`;
-
-  document.getElementById("tbody").innerHTML = html;
-  document.getElementById("tQty").textContent = tq;
-  document.getElementById("tMrp").textContent = "₹" + tm.toLocaleString("en-IN");
-  document.getElementById("tQtyTop").textContent = tq;
-}
-
-function addItem() {
-  const n = prompt("Variant Name:");
-  if (!n) return;
-  items[n.trim()] = { variant: n.trim(), qty: 1, mrp: 0, exceeded: false };
-  render();
-}
-function removeItem(k) { delete items[k]; render(); }
-
-/* ── VALIDATION ── */
-function checkFields() {
-  if (!document.getElementById("challan").value.trim())  { showToast("Enter Challan No.","error"); return false; }
-  if (!document.getElementById("dealer").value)           { showToast("Select Sales Officer","error"); return false; }
-  if (!document.getElementById("date").value)             { showToast("Select Date","error"); return false; }
-  if (!document.getElementById("dealerName").value.trim()){ showToast("Enter Dealer Name","error"); return false; }
-  if (!photoData)                                         { showToast("Capture confirmation photo","error"); return false; }
-  if (Object.keys(items).length === 0)                    { showToast("No items to submit","error"); return false; }
+/* ════ VALIDATION ════ */
+function checkFields(){
+  if(!document.getElementById("challan").value.trim()){showToast("Enter Challan No.","error");return false;}
+  if(!document.getElementById("dealer").value){showToast("Select Sales Officer","error");return false;}
+  if(!document.getElementById("date").value){showToast("Select Date","error");return false;}
+  if(!document.getElementById("dealerName").value.trim()){showToast("Enter Dealer Name","error");return false;}
+  if(!photoData){showToast("Capture confirmation photo","error");return false;}
+  if(Object.keys(items).length===0){showToast("No items to submit","error");return false;}
   return true;
 }
 
-/* ── CAMERA ── */
-function openCamera() {
-  navigator.mediaDevices.getUserMedia({ video: { facingMode:"environment", width:{ideal:1280}, height:{ideal:720} } })
-    .then(s => {
-      stream = s;
-      document.getElementById("cameraBox").style.display = "block";
-      document.getElementById("video").srcObject = s;
+/* ════ CAMERA (confirmation photo) ════ */
+function openCamera(){
+  navigator.mediaDevices.getUserMedia({video:{facingMode:"environment",width:{ideal:1280},height:{ideal:720}}})
+    .then(s=>{
+      camStream=s;
+      document.getElementById("cameraBox").style.display="block";
+      document.getElementById("video").srcObject=s;
     })
-    .catch(() => showToast("Camera access denied","error"));
+    .catch(()=>showToast("Camera access denied","error"));
 }
-function capturePhoto() {
-  const canvas = document.getElementById("canvas"), video = document.getElementById("video");
-  canvas.width = video.videoWidth || 320; canvas.height = video.videoHeight || 240;
-  canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
-  photoData = canvas.toDataURL("image/jpeg", 0.82);
-  if (stream) stream.getTracks().forEach(t => t.stop());
-  document.getElementById("video").srcObject = null;
-  document.getElementById("cameraBox").style.display = "none";
-  document.getElementById("preview").innerHTML = "";
-  document.getElementById("photoConfirmedBox").style.display = "flex";
-  document.getElementById("photoConfirmedBox").className = "photo-confirmed";
-  document.getElementById("photoConfirmedBox").innerHTML = `
+function capturePhoto(){
+  const cvs=document.getElementById("canvas"),vid=document.getElementById("video");
+  cvs.width=vid.videoWidth||320; cvs.height=vid.videoHeight||240;
+  cvs.getContext("2d").drawImage(vid,0,0,cvs.width,cvs.height);
+  photoData=cvs.toDataURL("image/jpeg",.82);
+  if(camStream) camStream.getTracks().forEach(t=>t.stop());
+  document.getElementById("video").srcObject=null;
+  document.getElementById("cameraBox").style.display="none";
+  document.getElementById("preview").innerHTML="";
+  document.getElementById("photoConfirmedBox").style.display="flex";
+  document.getElementById("photoConfirmedBox").className="photo-confirmed";
+  document.getElementById("photoConfirmedBox").innerHTML=`
     <img src="${photoData}" alt="photo">
     <div><div class="pc-text">✅ Photo Captured</div><div class="pc-sub">Tap Retake to change</div></div>
     <button class="btn btn-outline btn-sm" onclick="retakePhoto()" style="margin-left:auto">Retake</button>`;
-  document.getElementById("openCamBtn").style.display = "none";
+  document.getElementById("openCamBtn").style.display="none";
   showToast("Photo captured!","success");
 }
-function retakePhoto() {
-  photoData = "";
-  document.getElementById("photoConfirmedBox").style.display = "none";
-  document.getElementById("openCamBtn").style.display = "flex";
+function retakePhoto(){
+  photoData="";
+  document.getElementById("photoConfirmedBox").style.display="none";
+  document.getElementById("openCamBtn").style.display="flex";
   openCamera();
 }
 
-/* ── DOWNLOAD BILL ── */
-function downloadBill(matchedItems) {
-  const ch=document.getElementById("challan").value, so=document.getElementById("dealer").value;
-  const dn=document.getElementById("dealerName").value, dt=document.getElementById("date").value;
-  const time = new Date().toLocaleTimeString("en-IN");
+/* ════ DOWNLOAD BILL ════ */
+function downloadBill(matchedItems){
+  const ch=document.getElementById("challan").value,so=document.getElementById("dealer").value;
+  const dn=document.getElementById("dealerName").value,dt=document.getElementById("date").value;
+  const time=new Date().toLocaleTimeString("en-IN");
   let tq=0,tm=0,rows="";
   matchedItems.forEach(i=>{
     tq+=Number(i.qty)||0; tm+=(Number(i.qty)||0)*(Number(i.mrp)||0);
@@ -705,10 +1001,7 @@ function downloadBill(matchedItems) {
   const html=`<div style="font-family:'DM Sans',Arial,sans-serif;background:#fff;padding:28px;width:540px">
     <div style="background:linear-gradient(135deg,#0d1b3e,#162250);padding:18px 20px;border-radius:10px;margin-bottom:18px;display:flex;align-items:center;gap:12px">
       <div style="background:#f59e0b;border-radius:7px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#0d1b3e;flex-shrink:0">AD</div>
-      <div>
-        <div style="font-size:17px;font-weight:800;color:#fff;letter-spacing:.3px">AKAI DISTRIBUTORS</div>
-        <div style="font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:1px">Approval Challan</div>
-      </div>
+      <div><div style="font-size:17px;font-weight:800;color:#fff;letter-spacing:.3px">AKAI DISTRIBUTORS</div><div style="font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:1px">Approval Challan</div></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
       <div style="background:#f8faff;border-radius:7px;padding:10px;border:1px solid #d1daf7"><div style="font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Challan No.</div><div style="font-weight:700;font-size:13px">${ch}</div></div>
@@ -732,126 +1025,85 @@ function downloadBill(matchedItems) {
     ${photoData?`<div style="margin-top:14px;text-align:center"><div style="font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px">Confirmation Photo</div><img src="${photoData}" style="max-width:140px;border-radius:7px;border:2px solid #10b981"></div>`:""}
     <div style="margin-top:14px;text-align:center;font-size:9px;color:#94a3b8">AKAI Distributors — Approval Challan</div>
   </div>`;
-
   const bill=document.getElementById("bill");
   bill.innerHTML=html; bill.style.display="block";
-  html2canvas(bill,{scale:2,useCORS:true,backgroundColor:"#ffffff"}).then(canvas=>{
+  html2canvas(bill,{scale:2,useCORS:true,backgroundColor:"#ffffff"}).then(c=>{
     const a=document.createElement("a");
-    a.href=canvas.toDataURL("image/jpeg",.92);
+    a.href=c.toDataURL("image/jpeg",.92);
     a.download=`AKAI_${ch}_${dt}.jpg`;
     a.click();
     bill.style.display="none";
   });
 }
 
-/* ══════════════════════════════════════════════════════
-   SUBMIT — with partial quantity overflow handling
-
-   The server now returns:
-     matched: [ { variant, qtyAccepted, qtyExceeded, mrp } ]
-     notMatched: [ { variant, qty, mrp } ]
-
-   qtyAccepted  = how much was written to Data Sheet
-   qtyExceeded  = remainder that had no available rows to fill
-
-   Items with qtyExceeded > 0 stay in the table with the
-   "Qty Exceeded" badge and the remaining quantity.
-   Items fully accepted are removed from the table.
-   Items in notMatched (no challan/SO match at all) also stay.
-   ══════════════════════════════════════════════════════ */
-function submitData() {
-  if (!checkFields()) return;
-
+/* ════════════════════════════════════════════════════════
+   SUBMIT
+   ════════════════════════════════════════════════════════ */
+function submitData(){
+  if(!checkFields()) return;
   document.getElementById("processingOverlay").classList.add("active");
-  document.getElementById("submitBtn").disabled = true;
+  document.getElementById("submitBtn").disabled=true;
 
-  const challanVal = document.getElementById("challan").value.trim();
-  const soVal      = document.getElementById("dealer").value.trim();
-  const dealerVal  = document.getElementById("dealerName").value.trim();
-  const dateVal    = document.getElementById("date").value;
+  const challanVal=document.getElementById("challan").value.trim();
+  const soVal=document.getElementById("dealer").value.trim();
+  const dealerVal=document.getElementById("dealerName").value.trim();
+  const dateVal=document.getElementById("date").value;
+  const cleanItems=Object.values(items).map(i=>({variant:String(i.variant).trim(),qty:Number(i.qty)||0,mrp:Number(i.mrp)||0}));
 
-  const cleanItems = Object.values(items).map(i => ({
-    variant: String(i.variant).trim(),
-    qty:     Number(i.qty) || 0,
-    mrp:     Number(i.mrp) || 0
-  }));
-
-  fetch(API_URL, {
-    method: "POST",
-    body: new URLSearchParams({
-      data: JSON.stringify({
-        challan: challanVal, so: soVal, dealer: dealerVal,
-        date: dateVal, items: cleanItems, photo: photoData,
-        billOffset: BILL_NUMBER_OFFSET
-      })
-    })
+  fetch(API_URL,{
+    method:"POST",
+    body:new URLSearchParams({data:JSON.stringify({
+      challan:challanVal,so:soVal,dealer:dealerVal,
+      date:dateVal,items:cleanItems,photo:photoData,billOffset:BILL_NUMBER_OFFSET
+    })})
   })
-  .then(async res => {
-    const text = await res.text();
+  .then(async res=>{
+    const text=await res.text();
     let data;
-    try { data = JSON.parse(text); } catch { throw new Error("Invalid server response"); }
-    if (data.status !== "success") throw new Error(data.message || "Server error");
+    try{data=JSON.parse(text);}catch{throw new Error("Invalid server response");}
+    if(data.status!=="success") throw new Error(data.message||"Server error");
 
-    /* ── Build download list and new items state ── */
-    const matchedForBill = [];
-    let newItems = {};
+    const matchedForBill=[];
+    let newItems={};
 
-    // Handle fully/partially matched items
-    (data.matched || []).forEach(m => {
-      if (m.qtyAccepted > 0) {
-        matchedForBill.push({ variant: m.variant, qty: m.qtyAccepted, mrp: m.mrp });
-      }
-      if (m.qtyExceeded > 0) {
-        newItems[m.variant] = {
-          variant: m.variant,
-          qty: m.qtyExceeded,
-          mrp: m.mrp,
-          exceeded: true    // ← triggers red badge in render()
-        };
-      }
+    (data.matched||[]).forEach(m=>{
+      if(m.qtyAccepted>0) matchedForBill.push({variant:m.variant,qty:m.qtyAccepted,mrp:m.mrp});
+      if(m.qtyExceeded>0) newItems[m.variant]={variant:m.variant,qty:m.qtyExceeded,mrp:m.mrp,exceeded:true};
+    });
+    (data.notMatched||[]).forEach(i=>{
+      newItems[i.variant]={variant:i.variant,qty:i.qty,mrp:i.mrp,exceeded:false};
     });
 
-    // Handle completely not-matched items (no row in Data Sheet at all)
-    (data.notMatched || []).forEach(i => {
-      newItems[i.variant] = { variant: i.variant, qty: i.qty, mrp: i.mrp, exceeded: false };
-    });
+    items=newItems; render();
+    if(matchedForBill.length>0) downloadBill(matchedForBill);
 
-    items = newItems;
-    render();
+    const exceedCount=(data.matched||[]).filter(m=>m.qtyExceeded>0).length;
+    const noMatchCount=(data.notMatched||[]).length;
 
-    if (matchedForBill.length > 0) downloadBill(matchedForBill);
-
-    const exceedCount  = (data.matched || []).filter(m => m.qtyExceeded > 0).length;
-    const noMatchCount = (data.notMatched || []).length;
-    const leftover     = exceedCount + noMatchCount;
-
-    if (leftover === 0) {
-      showToast("All items submitted successfully!", "success", 4000);
-      setTimeout(() => {
-        document.getElementById("challan").value = "";
-        document.getElementById("dealer").value = "";
-        document.getElementById("dealerName").value = "";
-        photoData = "";
-        document.getElementById("preview").innerHTML = "";
-        document.getElementById("photoConfirmedBox").style.display = "none";
-        document.getElementById("openCamBtn").style.display = "flex";
+    if(exceedCount+noMatchCount===0){
+      showToast("All items submitted successfully!","success",4000);
+      setTimeout(()=>{
+        document.getElementById("challan").value="";
+        document.getElementById("dealer").value="";
+        document.getElementById("dealerName").value="";
+        photoData="";
+        document.getElementById("preview").innerHTML="";
+        document.getElementById("photoConfirmedBox").style.display="none";
+        document.getElementById("openCamBtn").style.display="flex";
         goPage(1);
-      }, 1600);
+      },1600);
     } else {
-      let msg = "";
-      if (exceedCount > 0)  msg += `${exceedCount} variant(s) qty exceeded. `;
-      if (noMatchCount > 0) msg += `${noMatchCount} variant(s) not matched.`;
-      showToast("⚠ " + msg.trim() + " Check table.", "warning", 6000);
-      setTimeout(() => goPage(1), 2200);
+      let msg="";
+      if(exceedCount>0) msg+=`${exceedCount} variant(s) qty exceeded. `;
+      if(noMatchCount>0) msg+=`${noMatchCount} variant(s) not matched.`;
+      showToast("⚠ "+msg.trim()+" Check table.","warning",6000);
+      setTimeout(()=>goPage(1),2200);
     }
   })
-  .catch(err => {
-    showToast("Submit failed: " + err.message, "error", 5000);
-    console.error(err);
-  })
-  .finally(() => {
+  .catch(err=>{showToast("Submit failed: "+err.message,"error",5000);console.error(err);})
+  .finally(()=>{
     document.getElementById("processingOverlay").classList.remove("active");
-    document.getElementById("submitBtn").disabled = false;
+    document.getElementById("submitBtn").disabled=false;
   });
 }
 </script>
