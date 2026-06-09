@@ -278,10 +278,6 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
       <label>Sales Officer (SO)</label>
       <select id="dealer">
         <option value="">— Select SO —</option>
-        <option>SAMARENDRA CHANDRA SARKA</option>
-        <option>AJAY SINGHA</option>
-        <option>SOMEN DAS</option>
-        <option>CHANDAN DAS</option>
       </select>
     </div>
     <div class="field">
@@ -510,6 +506,7 @@ window.onload = function() {
   document.getElementById("headerDate").textContent =
     today.toLocaleDateString("en-IN",{day:"2-digit",month:"short"});
   loadDealers();
+  loadSO();
   loadStockCache();
   // Pre-init barcode detector in background so first scan is instant
   initBarcodeDetector();
@@ -520,7 +517,7 @@ window.onload = function() {
   });
 };
 
-/* ════ DEALERS ════ */
+/* ════ DEALERS — from Master Dealer column A (A2:A) ════ */
 function loadDealers() {
   fetch(API_URL+"?type=dealers")
     .then(r=>r.json())
@@ -528,6 +525,22 @@ function loadDealers() {
       const list=document.getElementById("dealerList");
       list.innerHTML="";
       data.forEach(d=>{const o=document.createElement("option");o.value=d;list.appendChild(o);});
+    }).catch(()=>{});
+}
+
+/* ════ SALES OFFICERS (SO) — from Master Dealer column B (B2:B) ════ */
+function loadSO() {
+  fetch(API_URL+"?type=so")
+    .then(r=>r.json())
+    .then(data=>{
+      const sel=document.getElementById("dealer");
+      // Keep the placeholder option, remove any previously loaded ones
+      sel.innerHTML='<option value="">— Select SO —</option>';
+      data.forEach(name=>{
+        const o=document.createElement("option");
+        o.value=name; o.textContent=name;
+        sel.appendChild(o);
+      });
     }).catch(()=>{});
 }
 
