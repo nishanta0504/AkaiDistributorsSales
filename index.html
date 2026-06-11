@@ -454,6 +454,7 @@ let photoData   = "";
 let camStream   = null;
 let currentPage = 1;
 let activeScanMode = "qr";
+let lastBillNo  = "";   // delivery/bill number returned by server after submit
 
 /* ════ CACHE ════
    stockCache    : keyed by UID  → {variant, mrp}   (used by scanners)
@@ -502,12 +503,25 @@ const beep = (() => {
   } catch(e){ return ()=>{}; }
 })();
 
+/* ════ DATE DISPLAY HELPER ════
+   Converts an input-date string "YYYY-MM-DD" → "DD.MM.YYYY" for DISPLAY only.
+   The actual <input type="date"> value and the value sent to the sheet stay
+   in YYYY-MM-DD (HTML standard) so no logic breaks. */
+function fmtDate(d){
+  const s=String(d||"").trim();
+  const m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(m) return m[3]+"."+m[2]+"."+m[1]; // DD.MM.YYYY
+  return s; // leave anything unexpected as-is
+}
+
 /* ════ INIT ════ */
 window.onload = function() {
   const today = new Date();
   document.getElementById("date").value = today.toISOString().split("T")[0];
-  document.getElementById("headerDate").textContent =
-    today.toLocaleDateString("en-IN",{day:"2-digit",month:"short"});
+  const dd=String(today.getDate()).padStart(2,"0");
+  const mm=String(today.getMonth()+1).padStart(2,"0");
+  const yyyy=today.getFullYear();
+  document.getElementById("headerDate").textContent = dd+"."+mm+"."+yyyy;
   loadDealers();
   loadSO();
   loadStockCache();
@@ -927,10 +941,11 @@ function refreshSummary(){
   document.getElementById("summaryBox").innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px">
       <div style="background:#f8faff;border-radius:8px;padding:10px;border:1px solid #d1daf7"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Challan</div><div style="font-weight:700;font-size:13px">${ch}</div></div>
-      <div style="background:#f8faff;border-radius:8px;padding:10px;border:1px solid #d1daf7"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Date</div><div style="font-weight:700;font-size:13px">${dt}</div></div>
+      <div style="background:#f8faff;border-radius:8px;padding:10px;border:1px solid #d1daf7"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Date</div><div style="font-weight:700;font-size:13px">${fmtDate(dt)}</div></div>
       <div style="background:#f8faff;border-radius:8px;padding:10px;border:1px solid #d1daf7"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">SO</div><div style="font-weight:700;font-size:13px">${so}</div></div>
       <div style="background:#f8faff;border-radius:8px;padding:10px;border:1px solid #d1daf7"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Dealer</div><div style="font-weight:700;font-size:13px">${dn}</div></div>
     </div>
+    ${lastBillNo!==""?`<div style="background:linear-gradient(90deg,#fef3c7,#fffbeb);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;margin-top:6px;border:1px solid #fcd34d"><span style="font-size:10px;color:#92400e;text-transform:uppercase;letter-spacing:.7px;font-weight:700">Delivery Number</span><span style="font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:var(--navy)">${lastBillNo}</span></div>`:""}
     <div style="background:linear-gradient(90deg,#dbeafe,#eff6ff);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;margin-top:6px;border:1px solid #bfdbfe">
       <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:var(--navy)">${Object.keys(items).length} VARIANTS</span>
       <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--navy)">Qty: ${tq} &nbsp;|&nbsp; ₹${tm.toLocaleString("en-IN")}</span>
@@ -1001,10 +1016,11 @@ function downloadBill(matchedItems){
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
       <div style="background:#f8faff;border-radius:7px;padding:10px;border:1px solid #d1daf7"><div style="font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Challan No.</div><div style="font-weight:700;font-size:13px">${ch}</div></div>
-      <div style="background:#f8faff;border-radius:7px;padding:10px;border:1px solid #d1daf7"><div style="font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Date &amp; Time</div><div style="font-weight:700;font-size:13px">${dt} <span style="font-size:10px;color:#64748b">${time}</span></div></div>
+      <div style="background:#f8faff;border-radius:7px;padding:10px;border:1px solid #d1daf7"><div style="font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Date &amp; Time</div><div style="font-weight:700;font-size:13px">${fmtDate(dt)} <span style="font-size:10px;color:#64748b">${time}</span></div></div>
       <div style="background:#f8faff;border-radius:7px;padding:10px;border:1px solid #d1daf7"><div style="font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Sales Officer</div><div style="font-weight:700;font-size:13px">${so}</div></div>
       <div style="background:#f8faff;border-radius:7px;padding:10px;border:1px solid #d1daf7"><div style="font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Dealer</div><div style="font-weight:700;font-size:13px">${dn}</div></div>
     </div>
+    ${lastBillNo!==""?`<div style="background:linear-gradient(90deg,#fef3c7,#fffbeb);border-radius:7px;padding:10px 12px;border:1px solid #fcd34d;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center"><div style="font-size:9px;color:#92400e;text-transform:uppercase;letter-spacing:.7px">Delivery Number</div><div style="font-weight:800;font-size:15px;color:#0d1b3e">${lastBillNo}</div></div>`:""}
     <table style="width:100%;border-collapse:collapse;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden">
       <thead><tr style="background:linear-gradient(90deg,#e8eeff,#f0f4ff)">
         <th style="padding:9px 10px;text-align:left;font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.7px;border-bottom:2px solid #d1daf7">Variant</th>
@@ -1028,7 +1044,7 @@ function downloadBill(matchedItems){
   html2canvas(bill,{scale:2,useCORS:true,backgroundColor:"#ffffff"}).then(c=>{
     const a=document.createElement("a");
     a.href=c.toDataURL("image/jpeg",.92);
-    a.download=`AKAI_${ch}_${dt}.jpg`;
+    a.download=`AKAI_${ch}_${fmtDate(dt)}.jpg`;
     a.click();
     bill.style.display="none";
   });
@@ -1042,7 +1058,7 @@ function submitData(){
   const challanVal=document.getElementById("challan").value.trim();
   const soVal=document.getElementById("dealer").value.trim();
   const dealerVal=document.getElementById("dealerName").value.trim();
-  const dateVal=document.getElementById("date").value;
+  const dateVal=fmtDate(document.getElementById("date").value);
   const cleanItems=Object.values(items).map(i=>({variant:String(i.variant).trim(),qty:Number(i.qty)||0,mrp:Number(i.mrp)||0}));
   fetch(API_URL,{
     method:"POST",
@@ -1056,6 +1072,7 @@ function submitData(){
     let data;
     try{data=JSON.parse(text);}catch{throw new Error("Invalid server response");}
     if(data.status!=="success") throw new Error(data.message||"Server error");
+    lastBillNo = (data.billNo !== undefined && data.billNo !== null) ? data.billNo : "";
     const matchedForBill=[];
     let newItems={};
     (data.matched||[]).forEach(m=>{
@@ -1067,15 +1084,17 @@ function submitData(){
     });
     items=newItems; render();
     if(matchedForBill.length>0) downloadBill(matchedForBill);
+    refreshSummary(); // update summary so Delivery Number shows on page 2
     const exceedCount=(data.matched||[]).filter(m=>m.qtyExceeded>0).length;
     const noMatchCount=(data.notMatched||[]).length;
     if(exceedCount+noMatchCount===0){
-      showToast("All items submitted successfully!","success",4000);
+      showToast("All items submitted! Delivery No: "+lastBillNo,"success",4000);
       setTimeout(()=>{
         document.getElementById("challan").value="";
         document.getElementById("dealer").value="";
         document.getElementById("dealerName").value="";
         photoData="";
+        lastBillNo="";
         document.getElementById("preview").innerHTML="";
         document.getElementById("photoConfirmedBox").style.display="none";
         document.getElementById("openCamBtn").style.display="flex";
