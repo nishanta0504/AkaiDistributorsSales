@@ -998,21 +998,41 @@ function retakePhoto(){
   openCamera();
 }
 
-/* ════ DOWNLOAD BILL (with Total column) ════ */
+/* ════ DOWNLOAD BILL (with Total column) — splits into pages of 30 lines ════ */
 function downloadBill(matchedItems){
   const ch=document.getElementById("challan").value,so=document.getElementById("dealer").value;
   const dn=document.getElementById("dealerName").value,dt=document.getElementById("date").value;
   const time=new Date().toLocaleTimeString("en-IN");
-  let tq=0,tm=0,tt=0,rows="";
+
+  // Grand totals across ALL items (same on every page)
+  let tq=0,tm=0,tt=0;
   matchedItems.forEach(i=>{
-    const q=Number(i.qty)||0, m=Number(i.mrp)||0, lt=q*m;
-    tq+=q; tm+=m; tt+=lt;
-    rows+=`<tr><td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;text-align:left;font-size:13px">${i.variant}</td><td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;text-align:center;font-size:13px">${q}</td><td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;text-align:right;font-size:13px">₹${m}</td><td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;text-align:right;font-size:13px">₹${lt.toLocaleString("en-IN")}</td></tr>`;
+    const q=Number(i.qty)||0, m=Number(i.mrp)||0;
+    tq+=q; tm+=m; tt+=q*m;
   });
-  const html=`<div style="font-family:'DM Sans',Arial,sans-serif;background:#fff;padding:28px;width:540px">
+
+  // Split items into pages of 30 variant lines each
+  const PER_PAGE=30;
+  const pages=[];
+  for(let p=0;p<matchedItems.length;p+=PER_PAGE) pages.push(matchedItems.slice(p,p+PER_PAGE));
+  if(pages.length===0) pages.push([]); // always at least one page
+  const totalPages=pages.length;
+
+  // Build one full page (header + info + delivery no + table) — identical layout on every page
+  function buildPageHtml(pageItems, pageIndex){
+    let rows="";
+    pageItems.forEach(i=>{
+      const q=Number(i.qty)||0, m=Number(i.mrp)||0, lt=q*m;
+      rows+=`<tr><td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;text-align:left;font-size:13px">${i.variant}</td><td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;text-align:center;font-size:13px">${q}</td><td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;text-align:right;font-size:13px">₹${m}</td><td style="padding:8px 10px;border-bottom:1px solid #e2e8f0;text-align:right;font-size:13px">₹${lt.toLocaleString("en-IN")}</td></tr>`;
+    });
+    const isLast=(pageIndex===totalPages-1);
+    const pageBadge=(totalPages>1)?`<div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:16px;padding:4px 12px;font-size:11px;font-weight:700;color:#fff;white-space:nowrap">Page ${pageIndex+1} of ${totalPages}</div>`:"";
+    const pageFoot=(totalPages>1)?` &nbsp;•&nbsp; Page ${pageIndex+1} of ${totalPages}`:"";
+    return `<div style="font-family:'DM Sans',Arial,sans-serif;background:#fff;padding:28px;width:540px">
     <div style="background:linear-gradient(135deg,#0d1b3e,#162250);padding:18px 20px;border-radius:10px;margin-bottom:18px;display:flex;align-items:center;gap:12px">
       <div style="background:#f59e0b;border-radius:7px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#0d1b3e;flex-shrink:0">AD</div>
-      <div><div style="font-size:17px;font-weight:800;color:#fff;letter-spacing:.3px">AKAI DISTRIBUTORS</div><div style="font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:1px">Approval Challan</div></div>
+      <div style="flex:1"><div style="font-size:17px;font-weight:800;color:#fff;letter-spacing:.3px">AKAI DISTRIBUTORS</div><div style="font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:1px">Approval Challan</div></div>
+      ${pageBadge}
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
       <div style="background:#f8faff;border-radius:7px;padding:10px;border:1px solid #d1daf7"><div style="font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Challan No.</div><div style="font-weight:700;font-size:13px">${ch}</div></div>
@@ -1036,18 +1056,27 @@ function downloadBill(matchedItems){
         <td style="padding:9px 10px;text-align:right;font-weight:800;font-size:13px">₹${tt.toLocaleString("en-IN")}</td>
       </tr></tfoot>
     </table>
-    ${photoData?`<div style="margin-top:14px;text-align:center"><div style="font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px">Confirmation Photo</div><img src="${photoData}" style="max-width:140px;border-radius:7px;border:2px solid #10b981"></div>`:""}
-    <div style="margin-top:14px;text-align:center;font-size:9px;color:#94a3b8">AKAI Distributors — Approval Challan</div>
+    ${(isLast && photoData)?`<div style="margin-top:14px;text-align:center"><div style="font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px">Confirmation Photo</div><img src="${photoData}" style="max-width:140px;border-radius:7px;border:2px solid #10b981"></div>`:""}
+    <div style="margin-top:14px;text-align:center;font-size:9px;color:#94a3b8">AKAI Distributors — Approval Challan${pageFoot}</div>
   </div>`;
+  }
+
+  // Render each page sequentially and download as separate images
   const bill=document.getElementById("bill");
-  bill.innerHTML=html; bill.style.display="block";
-  html2canvas(bill,{scale:2,useCORS:true,backgroundColor:"#ffffff"}).then(c=>{
-    const a=document.createElement("a");
-    a.href=c.toDataURL("image/jpeg",.92);
-    a.download=`AKAI_${ch}_${fmtDate(dt)}.jpg`;
-    a.click();
-    bill.style.display="none";
-  });
+  function renderPage(idx){
+    if(idx>=pages.length){ bill.style.display="none"; bill.innerHTML=""; return; }
+    bill.innerHTML=buildPageHtml(pages[idx], idx);
+    bill.style.display="block";
+    html2canvas(bill,{scale:2,useCORS:true,backgroundColor:"#ffffff"}).then(c=>{
+      const a=document.createElement("a");
+      a.href=c.toDataURL("image/jpeg",.92);
+      const suffix=(totalPages>1)?`_page${idx+1}`:"";
+      a.download=`AKAI_${ch}_${fmtDate(dt)}${suffix}.jpg`;
+      a.click();
+      setTimeout(()=>renderPage(idx+1), 700); // delay so downloads don't collide
+    }).catch(()=>{ setTimeout(()=>renderPage(idx+1), 700); });
+  }
+  renderPage(0);
 }
 
 /* ════ SUBMIT ════ */
