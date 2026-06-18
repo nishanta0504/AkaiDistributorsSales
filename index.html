@@ -768,7 +768,7 @@ async function openBCScanner() {
   }
   document.getElementById("bcFeedback").textContent="Point camera at barcode";
   bcDecoding=false; lastBcCode=""; lastBcTime=0;
-  bcInterval = setInterval(()=>{ bcDecodeFrame(); }, 25);
+  bcInterval = setInterval(()=>{ bcDecodeFrame(); }, 110);
   try{ if("wakeLock" in navigator) navigator.wakeLock.request("screen"); }catch(e){}
 }
 function closeBCScanner() {
