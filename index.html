@@ -201,6 +201,12 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
 #addItemBox label{display:block;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px}
 .add-item-row{display:flex;gap:6px;align-items:center}
 #addItemInput{flex:1;padding:10px 12px;font-size:13px;border:1.5px solid var(--border);border-radius:8px;background:#fff}
+
+/* ════ DOWNLOAD-AGAIN BAR (NEW) ════ */
+#dlAgainBar{display:none;position:fixed;left:10px;right:10px;bottom:12px;z-index:9000;background:var(--navy);color:#fff;border-radius:12px;box-shadow:0 8px 26px rgba(0,0,0,.25);padding:10px 12px;align-items:center;gap:10px;max-width:540px;margin:0 auto}
+#dlAgainBar.show{display:flex}
+#dlAgainText{flex:1;font-size:12px;font-weight:600;line-height:1.3}
+#dlAgainClose{background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:50%;width:28px;height:28px;font-size:16px;cursor:pointer;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -213,6 +219,13 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
 
 <div class="scan-flash" id="scanFlash"></div>
 <div class="toast-container" id="toastContainer"></div>
+
+<!-- NEW — lets you re-download the last challan with one tap if the auto-download was blocked -->
+<div id="dlAgainBar">
+  <div id="dlAgainText">Challan ready</div>
+  <button class="btn btn-accent btn-sm" onclick="redownloadBill()">⬇ Download</button>
+  <button id="dlAgainClose" onclick="hideDlAgainBar()">×</button>
+</div>
 
 <!-- ════ HEADER ════ -->
 <div class="header" style="position:relative">
@@ -477,6 +490,7 @@ let camStream   = null;
 let currentPage = 1;
 let activeScanMode = "qr";
 let lastBillNo  = "";   // delivery/bill number returned by server after submit
+let lastBillFiles = []; // NEW — [{name, blob}] of the last downloaded challan (for "Download again")
 
 /* ════ CACHE ════
    stockCache    : keyed by UID  → {variant, mrp}   (used by scanners)
@@ -760,6 +774,13 @@ async function openBCScanner() {
     const vid=document.getElementById("bcVideo");
     vid.srcObject=bcStream;
     await vid.play();
+    // SPEED: ask for continuous autofocus (sharper barcodes = quicker reads). Ignored if unsupported.
+    try{
+      const tr=bcStream.getVideoTracks()[0];
+      const caps=(tr && tr.getCapabilities) ? tr.getCapabilities() : {};
+      if(caps.focusMode && caps.focusMode.includes("continuous"))
+        tr.applyConstraints({advanced:[{focusMode:"continuous"}]}).catch(()=>{});
+    }catch(e){}
   } catch(e) {
     showToast("Camera access denied","error");
     document.getElementById("bcBox").style.display="none";
@@ -768,7 +789,7 @@ async function openBCScanner() {
   }
   document.getElementById("bcFeedback").textContent="Point camera at barcode";
   bcDecoding=false; lastBcCode=""; lastBcTime=0;
-  bcInterval = setInterval(()=>{ bcDecodeFrame(); }, 110);
+  bcInterval = setInterval(()=>{ bcDecodeFrame(); }, 40); // SPEED: was 110ms (bcDecoding guard prevents overlap)
   try{ if("wakeLock" in navigator) navigator.wakeLock.request("screen"); }catch(e){}
 }
 function closeBCScanner() {
@@ -788,11 +809,16 @@ async function bcDecodeFrame() {
   bcDecoding=true;
   const cvs=document.getElementById("bcCanvas");
   const ctx=cvs.getContext("2d",{willReadFrequently:true});
+  // SPEED: decode only the centre band of the frame (it fully contains the
+  // on-screen scan window), and don't re-allocate the canvas every frame.
   const MAX_W = 960;
-  const scale = vid.videoWidth > MAX_W ? MAX_W / vid.videoWidth : 1;
-  cvs.width  = Math.round(vid.videoWidth  * scale);
-  cvs.height = Math.round(vid.videoHeight * scale);
-  ctx.drawImage(vid, 0, 0, cvs.width, cvs.height);
+  const vw = vid.videoWidth, vh = vid.videoHeight;
+  const sy = Math.round(vh * 0.2), sh = Math.round(vh * 0.6);
+  const scale = vw > MAX_W ? MAX_W / vw : 1;
+  const cw = Math.round(vw * scale), ch = Math.round(sh * scale);
+  if(cvs.width  !== cw) cvs.width  = cw;
+  if(cvs.height !== ch) cvs.height = ch;
+  ctx.drawImage(vid, 0, sy, vw, sh, 0, 0, cw, ch);
   let code=null;
   try {
     if(!bcUseZXing && bcDetector) {
@@ -968,7 +994,12 @@ function goToPage2(){
   if(!document.getElementById("date").value){showToast("Select Date","error");return;}
   if(!document.getElementById("dealerName").value.trim()){showToast("Enter Dealer Name","error");return;}
   if(Object.keys(items).length===0){showToast("Add at least one item","error");return;}
+  warmUpServer(); // NEW — wakes the server while you take the photo, so Submit is faster
   goPage(2);
+}
+/* NEW — light ping so the Apps Script is already awake when Submit is pressed */
+function warmUpServer(){
+  try{ fetch(API_URL+"?type=ping",{cache:"no-store"}).catch(()=>{}); }catch(e){}
 }
 function refreshSummary(){
   const ch=document.getElementById("challan").value,so=document.getElementById("dealer").value;
@@ -1186,20 +1217,70 @@ function downloadBill(matchedItems){
 
   // Render each page sequentially and download as separate images
   const bill=document.getElementById("bill");
+  const files=[];        // NEW — kept for "Download again"
+  let anyFailed=false;
+  const safeCh=String(ch).replace(/[\\/:*?"<>|]/g,"-"); // NEW — characters like "/" break file names
   function renderPage(idx){
-    if(idx>=pages.length){ bill.style.display="none"; bill.innerHTML=""; return; }
+    if(idx>=pages.length){
+      bill.style.display="none"; bill.innerHTML="";
+      if(files.length){
+        lastBillFiles=files;
+        showDlAgainBar(billNoSnap, ch, anyFailed);
+      }
+      return;
+    }
     bill.innerHTML=buildPageHtml(pages[idx], idx);
     bill.style.display="block";
-    html2canvas(bill,{scale:1.6,useCORS:true,backgroundColor:"#ffffff"}).then(c=>{
-      const a=document.createElement("a");
-      a.href=c.toDataURL("image/jpeg",.92);
+    html2canvas(bill,{scale:1.6,useCORS:true,backgroundColor:"#ffffff"}).then(c=>canvasToBlob(c)).then(blob=>{
       const suffix=(totalPages>1)?`_page${idx+1}`:"";
-      a.download=`AKAI_${ch}_${fmtDate(dt)}${suffix}.jpg`;
-      a.click();
+      const name=`AKAI_${safeCh}_${fmtDate(dt)}${suffix}.jpg`;
+      files.push({name:name, blob:blob});
+      saveBlob(blob, name);
       setTimeout(()=>renderPage(idx+1), 700); // delay so downloads don't collide
-    }).catch(()=>{ setTimeout(()=>renderPage(idx+1), 700); });
+    }).catch(()=>{ anyFailed=true; setTimeout(()=>renderPage(idx+1), 700); });
   }
   renderPage(0);
+}
+
+/* ════ DOWNLOAD HELPERS (NEW) ════
+   Blob + object URL instead of a huge data: URL, and the link is attached to
+   the page before clicking — both are needed for downloads to work every time
+   (big data: URLs and detached links are silently dropped by many phones). */
+function canvasToBlob(c){
+  return new Promise(resolve=>{
+    const fallback=()=>resolve(dataUrlToBlob(c.toDataURL("image/jpeg",.92)));
+    try{ c.toBlob(b=>{ b ? resolve(b) : fallback(); },"image/jpeg",.92); }
+    catch(e){ fallback(); }
+  });
+}
+function dataUrlToBlob(u){
+  const parts=u.split(","), mime=(parts[0].match(/:(.*?);/)||[])[1]||"image/jpeg";
+  const bin=atob(parts[1]), arr=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+  return new Blob([arr],{type:mime});
+}
+function saveBlob(blob, name){
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url; a.download=name; a.rel="noopener"; a.style.display="none";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>{ a.remove(); URL.revokeObjectURL(url); }, 60000);
+}
+function showDlAgainBar(billNo, ch, failed){
+  const txt=document.getElementById("dlAgainText");
+  txt.textContent = failed
+    ? "⚠ Some pages could not be created. Tap Download to save what was made."
+    : "📄 Challan "+ch+(billNo!==""?" • Delivery No "+billNo:"")+" — not downloaded? Tap Download";
+  document.getElementById("dlAgainBar").classList.add("show");
+}
+function hideDlAgainBar(){
+  document.getElementById("dlAgainBar").classList.remove("show");
+}
+function redownloadBill(){
+  if(!lastBillFiles.length){ showToast("Nothing to download yet","warning",1800); return; }
+  lastBillFiles.forEach((f,i)=>setTimeout(()=>saveBlob(f.blob,f.name), i*700));
+  showToast("Downloading challan…","success",1600);
 }
 
 /* ════ SUBMIT ════ */
