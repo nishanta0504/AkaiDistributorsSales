@@ -1308,6 +1308,8 @@ function submitData(){
     let data;
     try{data=JSON.parse(text);}catch{throw new Error("Invalid server response");}
     if(data.status!=="success") throw new Error(data.message||"Server error");
+    // NEW — warn if the Apps Script deployment is still the old version
+    if(!data.version) showToast("⚠ Server script is OLD. In Apps Script: Deploy → Manage deployments → ✏️ Edit → New version → Deploy","warning",9000);
     lastBillNo = (data.billNo !== undefined && data.billNo !== null) ? data.billNo : "";
     const matchedForBill=[];
     let newItems={};
