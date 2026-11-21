@@ -207,6 +207,23 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
 #dlAgainBar.show{display:flex}
 #dlAgainText{flex:1;font-size:12px;font-weight:600;line-height:1.3}
 #dlAgainClose{background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:50%;width:28px;height:28px;font-size:16px;cursor:pointer;flex-shrink:0}
+
+/* ════ PAGE SWITCHER — Challan Entry / Challan Confirm (NEW) ════ */
+.page-switch-btn{width:34px;height:34px;min-width:34px;border:none;background:rgba(255,255,255,.12);border-radius:8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;flex-shrink:0}
+.page-switch-btn span{width:16px;height:2px;background:#fff;border-radius:2px;display:block}
+.page-switch-btn:active{background:rgba(255,255,255,.22)}
+.page-switch-dd{position:absolute;top:54px;left:10px;background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(13,27,62,.22);overflow:hidden;z-index:9999;min-width:210px;border:1px solid rgba(209,218,247,.6);display:none}
+.page-switch-dd.open{display:block;animation:ddIn .15s ease}
+.page-switch-dd .menu-item.current{background:#f0f4ff}
+.menu-item-icon.pe{background:rgba(26,86,219,.1)}
+.menu-item-icon.pc{background:rgba(16,185,129,.12)}
+#pageConfirm{display:none}
+body.confirm-mode #pageConfirm{display:block;animation:fadeIn .2s ease}
+body.confirm-mode #page1,body.confirm-mode #page2,body.confirm-mode .stepper,
+body.confirm-mode #cacheBar,body.confirm-mode #menuBtn{display:none!important}
+#cfVideo{border-radius:10px;border:2px solid rgba(255,255,255,.2);width:100%;max-width:300px}
+#cfVideo.mirror{transform:scaleX(-1)}
+#cfBill{display:none;background:#fff;position:fixed;left:-9999px;top:0}
 </style>
 </head>
 <body>
@@ -229,10 +246,29 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
 
 <!-- ════ HEADER ════ -->
 <div class="header" style="position:relative">
+  <button class="page-switch-btn" id="pageSwitchBtn" onclick="togglePageSwitch()" aria-label="Pages">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="page-switch-dd" id="pageSwitchDd">
+    <div class="menu-item current" id="psEntry" onclick="switchAppMode('entry')">
+      <div class="menu-item-icon pe">📝</div>
+      <div>
+        <div class="menu-item-label">Challan Entry</div>
+        <div class="menu-item-sub">Scan, submit &amp; download</div>
+      </div>
+    </div>
+    <div class="menu-item" id="psConfirm" onclick="switchAppMode('confirm')">
+      <div class="menu-item-icon pc">✅</div>
+      <div>
+        <div class="menu-item-label">Challan Confirm</div>
+        <div class="menu-item-sub">Search challan, confirm &amp; download</div>
+      </div>
+    </div>
+  </div>
   <div class="header-logo">AD</div>
   <div class="header-text">
     <h1>AKAI DISTRIBUTORS</h1>
-    <p>Approval Challan</p>
+    <p id="headerSub">Approval Challan</p>
   </div>
   <div class="header-right">
     <div class="header-date" id="headerDate"></div>
@@ -474,10 +510,86 @@ td input[type="number"],td input[type="text"]{width:68px;padding:5px 6px;font-si
 
 <div id="bill"></div>
 
+<!-- ══════════════════ CHALLAN CONFIRM PAGE (NEW) ══════════════════ -->
+<div id="pageConfirm">
+<div class="container">
+
+  <div class="card">
+    <div class="card-title">Search Challan</div>
+    <div class="add-item-row">
+      <input type="text" id="cfChallan" placeholder="Enter Challan No." autocomplete="off" style="flex:1"
+             onkeydown="if(event.key==='Enter'){event.preventDefault();cfSearch();}">
+      <button class="btn btn-primary" id="cfSearchBtn" onclick="cfSearch()" style="padding:11px 18px">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        Search
+      </button>
+    </div>
+  </div>
+
+  <div class="card" id="cfResultCard" style="display:none">
+    <div class="card-title">Challan Details</div>
+    <div id="cfSummary"></div>
+    <div class="table-wrap" style="margin-top:10px">
+      <table>
+        <thead><tr>
+          <th style="text-align:left">Variant</th><th>Qty</th><th>MRP ₹</th><th>Total ₹</th>
+        </tr></thead>
+        <tbody id="cfTbody"></tbody>
+        <tfoot><tr class="tfoot-row">
+          <td><b>TOTAL</b></td><td id="cfTQty">0</td><td id="cfTMrp">₹0</td><td id="cfTTotal">₹0</td>
+        </tr></tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" id="cfConfirmCard" style="display:none">
+    <div class="card-title">Confirmation Photo / Selfie / Signature</div>
+    <div id="cfConfirmedBox" style="display:none"></div>
+    <div id="cfChooser" style="display:flex;gap:8px;margin-bottom:8px">
+      <button class="btn btn-outline" onclick="cfOpenCamera('environment')" style="flex:1;padding:12px 8px">📷 Photo</button>
+      <button class="btn btn-outline" onclick="cfOpenCamera('user')" style="flex:1;padding:12px 8px">🤳 Selfie</button>
+      <button class="btn btn-outline" onclick="cfOpenSign()" style="flex:1;padding:12px 8px">✍️ Sign</button>
+    </div>
+    <div style="text-align:center;font-size:10px;color:var(--muted);margin-bottom:8px" id="cfHint">Take a photo or selfie. Use Sign if the camera isn't working.</div>
+
+    <div id="cfCameraBox" style="display:none;text-align:center;background:var(--navy);border-radius:var(--r);padding:14px;margin-bottom:12px">
+      <div class="cam-title" id="cfCamTitle">📷 Live Camera</div>
+      <video id="cfVideo" autoplay playsinline muted></video>
+      <div class="cam-btns">
+        <button class="btn btn-success btn-sm" onclick="cfCapture()">📸 Capture</button>
+        <button class="btn btn-outline btn-sm" style="color:#fff;border-color:rgba(255,255,255,.35)" onclick="cfFlipCamera()">🔄 Flip</button>
+        <button class="btn btn-outline btn-sm" style="color:#fff;border-color:rgba(255,255,255,.35)" onclick="cfResetConfirm()">✕ Cancel</button>
+      </div>
+      <canvas id="cfCanvas" style="display:none"></canvas>
+    </div>
+
+    <div id="cfSignBox" style="display:none;text-align:center;background:var(--navy);border-radius:var(--r);padding:14px;margin-bottom:12px">
+      <div class="cam-title">✍️ Sign Below</div>
+      <canvas id="cfSignCanvas" style="background:#fff;border-radius:10px;border:2px solid rgba(255,255,255,.2);width:100%;max-width:320px;height:160px;touch-action:none"></canvas>
+      <div class="cam-btns">
+        <button class="btn btn-success btn-sm" onclick="cfSaveSign()">✔ Save Sign</button>
+        <button class="btn btn-outline btn-sm" style="color:#fff;border-color:rgba(255,255,255,.35)" onclick="cfClearSign()">🔄 Clear</button>
+        <button class="btn btn-outline btn-sm" style="color:#fff;border-color:rgba(255,255,255,.35)" onclick="cfResetConfirm()">✕ Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="cfDownloadCard" style="display:none;padding:12px">
+    <button class="btn btn-success" style="width:100%;padding:13px;font-size:15px" onclick="cfDownload()" id="cfDownloadBtn">
+      <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg>
+      Download Challan
+    </button>
+    <div style="text-align:center;margin-top:7px;font-size:11px;color:var(--muted)">Add a photo, selfie or signature first.</div>
+  </div>
+
+</div>
+</div>
+<div id="cfBill"></div>
+
 <script>
 /* ════ CONFIG ════ */
 const BILL_NUMBER_OFFSET = 0;
-const API_URL = "https://script.google.com/macros/s/AKfycbz_VAjxgrMJHPYWmJQAVJKiHtPo7z705wPVNMMXQk0cNj1PcU-9YZ9f7MyjNdP3OjRC/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbz_VAjxgrMJHPYWmJQAVJKiHtPo7z705wPVNMMXQk0cNj1PcU-9YZ9f7MyjNdP3OjRC/exec"
 
 /* ════ STATE ════ */
 let items       = {};
@@ -1350,6 +1462,309 @@ function submitData(){
     document.getElementById("processingOverlay").classList.remove("active");
     document.getElementById("submitBtn").disabled=false;
   });
+}
+
+/* ═════════════════════════════════════════════════════════════════
+   CHALLAN CONFIRM PAGE (NEW) — separate state & functions, so nothing
+   in Challan Entry (items, photoData, camera, signature, submit) is touched.
+   ═════════════════════════════════════════════════════════════════ */
+let cfData    = null;          // {challan,date,dealer,items:[{variant,qty,mrp}]}
+let cfPhoto   = "";            // captured photo / selfie / signature (data URL)
+let cfType    = "";            // "photo" | "selfie" | "sign"
+let cfStream  = null;
+let cfFacing  = "environment";
+let cfSignCtx = null, cfSigning = false, cfSignInk = false;
+
+function cfEsc(s){
+  return String(s===undefined||s===null?"":s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+/* ── Page switcher (top-left) ── */
+function togglePageSwitch(){
+  document.getElementById("menuDropdown").classList.remove("open");
+  document.getElementById("pageSwitchDd").classList.toggle("open");
+}
+function closePageSwitch(){
+  document.getElementById("pageSwitchDd").classList.remove("open");
+}
+document.addEventListener("click", e=>{
+  if(!e.target.closest("#pageSwitchBtn") && !e.target.closest("#pageSwitchDd")) closePageSwitch();
+});
+document.addEventListener("visibilitychange", ()=>{ if(document.hidden) cfStopCamera(); });
+
+function switchAppMode(mode){
+  closePageSwitch();
+  const isConfirm = (mode === "confirm");
+  document.getElementById("psEntry").classList.toggle("current", !isConfirm);
+  document.getElementById("psConfirm").classList.toggle("current", isConfirm);
+  if(isConfirm){
+    // stop entry-page scanners so they don't run in the background
+    if(qrScanning) closeQRScanner();
+    if(bcStream)   closeBCScanner();
+    document.getElementById("menuDropdown").classList.remove("open");
+    document.body.classList.add("confirm-mode");
+    document.getElementById("headerSub").textContent = "Challan Confirm";
+    warmUpServer();
+    setTimeout(()=>{ const el=document.getElementById("cfChallan"); if(el && !cfData) el.focus(); },150);
+  } else {
+    cfStopCamera();
+    document.body.classList.remove("confirm-mode");
+    document.getElementById("headerSub").textContent = "Approval Challan";
+  }
+  window.scrollTo(0,0);
+}
+
+/* ── Search ── */
+function cfSearch(){
+  const ch = document.getElementById("cfChallan").value.trim();
+  if(!ch){ showToast("Enter Challan No.","error"); return; }
+  const btn = document.getElementById("cfSearchBtn");
+  btn.disabled = true;
+  const oldHtml = btn.innerHTML;
+  btn.innerHTML = "⏳ Searching…";
+  fetch(API_URL+"?type=challan&challan="+encodeURIComponent(ch), {cache:"no-store"})
+    .then(r=>r.json())
+    .then(data=>{
+      if(!data || data.error){
+        if(data && data.error==="Unknown request")
+          showToast("⚠ Server script is OLD. Deploy a New version in Apps Script.","warning",7000);
+        else
+          showToast((data && data.error) ? data.error+": "+ch : "Challan not found","error",3000);
+        cfData = null;
+        cfHideResult();
+        return;
+      }
+      cfData = data;
+      cfResetConfirm();
+      cfRenderResult();
+    })
+    .catch(()=>{ showToast("Search failed — check internet","error",3000); })
+    .finally(()=>{ btn.disabled=false; btn.innerHTML=oldHtml; });
+}
+function cfHideResult(){
+  cfStopCamera();
+  ["cfResultCard","cfConfirmCard","cfDownloadCard"].forEach(id=>document.getElementById(id).style.display="none");
+}
+function cfRenderResult(){
+  const d = cfData;
+  let tq=0, tm=0, tt=0, rows="";
+  d.items.forEach(i=>{
+    const q=Number(i.qty)||0, m=Number(i.mrp)||0, lt=q*m;
+    tq+=q; tm+=m; tt+=lt;
+    rows+=`<tr><td style="text-align:left;font-weight:500;font-size:12px">${cfEsc(i.variant)}</td><td><b>${q}</b></td><td>₹${m}</td><td><b>₹${lt.toLocaleString("en-IN")}</b></td></tr>`;
+  });
+  const box = (label,val)=>`<div style="background:#f8faff;border-radius:8px;padding:10px;border:1px solid #d1daf7"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">${label}</div><div style="font-weight:700;font-size:13px">${cfEsc(val)||"—"}</div></div>`;
+  document.getElementById("cfSummary").innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      ${box("Challan No.", d.challan)}
+      ${box("Date", d.date)}
+    </div>
+    <div style="margin-top:8px">${box("Dealer / SO", d.dealer)}</div>
+    <div style="background:linear-gradient(90deg,#dbeafe,#eff6ff);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;margin-top:8px;border:1px solid #bfdbfe">
+      <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:var(--navy)">${d.items.length} VARIANTS</span>
+      <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--navy)">Qty: ${tq} &nbsp;|&nbsp; ₹${tt.toLocaleString("en-IN")}</span>
+    </div>`;
+  document.getElementById("cfTbody").innerHTML = rows;
+  document.getElementById("cfTQty").textContent = tq;
+  document.getElementById("cfTMrp").textContent = "₹"+tm.toLocaleString("en-IN");
+  document.getElementById("cfTTotal").textContent = "₹"+tt.toLocaleString("en-IN");
+  ["cfResultCard","cfConfirmCard","cfDownloadCard"].forEach(id=>document.getElementById(id).style.display="block");
+  showToast("Challan "+d.challan+" — "+d.items.length+" variant(s)","success",1800);
+}
+
+/* ── Camera: Photo (back) / Selfie (front) ── */
+function cfStopCamera(){
+  if(cfStream){ cfStream.getTracks().forEach(t=>t.stop()); cfStream=null; }
+  const v=document.getElementById("cfVideo");
+  if(v) v.srcObject=null;
+  const box=document.getElementById("cfCameraBox");
+  if(box) box.style.display="none";
+}
+function cfOpenCamera(facing){
+  cfFacing = facing || "environment";
+  document.getElementById("cfSignBox").style.display="none";
+  cfStopCamera();
+  navigator.mediaDevices.getUserMedia({video:{facingMode:cfFacing,width:{ideal:1280},height:{ideal:720}}})
+    .then(s=>{
+      cfStream=s;
+      const v=document.getElementById("cfVideo");
+      v.classList.toggle("mirror", cfFacing==="user");
+      v.srcObject=s;
+      document.getElementById("cfCamTitle").textContent = cfFacing==="user" ? "🤳 Selfie Camera" : "📷 Live Camera";
+      document.getElementById("cfCameraBox").style.display="block";
+    })
+    .catch(()=>showToast("Camera access denied — you can use Sign instead","error",3000));
+}
+function cfFlipCamera(){
+  cfOpenCamera(cfFacing==="user" ? "environment" : "user");
+}
+function cfCapture(){
+  const v=document.getElementById("cfVideo"), c=document.getElementById("cfCanvas");
+  if(!cfStream || !v.videoWidth){ showToast("Camera not ready yet","warning",1500); return; }
+  c.width=v.videoWidth; c.height=v.videoHeight;
+  const ctx=c.getContext("2d");
+  if(cfFacing==="user"){ ctx.translate(c.width,0); ctx.scale(-1,1); } // save selfie as seen on screen
+  ctx.drawImage(v,0,0,c.width,c.height);
+  ctx.setTransform(1,0,0,1,0,0);
+  cfPhoto = c.toDataURL("image/jpeg",.82);
+  cfType  = (cfFacing==="user") ? "selfie" : "photo";
+  cfStopCamera();
+  cfShowConfirmed(cfType==="selfie" ? "✅ Selfie Captured" : "✅ Photo Captured");
+  showToast(cfType==="selfie" ? "Selfie captured!" : "Photo captured!","success");
+}
+
+/* ── Signature ── */
+function cfOpenSign(){
+  cfStopCamera();
+  document.getElementById("cfSignBox").style.display="block";
+  requestAnimationFrame(()=>{ setTimeout(cfInitSign, 30); });
+}
+function cfInitSign(){
+  const c=document.getElementById("cfSignCanvas");
+  const r=c.getBoundingClientRect();
+  c.width =Math.max(280, Math.round(r.width  || c.clientWidth || 320));
+  c.height=Math.max(150, Math.round(r.height || 160));
+  cfSignCtx=c.getContext("2d");
+  cfSignCtx.fillStyle="#ffffff"; cfSignCtx.fillRect(0,0,c.width,c.height);
+  cfSignCtx.strokeStyle="#0d1b3e"; cfSignCtx.lineWidth=3;
+  cfSignCtx.lineCap="round"; cfSignCtx.lineJoin="round";
+  cfSignInk=false;
+  if(c._cfBound) return;
+  c._cfBound=true;
+  const pos=e=>{
+    const rr=c.getBoundingClientRect();
+    const t=(e.touches&&e.touches[0])?e.touches[0]:((e.changedTouches&&e.changedTouches[0])?e.changedTouches[0]:e);
+    return {x:(t.clientX-rr.left)*(c.width/(rr.width||c.width)), y:(t.clientY-rr.top)*(c.height/(rr.height||c.height))};
+  };
+  const start=e=>{ e.preventDefault(); cfSigning=true; const p=pos(e); cfSignCtx.beginPath(); cfSignCtx.moveTo(p.x,p.y); cfSignCtx.lineTo(p.x+0.1,p.y+0.1); cfSignCtx.stroke(); cfSignInk=true; };
+  const move =e=>{ if(!cfSigning) return; e.preventDefault(); const p=pos(e); cfSignCtx.lineTo(p.x,p.y); cfSignCtx.stroke(); cfSignInk=true; };
+  const end  =()=>{ cfSigning=false; };
+  c.addEventListener("mousedown",start); c.addEventListener("mousemove",move); window.addEventListener("mouseup",end);
+  c.addEventListener("touchstart",start,{passive:false}); c.addEventListener("touchmove",move,{passive:false}); c.addEventListener("touchend",end);
+}
+function cfClearSign(){
+  if(!cfSignCtx) return;
+  const c=document.getElementById("cfSignCanvas");
+  cfSignCtx.fillStyle="#ffffff"; cfSignCtx.fillRect(0,0,c.width,c.height);
+  cfSignInk=false;
+}
+function cfSaveSign(){
+  if(!cfSignInk){ showToast("Please sign first","warning",1800); return; }
+  cfPhoto=document.getElementById("cfSignCanvas").toDataURL("image/jpeg",.85);
+  cfType="sign";
+  document.getElementById("cfSignBox").style.display="none";
+  cfShowConfirmed("✅ Signature Saved");
+  showToast("Signature saved!","success");
+}
+
+/* ── Confirmed state / reset ── */
+function cfShowConfirmed(label){
+  document.getElementById("cfChooser").style.display="none";
+  document.getElementById("cfHint").style.display="none";
+  const b=document.getElementById("cfConfirmedBox");
+  b.className="photo-confirmed"; b.style.display="flex";
+  b.innerHTML=`<img src="${cfPhoto}" alt="confirm">
+    <div><div class="pc-text">${label}</div><div class="pc-sub">Tap Redo to change</div></div>
+    <button class="btn btn-outline btn-sm" onclick="cfResetConfirm()" style="margin-left:auto">Redo</button>`;
+}
+function cfResetConfirm(){
+  cfPhoto=""; cfType="";
+  cfStopCamera();
+  document.getElementById("cfSignBox").style.display="none";
+  const b=document.getElementById("cfConfirmedBox");
+  b.style.display="none"; b.innerHTML="";
+  document.getElementById("cfChooser").style.display="flex";
+  document.getElementById("cfHint").style.display="block";
+}
+
+/* ── Download (same layout as the entry bill, 30 lines per page) ── */
+function cfDownload(){
+  if(!cfData){ showToast("Search a challan first","error"); return; }
+  if(!cfPhoto){ showToast("Add a photo, selfie or signature","error"); return; }
+  const d=cfData, photoSnap=cfPhoto, typeSnap=cfType;
+  const time=new Date().toLocaleTimeString("en-IN");
+  const now=new Date();
+  const today=String(now.getDate()).padStart(2,"0")+"."+String(now.getMonth()+1).padStart(2,"0")+"."+now.getFullYear();
+  let tq=0,tm=0,tt=0;
+  d.items.forEach(i=>{ const q=Number(i.qty)||0,m=Number(i.mrp)||0; tq+=q; tm+=m; tt+=q*m; });
+  const PER_PAGE=30, pages=[];
+  for(let p=0;p<d.items.length;p+=PER_PAGE) pages.push(d.items.slice(p,p+PER_PAGE));
+  if(pages.length===0) pages.push([]);
+  const totalPages=pages.length;
+  const photoLabel = typeSnap==="sign" ? "Signature" : (typeSnap==="selfie" ? "Selfie" : "Confirmation Photo");
+  const td='padding:8px 10px;border-bottom:1px solid #e2e8f0;font-size:13px';
+  const th='padding:9px 10px;font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.7px;border-bottom:2px solid #d1daf7';
+  const info=(l,v)=>`<div style="background:#f8faff;border-radius:7px;padding:10px;border:1px solid #d1daf7"><div style="font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">${l}</div><div style="font-weight:700;font-size:13px">${v}</div></div>`;
+
+  function pageHtml(pageItems, idx){
+    let rows="";
+    pageItems.forEach(i=>{
+      const q=Number(i.qty)||0, m=Number(i.mrp)||0;
+      rows+=`<tr><td style="${td};text-align:left">${cfEsc(i.variant)}</td><td style="${td};text-align:center">${q}</td><td style="${td};text-align:right">₹${m}</td><td style="${td};text-align:right">₹${(q*m).toLocaleString("en-IN")}</td></tr>`;
+    });
+    const isLast=(idx===totalPages-1);
+    const badge=(totalPages>1)?`<div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:16px;padding:4px 12px;font-size:11px;font-weight:700;color:#fff;white-space:nowrap">Page ${idx+1} of ${totalPages}</div>`:"";
+    const foot=(totalPages>1)?` &nbsp;•&nbsp; Page ${idx+1} of ${totalPages}`:"";
+    return `<div style="font-family:'DM Sans',Arial,sans-serif;background:#fff;padding:28px;width:540px">
+    <div style="background:linear-gradient(135deg,#0d1b3e,#162250);padding:18px 20px;border-radius:10px;margin-bottom:18px;display:flex;align-items:center;gap:12px">
+      <div style="background:#f59e0b;border-radius:7px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#0d1b3e;flex-shrink:0">AD</div>
+      <div style="flex:1"><div style="font-size:17px;font-weight:800;color:#fff;letter-spacing:.3px">AKAI DISTRIBUTORS</div><div style="font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:1px">Challan Confirmation</div></div>
+      ${badge}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      ${info("Challan No.", cfEsc(d.challan))}
+      ${info("Challan Date", cfEsc(d.date)||"—")}
+      ${info("Dealer / SO", cfEsc(d.dealer)||"—")}
+      ${info("Confirmed On", today+` <span style="font-size:10px;color:#64748b">${time}</span>`)}
+    </div>
+    <table style="width:100%;border-collapse:collapse;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden">
+      <thead><tr style="background:linear-gradient(90deg,#e8eeff,#f0f4ff)">
+        <th style="${th};text-align:left">Variant</th><th style="${th};text-align:center">Qty</th><th style="${th};text-align:right">MRP</th><th style="${th};text-align:right">Total</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr style="background:linear-gradient(90deg,#dbeafe,#eff6ff)">
+        <td style="padding:9px 10px;font-weight:800;font-size:13px">TOTAL</td>
+        <td style="padding:9px 10px;text-align:center;font-weight:800;font-size:13px">${tq}</td>
+        <td style="padding:9px 10px;text-align:right;font-weight:800;font-size:13px">₹${tm.toLocaleString("en-IN")}</td>
+        <td style="padding:9px 10px;text-align:right;font-weight:800;font-size:13px">₹${tt.toLocaleString("en-IN")}</td>
+      </tr></tfoot>
+    </table>
+    ${(isLast && photoSnap)?`<div style="margin-top:14px;text-align:center"><div style="font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px">${photoLabel}</div><img src="${photoSnap}" style="max-width:${typeSnap==="sign"?"220":"140"}px;border-radius:7px;border:2px solid #10b981"></div>`:""}
+    <div style="margin-top:14px;text-align:center;font-size:9px;color:#94a3b8">AKAI Distributors — Challan Confirmation${foot}</div>
+    <div style="margin-top:8px;text-align:center;font-size:10px;color:#475569;font-weight:800">Disclaimer: data is entered manually and mistakes may occur</div>
+  </div>`;
+  }
+
+  const btn=document.getElementById("cfDownloadBtn");
+  btn.disabled=true;
+  const bill=document.getElementById("cfBill");
+  const files=[]; let anyFailed=false;
+  const safe=s=>String(s).replace(/[\\/:*?"<>|]/g,"-");
+  function renderPage(idx){
+    if(idx>=pages.length){
+      bill.style.display="none"; bill.innerHTML="";
+      btn.disabled=false;
+      if(files.length){
+        lastBillFiles=files;
+        showDlAgainBar("", d.challan, anyFailed);
+        showToast("Challan "+d.challan+" downloaded","success",2500);
+      } else {
+        showToast("Download failed — please try again","error",3000);
+      }
+      return;
+    }
+    bill.innerHTML=pageHtml(pages[idx], idx);
+    bill.style.display="block";
+    html2canvas(bill,{scale:1.6,useCORS:true,backgroundColor:"#ffffff"}).then(c=>canvasToBlob(c)).then(blob=>{
+      const suffix=(totalPages>1)?`_page${idx+1}`:"";
+      const name=`AKAI_CONFIRM_${safe(d.challan)}_${safe(today)}${suffix}.jpg`;
+      files.push({name:name, blob:blob});
+      saveBlob(blob, name);
+      setTimeout(()=>renderPage(idx+1), 700);
+    }).catch(()=>{ anyFailed=true; setTimeout(()=>renderPage(idx+1), 700); });
+  }
+  renderPage(0);
 }
 </script>
 </body>
