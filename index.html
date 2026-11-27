@@ -224,6 +224,19 @@ body.confirm-mode #cacheBar,body.confirm-mode #menuBtn{display:none!important}
 #cfVideo{border-radius:10px;border:2px solid rgba(255,255,255,.2);width:100%;max-width:300px}
 #cfVideo.mirror{transform:scaleX(-1)}
 #cfBill{display:none;background:#fff;position:fixed;left:-9999px;top:0}
+/* Sales Book bills on the Challan Confirm page */
+.cf-bill{border:1.5px solid var(--border);border-radius:12px;margin-top:10px;overflow:hidden;background:#fff;transition:border-color .15s,box-shadow .15s}
+.cf-bill.sel{border-color:var(--green);box-shadow:0 0 0 3px rgba(16,185,129,.12)}
+.cf-bill-head{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f8faff;cursor:pointer;user-select:none}
+.cf-bill.sel .cf-bill-head{background:rgba(16,185,129,.08)}
+.cf-check{width:22px;height:22px;min-width:22px;border-radius:6px;border:2px solid #94a3b8;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;background:#fff}
+.cf-bill.sel .cf-check{background:var(--green);border-color:var(--green)}
+.cf-bill-info{flex:1;min-width:0}
+.cf-bill-dealer{font-weight:700;font-size:13px;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cf-bill-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.cf-bill-meta b{color:var(--navy)}
+.cf-bill table{margin:0}
+.cf-selbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
 </style>
 </head>
 <body>
@@ -529,17 +542,11 @@ body.confirm-mode #cacheBar,body.confirm-mode #menuBtn{display:none!important}
   <div class="card" id="cfResultCard" style="display:none">
     <div class="card-title">Challan Details</div>
     <div id="cfSummary"></div>
-    <div class="table-wrap" style="margin-top:10px">
-      <table>
-        <thead><tr>
-          <th style="text-align:left">Variant</th><th>Qty</th><th>MRP ₹</th><th>Total ₹</th>
-        </tr></thead>
-        <tbody id="cfTbody"></tbody>
-        <tfoot><tr class="tfoot-row">
-          <td><b>TOTAL</b></td><td id="cfTQty">0</td><td id="cfTMrp">₹0</td><td id="cfTTotal">₹0</td>
-        </tr></tfoot>
-      </table>
+    <div class="cf-selbar">
+      <span id="cfSelInfo" style="font-size:12px;font-weight:700;color:var(--navy)">0 selected</span>
+      <button class="btn btn-outline btn-sm" id="cfSelAllBtn" onclick="cfToggleAll()">Select all</button>
     </div>
+    <div id="cfBills"></div>
   </div>
 
   <div class="card" id="cfConfirmCard" style="display:none">
@@ -577,9 +584,9 @@ body.confirm-mode #cacheBar,body.confirm-mode #menuBtn{display:none!important}
   <div class="card" id="cfDownloadCard" style="display:none;padding:12px">
     <button class="btn btn-success" style="width:100%;padding:13px;font-size:15px" onclick="cfDownload()" id="cfDownloadBtn">
       <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg>
-      Download Challan
+      <span id="cfDownloadText">Download Challan</span>
     </button>
-    <div style="text-align:center;margin-top:7px;font-size:11px;color:var(--muted)">Add a photo, selfie or signature first.</div>
+    <div style="text-align:center;margin-top:7px;font-size:11px;color:var(--muted)">Select bill(s) and add a photo, selfie or signature first.</div>
   </div>
 
 </div>
@@ -589,7 +596,7 @@ body.confirm-mode #cacheBar,body.confirm-mode #menuBtn{display:none!important}
 <script>
 /* ════ CONFIG ════ */
 const BILL_NUMBER_OFFSET = 0;
-const API_URL = "https://script.google.com/macros/s/AKfycbz_VAjxgrMJHPYWmJQAVJKiHtPo7z705wPVNMMXQk0cNj1PcU-9YZ9f7MyjNdP3OjRC/exec"
+const API_URL = "https://script.google.com/macros/s/AKfycbz_VAjxgrMJHPYWmJQAVJKiHtPo7z705wPVNMMXQk0cNj1PcU-9YZ9f7MyjNdP3OjRC/exec";
 
 /* ════ STATE ════ */
 let items       = {};
@@ -1515,7 +1522,9 @@ function switchAppMode(mode){
   window.scrollTo(0,0);
 }
 
-/* ── Search ── */
+/* ── Search (Sales Book) ── */
+let cfSel = {};   // selected bill indexes → true
+
 function cfSearch(){
   const ch = document.getElementById("cfChallan").value.trim();
   if(!ch){ showToast("Enter Challan No.","error"); return; }
@@ -1523,10 +1532,10 @@ function cfSearch(){
   btn.disabled = true;
   const oldHtml = btn.innerHTML;
   btn.innerHTML = "⏳ Searching…";
-  fetch(API_URL+"?type=challan&challan="+encodeURIComponent(ch), {cache:"no-store"})
+  fetch(API_URL+"?type=salesbook&challan="+encodeURIComponent(ch), {cache:"no-store"})
     .then(r=>r.json())
     .then(data=>{
-      if(!data || data.error){
+      if(!data || data.error || !Array.isArray(data.bills)){
         if(data && data.error==="Unknown request")
           showToast("⚠ Server script is OLD. Deploy a New version in Apps Script.","warning",7000);
         else
@@ -1536,6 +1545,8 @@ function cfSearch(){
         return;
       }
       cfData = data;
+      cfSel = {};
+      if(data.bills.length===1) cfSel[0]=true;   // only one bill → pre-selected
       cfResetConfirm();
       cfRenderResult();
     })
@@ -1546,31 +1557,73 @@ function cfHideResult(){
   cfStopCamera();
   ["cfResultCard","cfConfirmCard","cfDownloadCard"].forEach(id=>document.getElementById(id).style.display="none");
 }
+function cfBillTotals(b){
+  let tq=0,tm=0,tt=0;
+  b.items.forEach(i=>{ const q=Number(i.qty)||0,m=Number(i.mrp)||0; tq+=q; tm+=m; tt+=q*m; });
+  return {tq,tm,tt};
+}
 function cfRenderResult(){
   const d = cfData;
-  let tq=0, tm=0, tt=0, rows="";
-  d.items.forEach(i=>{
-    const q=Number(i.qty)||0, m=Number(i.mrp)||0, lt=q*m;
-    tq+=q; tm+=m; tt+=lt;
-    rows+=`<tr><td style="text-align:left;font-weight:500;font-size:12px">${cfEsc(i.variant)}</td><td><b>${q}</b></td><td>₹${m}</td><td><b>₹${lt.toLocaleString("en-IN")}</b></td></tr>`;
-  });
   const box = (label,val)=>`<div style="background:#f8faff;border-radius:8px;padding:10px;border:1px solid #d1daf7"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">${label}</div><div style="font-weight:700;font-size:13px">${cfEsc(val)||"—"}</div></div>`;
   document.getElementById("cfSummary").innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
       ${box("Challan No.", d.challan)}
-      ${box("Date", d.date)}
-    </div>
-    <div style="margin-top:8px">${box("Dealer / SO", d.dealer)}</div>
-    <div style="background:linear-gradient(90deg,#dbeafe,#eff6ff);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;margin-top:8px;border:1px solid #bfdbfe">
-      <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:var(--navy)">${d.items.length} VARIANTS</span>
-      <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--navy)">Qty: ${tq} &nbsp;|&nbsp; ₹${tt.toLocaleString("en-IN")}</span>
+      ${box("Bills Found", String(d.bills.length))}
     </div>`;
-  document.getElementById("cfTbody").innerHTML = rows;
-  document.getElementById("cfTQty").textContent = tq;
-  document.getElementById("cfTMrp").textContent = "₹"+tm.toLocaleString("en-IN");
-  document.getElementById("cfTTotal").textContent = "₹"+tt.toLocaleString("en-IN");
+  let html="";
+  d.bills.forEach((b,bi)=>{
+    const t=cfBillTotals(b);
+    let rows="";
+    b.items.forEach(i=>{
+      rows+=`<tr><td style="text-align:left;font-weight:500;font-size:12px">${cfEsc(i.variant)}</td><td><b>${Number(i.qty)||0}</b></td><td>₹${Number(i.mrp)||0}</td></tr>`;
+    });
+    html+=`<div class="cf-bill${cfSel[bi]?" sel":""}" id="cfBill_${bi}">
+      <div class="cf-bill-head" onclick="cfToggleBill(${bi})">
+        <div class="cf-check">${cfSel[bi]?"✓":""}</div>
+        <div class="cf-bill-info">
+          <div class="cf-bill-dealer">${cfEsc(b.dealer)||"—"}</div>
+          <div class="cf-bill-meta">Bill No: <b>${cfEsc(b.bill)||"—"}</b> &nbsp;•&nbsp; Date: <b>${cfEsc(b.date)||"—"}</b></div>
+        </div>
+        <div style="text-align:right;font-size:11px;color:var(--muted)"><b style="color:var(--navy);font-size:13px">${t.tq}</b> pcs<br>${b.items.length} variant(s)</div>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th style="text-align:left">Variant</th><th>Qty</th><th>MRP ₹</th></tr></thead>
+        <tbody>${rows}</tbody>
+        <tfoot><tr class="tfoot-row"><td><b>TOTAL</b></td><td>${t.tq}</td><td>₹${t.tt.toLocaleString("en-IN")}</td></tr></tfoot>
+      </table></div>
+    </div>`;
+  });
+  document.getElementById("cfBills").innerHTML = html;
+  cfUpdateSelInfo();
   ["cfResultCard","cfConfirmCard","cfDownloadCard"].forEach(id=>document.getElementById(id).style.display="block");
-  showToast("Challan "+d.challan+" — "+d.items.length+" variant(s)","success",1800);
+  showToast("Challan "+d.challan+" — "+d.bills.length+" bill(s) found","success",1800);
+}
+function cfToggleBill(bi){
+  if(cfSel[bi]) delete cfSel[bi]; else cfSel[bi]=true;
+  const el=document.getElementById("cfBill_"+bi);
+  if(el){
+    el.classList.toggle("sel", !!cfSel[bi]);
+    el.querySelector(".cf-check").textContent = cfSel[bi] ? "✓" : "";
+  }
+  cfUpdateSelInfo();
+}
+function cfToggleAll(){
+  if(!cfData) return;
+  const all = Object.keys(cfSel).length === cfData.bills.length;
+  cfSel = {};
+  if(!all) cfData.bills.forEach((b,bi)=>cfSel[bi]=true);
+  cfData.bills.forEach((b,bi)=>{
+    const el=document.getElementById("cfBill_"+bi);
+    if(el){ el.classList.toggle("sel", !!cfSel[bi]); el.querySelector(".cf-check").textContent = cfSel[bi] ? "✓" : ""; }
+  });
+  cfUpdateSelInfo();
+}
+function cfUpdateSelInfo(){
+  if(!cfData) return;
+  const n=Object.keys(cfSel).length, total=cfData.bills.length;
+  document.getElementById("cfSelInfo").textContent = n+" of "+total+" bill(s) selected";
+  document.getElementById("cfSelAllBtn").textContent = (n===total && total>0) ? "Clear all" : "Select all";
+  document.getElementById("cfDownloadText").textContent = n>1 ? "Download "+n+" Challans" : "Download Challan";
 }
 
 /* ── Camera: Photo (back) / Selfie (front) ── */
@@ -1678,46 +1731,56 @@ function cfResetConfirm(){
   document.getElementById("cfHint").style.display="block";
 }
 
-/* ── Download (same layout as the entry bill, 30 lines per page) ── */
+/* ── Download — same format as the Challan Entry bill, one per selected bill ── */
 function cfDownload(){
   if(!cfData){ showToast("Search a challan first","error"); return; }
+  const selIdx = Object.keys(cfSel).map(Number).sort((x,y)=>x-y);
+  if(selIdx.length===0){ showToast("Select at least one bill","error"); return; }
   if(!cfPhoto){ showToast("Add a photo, selfie or signature","error"); return; }
-  const d=cfData, photoSnap=cfPhoto, typeSnap=cfType;
-  const time=new Date().toLocaleTimeString("en-IN");
-  const now=new Date();
-  const today=String(now.getDate()).padStart(2,"0")+"."+String(now.getMonth()+1).padStart(2,"0")+"."+now.getFullYear();
-  let tq=0,tm=0,tt=0;
-  d.items.forEach(i=>{ const q=Number(i.qty)||0,m=Number(i.mrp)||0; tq+=q; tm+=m; tt+=q*m; });
-  const PER_PAGE=30, pages=[];
-  for(let p=0;p<d.items.length;p+=PER_PAGE) pages.push(d.items.slice(p,p+PER_PAGE));
-  if(pages.length===0) pages.push([]);
-  const totalPages=pages.length;
-  const photoLabel = typeSnap==="sign" ? "Signature" : (typeSnap==="selfie" ? "Selfie" : "Confirmation Photo");
-  const td='padding:8px 10px;border-bottom:1px solid #e2e8f0;font-size:13px';
-  const th='padding:9px 10px;font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.7px;border-bottom:2px solid #d1daf7';
-  const info=(l,v)=>`<div style="background:#f8faff;border-radius:7px;padding:10px;border:1px solid #d1daf7"><div style="font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">${l}</div><div style="font-weight:700;font-size:13px">${v}</div></div>`;
 
-  function pageHtml(pageItems, idx){
+  const d=cfData, photoSnap=cfPhoto, typeSnap=cfType;
+  const ch=d.challan, so=d.so||"";
+  const time=new Date().toLocaleTimeString("en-IN");
+  const photoLabel = typeSnap==="sign" ? "Signature" : (typeSnap==="selfie" ? "Selfie" : "Confirmation Photo");
+  const safe=s=>String(s).replace(/[\\/:*?"<>|]/g,"-");
+  const PER_PAGE=30;
+
+  // build every page of every selected bill up front
+  const jobs=[];
+  selIdx.forEach(bi=>{
+    const b=d.bills[bi], t=cfBillTotals(b);
+    const pages=[];
+    for(let p=0;p<b.items.length;p+=PER_PAGE) pages.push(b.items.slice(p,p+PER_PAGE));
+    if(pages.length===0) pages.push([]);
+    pages.forEach((pg,pi)=>jobs.push({b,t,pg,pi,total:pages.length}));
+  });
+
+  function pageHtml(job){
+    const {b,t,pg,pi,total}=job;
+    const td='padding:8px 10px;border-bottom:1px solid #e2e8f0;font-size:13px';
+    const th='padding:9px 10px;font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.7px;border-bottom:2px solid #d1daf7';
+    const info=(l,v)=>`<div style="background:#f8faff;border-radius:7px;padding:10px;border:1px solid #d1daf7"><div style="font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">${l}</div><div style="font-weight:700;font-size:13px">${v}</div></div>`;
     let rows="";
-    pageItems.forEach(i=>{
+    pg.forEach(i=>{
       const q=Number(i.qty)||0, m=Number(i.mrp)||0;
       rows+=`<tr><td style="${td};text-align:left">${cfEsc(i.variant)}</td><td style="${td};text-align:center">${q}</td><td style="${td};text-align:right">₹${m}</td><td style="${td};text-align:right">₹${(q*m).toLocaleString("en-IN")}</td></tr>`;
     });
-    const isLast=(idx===totalPages-1);
-    const badge=(totalPages>1)?`<div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:16px;padding:4px 12px;font-size:11px;font-weight:700;color:#fff;white-space:nowrap">Page ${idx+1} of ${totalPages}</div>`:"";
-    const foot=(totalPages>1)?` &nbsp;•&nbsp; Page ${idx+1} of ${totalPages}`:"";
+    const isLast=(pi===total-1);
+    const badge=(total>1)?`<div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:16px;padding:4px 12px;font-size:11px;font-weight:700;color:#fff;white-space:nowrap">Page ${pi+1} of ${total}</div>`:"";
+    const foot=(total>1)?` &nbsp;•&nbsp; Page ${pi+1} of ${total}`:"";
     return `<div style="font-family:'DM Sans',Arial,sans-serif;background:#fff;padding:28px;width:540px">
     <div style="background:linear-gradient(135deg,#0d1b3e,#162250);padding:18px 20px;border-radius:10px;margin-bottom:18px;display:flex;align-items:center;gap:12px">
       <div style="background:#f59e0b;border-radius:7px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#0d1b3e;flex-shrink:0">AD</div>
-      <div style="flex:1"><div style="font-size:17px;font-weight:800;color:#fff;letter-spacing:.3px">AKAI DISTRIBUTORS</div><div style="font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:1px">Challan Confirmation</div></div>
+      <div style="flex:1"><div style="font-size:17px;font-weight:800;color:#fff;letter-spacing:.3px">AKAI DISTRIBUTORS</div><div style="font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:1px">Approval Challan</div></div>
       ${badge}
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
-      ${info("Challan No.", cfEsc(d.challan))}
-      ${info("Challan Date", cfEsc(d.date)||"—")}
-      ${info("Dealer / SO", cfEsc(d.dealer)||"—")}
-      ${info("Confirmed On", today+` <span style="font-size:10px;color:#64748b">${time}</span>`)}
+      ${info("Challan No.", cfEsc(ch))}
+      ${info("Date &amp; Time", (cfEsc(b.date)||"—")+` <span style="font-size:10px;color:#64748b">${time}</span>`)}
+      ${info("Sales Officer", cfEsc(so)||"—")}
+      ${info("Dealer", cfEsc(b.dealer)||"—")}
     </div>
+    ${b.bill!==""?`<div style="background:linear-gradient(90deg,#fef3c7,#fffbeb);border-radius:7px;padding:10px 12px;border:1px solid #fcd34d;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center"><div style="font-size:9px;color:#92400e;text-transform:uppercase;letter-spacing:.7px">Delivery Number</div><div style="font-weight:800;font-size:15px;color:#0d1b3e">${cfEsc(b.bill)}</div></div>`:""}
     <table style="width:100%;border-collapse:collapse;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden">
       <thead><tr style="background:linear-gradient(90deg,#e8eeff,#f0f4ff)">
         <th style="${th};text-align:left">Variant</th><th style="${th};text-align:center">Qty</th><th style="${th};text-align:right">MRP</th><th style="${th};text-align:right">Total</th>
@@ -1725,13 +1788,13 @@ function cfDownload(){
       <tbody>${rows}</tbody>
       <tfoot><tr style="background:linear-gradient(90deg,#dbeafe,#eff6ff)">
         <td style="padding:9px 10px;font-weight:800;font-size:13px">TOTAL</td>
-        <td style="padding:9px 10px;text-align:center;font-weight:800;font-size:13px">${tq}</td>
-        <td style="padding:9px 10px;text-align:right;font-weight:800;font-size:13px">₹${tm.toLocaleString("en-IN")}</td>
-        <td style="padding:9px 10px;text-align:right;font-weight:800;font-size:13px">₹${tt.toLocaleString("en-IN")}</td>
+        <td style="padding:9px 10px;text-align:center;font-weight:800;font-size:13px">${t.tq}</td>
+        <td style="padding:9px 10px;text-align:right;font-weight:800;font-size:13px">₹${t.tm.toLocaleString("en-IN")}</td>
+        <td style="padding:9px 10px;text-align:right;font-weight:800;font-size:13px">₹${t.tt.toLocaleString("en-IN")}</td>
       </tr></tfoot>
     </table>
     ${(isLast && photoSnap)?`<div style="margin-top:14px;text-align:center"><div style="font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px">${photoLabel}</div><img src="${photoSnap}" style="max-width:${typeSnap==="sign"?"220":"140"}px;border-radius:7px;border:2px solid #10b981"></div>`:""}
-    <div style="margin-top:14px;text-align:center;font-size:9px;color:#94a3b8">AKAI Distributors — Challan Confirmation${foot}</div>
+    <div style="margin-top:14px;text-align:center;font-size:9px;color:#94a3b8">AKAI Distributors — Approval Challan${foot}</div>
     <div style="margin-top:8px;text-align:center;font-size:10px;color:#475569;font-weight:800">Disclaimer: data is entered manually and mistakes may occur</div>
   </div>`;
   }
@@ -1740,31 +1803,32 @@ function cfDownload(){
   btn.disabled=true;
   const bill=document.getElementById("cfBill");
   const files=[]; let anyFailed=false;
-  const safe=s=>String(s).replace(/[\\/:*?"<>|]/g,"-");
-  function renderPage(idx){
-    if(idx>=pages.length){
+  function renderJob(k){
+    if(k>=jobs.length){
       bill.style.display="none"; bill.innerHTML="";
       btn.disabled=false;
       if(files.length){
         lastBillFiles=files;
-        showDlAgainBar("", d.challan, anyFailed);
-        showToast("Challan "+d.challan+" downloaded","success",2500);
+        const billNos=selIdx.map(bi=>d.bills[bi].bill).filter(Boolean).join(", ");
+        showDlAgainBar(billNos, ch, anyFailed);
+        showToast(selIdx.length>1 ? selIdx.length+" challans downloaded" : "Challan downloaded","success",2500);
       } else {
         showToast("Download failed — please try again","error",3000);
       }
       return;
     }
-    bill.innerHTML=pageHtml(pages[idx], idx);
+    const job=jobs[k];
+    bill.innerHTML=pageHtml(job);
     bill.style.display="block";
     html2canvas(bill,{scale:1.6,useCORS:true,backgroundColor:"#ffffff"}).then(c=>canvasToBlob(c)).then(blob=>{
-      const suffix=(totalPages>1)?`_page${idx+1}`:"";
-      const name=`AKAI_CONFIRM_${safe(d.challan)}_${safe(today)}${suffix}.jpg`;
+      const suffix=(job.total>1)?`_page${job.pi+1}`:"";
+      const name=`AKAI_${safe(ch)}_${safe(job.b.bill||"bill")}_${safe(job.b.date||"")}${suffix}.jpg`;
       files.push({name:name, blob:blob});
       saveBlob(blob, name);
-      setTimeout(()=>renderPage(idx+1), 700);
-    }).catch(()=>{ anyFailed=true; setTimeout(()=>renderPage(idx+1), 700); });
+      setTimeout(()=>renderJob(k+1), 700);
+    }).catch(()=>{ anyFailed=true; setTimeout(()=>renderJob(k+1), 700); });
   }
-  renderPage(0);
+  renderJob(0);
 }
 </script>
 </body>
